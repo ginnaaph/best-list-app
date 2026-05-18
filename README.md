@@ -1,50 +1,36 @@
-# Welcome to your Expo app 👋
+# BestList 
+## What it is
+A personal food ranking app for iOS. Log dishes you've tried at specific restaurants, score them, and the app automatically ranks them. Think Letterboxd for food — but dish-specific, not restaurant-specific. Your own private food memory book you can share when someone asks "where's the best breakfast burrito?"
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+## Problem it solves
+You try a great dish, forget where it was, can't remember how it compared to the last one. BestList is the external memory — log it once, find it forever.
 
-## Get started
+## Core MVP (4 things only)
+1. **Categories** — create a named list (e.g. "Breakfast Burrito", "Ramen")
+2. **Entries** — add a dish to a category with: place name, city, optional photo, weighted score, optional note
+3. **Ranking** — entries auto-sort by overall score. Re-sortable by individual dimension (taste / value / portion / vibe)
+4. **Shareable link** — toggle a category public, share a read-only link
 
-1. Install dependencies
+## Weighted Scoring
+Each entry is scored across 4 dimensions:
+- **Taste** — how good was it?
+- **Value** — worth the price?
+- **Portion** — how filling?
+- **Vibe** — ambiance, service, experience?
 
-   ```bash
-   npm install
-   ```
+Overall score is auto-calculated. User can re-sort any list by any single dimension (e.g. "cheapest burrito" = sort by value).
 
-2. Start the app
+## Tech Stack
+- **Framework:** React Native + Expo
+- **Styling:** NativeWind (Tailwind for RN)
+- **Backend/DB:** postgresSQL
+- **auth**: clerk 
+- **IDE:** VS Code
+- **Testing:** Expo Go
 
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Screens (MVP)
+1. Home — category grid tiles
+2. Category / Ranked List — ranked entry cards, sortable
+3. Add Entry — photo + place + weighted score sliders + note
+4. Entry Detail — full view with score breakdown
+5. Shareable List — read-only public view
