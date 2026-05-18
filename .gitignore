@@ -30,7 +30,16 @@ yarn-error.*
 .DS_Store
 *.pem
 
+# local assistant / agent files
+AGENTS.md
+CLAUDE.md
+.agents/
+.claude/
+skills-lock.json
+
 # local env files
+.env
+.env.*
 .env*.local
 
 # typescript
