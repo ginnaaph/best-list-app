@@ -5,7 +5,7 @@ A personal food ranking app for iOS. Log dishes you've tried at specific restaur
 ## Problem it solves
 You try a great dish, forget where it was, can't remember how it compared to the last one. BestList is the external memory — log it once, find it forever.
 
-## Core MVP (4 things only)
+## Core MVP 
 1. **Categories** — create a named list (e.g. "Breakfast Burrito", "Ramen")
 2. **Entries** — add a dish to a category with: place name, city, optional photo, weighted score, optional note
 3. **Ranking** — entries auto-sort by overall score. Re-sortable by individual dimension (taste / value / portion / vibe)
