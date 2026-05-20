@@ -1,25 +1,44 @@
-import { ScrollView, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-import { CategoryGrid, FloatingAddButton, HomeHeader, SearchPill } from "@/components";
-import { categories } from "@/data";
+import { OnboardingCardStack } from "@/components";
+import { colors } from "@/constants/theme";
 
 export default function Index() {
   return (
-    <View className="flex-1 bg-app">
-      <ScrollView
-        className="flex-1"
-        contentContainerClassName="min-h-full px-5 pb-28 pt-16"
-        contentInsetAdjustmentBehavior="automatic"
-        showsVerticalScrollIndicator={false}
-      >
-        <View className="gap-5">
-          <HomeHeader />
-          <SearchPill />
-          <CategoryGrid categories={categories} />
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
+      <View className="flex-1 px-5 pb-7 pt-4">
+        <View className="items-center">
+          <Text className="font-mono-bestlist text-[7px] font-bold uppercase text-secondary">
+            V 1.0 - FIELD-TESTED
+          </Text>
         </View>
-      </ScrollView>
 
-      <FloatingAddButton />
-    </View>
+        <View className="flex-1 items-center justify-center pb-14">
+          <View className="items-center gap-7">
+            <OnboardingCardStack />
+
+            <View className="items-center gap-3">
+              <Text className="font-display text-[34px] font-bold leading-[38px] text-primary">
+                BestList
+              </Text>
+              <Text className="max-w-44 text-center font-display text-[13px] leading-[16px] text-secondary">
+                A field guide to your favorite food — ranked, remembered, and ready to share.
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        <View className="gap-4">
+          <Pressable className="h-12 items-center justify-center rounded-bestlist-md bg-accent">
+            <Text className="text-label text-white">Get started</Text>
+          </Pressable>
+
+          <Pressable className="items-center py-1">
+            <Text className="text-caption text-secondary">I already have an account</Text>
+          </Pressable>
+        </View>
+      </View>
+    </SafeAreaView>
   );
 }
