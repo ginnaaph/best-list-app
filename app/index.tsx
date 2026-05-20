@@ -1,3 +1,4 @@
+import { Link } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -30,9 +31,11 @@ export default function Index() {
         </View>
 
         <View className="gap-4">
-          <Pressable className="h-12 items-center justify-center rounded-bestlist-md bg-accent">
-            <Text className="text-label text-white">Get started</Text>
-          </Pressable>
+          <Link href="./how-it-works" asChild>
+            <Pressable className="h-12 items-center justify-center rounded-bestlist-md bg-accent">
+              <Text className="text-label text-white">Get started</Text>
+            </Pressable>
+          </Link>
 
           <Pressable className="items-center py-1">
             <Text className="text-caption text-secondary">I already have an account</Text>
