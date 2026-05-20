@@ -1,1 +1,1 @@
-export {};
+export { categories } from "@/data/categories";

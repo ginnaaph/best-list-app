@@ -38,6 +38,30 @@
   background-color: var(--color-bestlist-green);
 }
 
+@utility bg-category-gold {
+  background-color: #dfb950;
+}
+
+@utility bg-category-clay {
+  background-color: #9f603b;
+}
+
+@utility bg-category-tomato {
+  background-color: #c45624;
+}
+
+@utility bg-category-brick {
+  background-color: #a8311f;
+}
+
+@utility bg-category-espresso {
+  background-color: #2b150b;
+}
+
+@utility bg-category-caramel {
+  background-color: #a56524;
+}
+
 @utility text-primary {
   color: var(--color-bestlist-text);
 }
