@@ -10,9 +10,7 @@ export default function Index() {
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
       <View className="flex-1 px-5 pb-7 pt-4">
         <View className="items-center">
-          <Text className="font-mono-bestlist text-[7px] font-bold uppercase text-secondary">
-            V 1.0 - FIELD-TESTED
-          </Text>
+          <Text className="font-mono-bestlist text-[10px] font-bold uppercase text-secondary"></Text>
         </View>
 
         <View className="flex-1 items-center justify-center pb-14">
@@ -20,11 +18,12 @@ export default function Index() {
             <OnboardingCardStack />
 
             <View className="items-center gap-3">
-              <Text className="font-display text-[34px] font-bold leading-[38px] text-primary">
+              <Text className="font-display text-[34px] font-bold leading-9.5 text-primary">
                 BestList
               </Text>
-              <Text className="max-w-44 text-center font-display text-[13px] leading-[16px] text-secondary">
-                A field guide to your favorite food — ranked, remembered, and ready to share.
+              <Text className="max-w-44 text-center font-display text-[18px] leading-[16px] text-secondary">
+                A field guide to your favorite food — ranked, remembered, and
+                ready to share.
               </Text>
             </View>
           </View>
@@ -38,7 +37,9 @@ export default function Index() {
           </Link>
 
           <Pressable className="items-center py-1">
-            <Text className="text-caption text-secondary">I already have an account</Text>
+            <Text className="text-caption text-secondary">
+              I already have an account
+            </Text>
           </Pressable>
         </View>
       </View>
