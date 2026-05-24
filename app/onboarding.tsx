@@ -5,7 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { OnboardingCardStack } from "@/components";
 import { colors } from "@/constants/theme";
 
-export default function Index() {
+export default function Onboarding() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
       <View className="flex-1 px-5 pb-7 pt-4">

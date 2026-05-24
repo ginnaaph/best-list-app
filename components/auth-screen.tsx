@@ -1,0 +1,180 @@
+import { Ionicons } from "@expo/vector-icons";
+import { Link, router } from "expo-router";
+import { useState } from "react";
+import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+
+import { VerificationModal } from "@/components/verification-modal";
+import { colors } from "@/constants/theme";
+
+type AuthScreenProps = {
+  mode: "sign-up" | "sign-in";
+};
+
+const authCopy = {
+  "sign-up": {
+    eyebrow: "Start your field guide",
+    title: "Create your account.",
+    subtitle: "Track your favorite dishes and share your list with friends.",
+    email: "you@kitchen.com",
+    button: "Sign up",
+    footerLead: "Already have an account?",
+    footerAction: "Sign in",
+    footerHref: "./sign-in",
+    legal: true,
+  },
+  "sign-in": {
+    eyebrow: "Welcome back",
+    title: "Sign in to your lists.",
+    subtitle: "",
+    email: "kev@bestlist.app",
+    button: "Sign in",
+    footerLead: "New to BestList?",
+    footerAction: "Create an account",
+    footerHref: "./sign-up",
+    legal: false,
+  },
+} as const;
+
+export function AuthScreen({ mode }: AuthScreenProps) {
+  const copy = authCopy[mode];
+  const [email, setEmail] = useState<string>(copy.email);
+  const [isVerificationVisible, setIsVerificationVisible] = useState(false);
+
+  const handlePrimaryPress = () => {
+    if (mode === "sign-in") {
+      router.replace("./home");
+      return;
+    }
+
+    setIsVerificationVisible(true);
+  };
+
+  return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
+      <ScrollView
+        className="flex-1"
+        contentContainerClassName="min-h-full px-7 pb-8 pt-20"
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        <View className="min-h-full justify-between">
+          <View>
+            <Text className="text-center font-display text-[41px] font-bold leading-[47px] text-primary">
+              BestList
+              <Text className="text-accent">.</Text>
+            </Text>
+
+            <View className="mt-[74px] gap-4">
+              <View className="gap-3">
+                <Text className="font-mono-bestlist text-[13px] font-bold uppercase leading-[18px] tracking-[5px] text-accent">
+                  {copy.eyebrow}
+                </Text>
+                <Text className="font-display text-[39px] font-bold leading-[43px] text-primary">
+                  {copy.title}
+                </Text>
+                {copy.subtitle ? (
+                  <Text className="font-body text-[17px] leading-[24px] text-secondary">
+                    {copy.subtitle}
+                  </Text>
+                ) : null}
+              </View>
+
+              <View className="mt-5 gap-2">
+                <Text className="font-mono-bestlist text-[13px] font-bold uppercase leading-[16px] tracking-[4px] text-secondary">
+                  Email
+                </Text>
+                <TextInput
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  className="h-[62px] rounded-bestlist-md border border-subtle bg-card px-5 font-body text-[21px] leading-[25px] text-primary"
+                  inputMode="email"
+                  keyboardType="email-address"
+                  onChangeText={setEmail}
+                  placeholder={copy.email}
+                  placeholderTextColor={colors.primaryText}
+                  textContentType="emailAddress"
+                  value={email}
+                />
+              </View>
+
+              <Pressable
+                className="mt-4 h-[61px] items-center justify-center rounded-bestlist-lg bg-accent"
+                onPress={handlePrimaryPress}
+              >
+                <Text className="font-body text-[18px] font-bold leading-[22px] text-white">
+                  {copy.button}
+                </Text>
+              </Pressable>
+
+              {copy.legal ? (
+                <Text className="text-center font-body text-[14px] leading-[19px] text-secondary">
+                  By signing up you agree to our{" "}
+                  <Text className="text-primary underline">Terms</Text> and{" "}
+                  <Text className="text-primary underline">Privacy</Text>.
+                </Text>
+              ) : null}
+
+              <View className="my-4 flex-row items-center gap-4">
+                <View className="h-px flex-1 bg-[#E5E3DF]" />
+                <Text className="font-mono-bestlist text-[13px] font-bold uppercase leading-[16px] text-secondary">
+                  Or
+                </Text>
+                <View className="h-px flex-1 bg-[#E5E3DF]" />
+              </View>
+
+              <SocialButton icon="google" label="Continue with Google" />
+              <SocialButton icon="apple" label="Continue with Apple" />
+            </View>
+          </View>
+
+          <View className="items-center pt-14">
+            <Link href={copy.footerHref} asChild>
+              <Pressable className="py-2">
+                <Text className="font-body text-[16px] leading-[20px] text-secondary">
+                  {copy.footerLead}{" "}
+                  <Text className="font-bold text-accent">
+                    {copy.footerAction}
+                  </Text>
+                </Text>
+              </Pressable>
+            </Link>
+          </View>
+        </View>
+      </ScrollView>
+
+      <VerificationModal
+        email={email || copy.email}
+        onClose={() => setIsVerificationVisible(false)}
+        visible={isVerificationVisible}
+      />
+    </SafeAreaView>
+  );
+}
+
+type SocialButtonProps = {
+  icon: "google" | "apple";
+  label: string;
+};
+
+function SocialButton({ icon, label }: SocialButtonProps) {
+  const isGoogle = icon === "google";
+
+  return (
+    <Pressable className="h-[61px] flex-row items-center rounded-bestlist-md border border-subtle bg-card px-6">
+      <View className="w-8 items-center">
+        {isGoogle ? (
+          <Text className="font-body text-[28px] font-bold leading-[32px] text-[#4285F4]">
+            G
+          </Text>
+        ) : (
+          <Ionicons name="logo-apple" size={31} color="#000000" />
+        )}
+      </View>
+      <Text className="flex-1 text-center font-body text-[18px] font-bold leading-[22px] text-primary">
+        {label}
+      </Text>
+      <View className="w-8" />
+    </Pressable>
+  );
+}

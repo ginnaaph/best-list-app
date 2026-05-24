@@ -1,8 +1,13 @@
-import { router } from "expo-router";
+import { Link, router } from "expo-router";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { DishCardPreview, HowItWorksStep, RankingPreview, ScorePreview } from "@/components";
+import {
+  DishCardPreview,
+  HowItWorksStep,
+  RankingPreview,
+  ScorePreview,
+} from "@/components";
 import { colors } from "@/constants/theme";
 
 export default function HowItWorks() {
@@ -15,21 +20,27 @@ export default function HowItWorks() {
             className="h-8 w-8 items-center justify-center rounded-full border border-subtle bg-white"
             onPress={() => router.back()}
           >
-            <Text className="font-body text-[18px] leading-[20px] text-accent">‹</Text>
+            <Text className="font-body text-[18px] leading-[20px] text-accent">
+              ‹
+            </Text>
           </Pressable>
 
-          <Pressable className="px-1 py-2">
-            <Text className="font-body text-[9px] font-medium leading-[12px] text-secondary">Skip</Text>
-          </Pressable>
+          <Link href="./sign-up" asChild>
+            <Pressable className="px-1 py-2">
+              <Text className="font-body text-[13px] font-medium leading-[16px] text-secondary">
+                Skip
+              </Text>
+            </Pressable>
+          </Link>
         </View>
 
         <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
           <View className="gap-5 pb-5 pt-4">
             <View>
-              <Text className="font-mono-bestlist text-[8px] font-bold uppercase leading-[12px] text-accent">
+              <Text className="font-mono-bestlist text-[11px] font-bold uppercase leading-[14px] text-accent">
                 The idea
               </Text>
-              <Text className="max-w-[260px] font-display text-[29px] font-bold leading-[29px] text-primary">
+              <Text className="max-w-[320px] font-display text-[38px] font-bold leading-[43px] text-primary">
                 One bite, one score, one running ranking.
               </Text>
             </View>
@@ -62,9 +73,13 @@ export default function HowItWorks() {
           </View>
         </ScrollView>
 
-        <Pressable className="h-12 items-center justify-center rounded-bestlist-md bg-accent">
-          <Text className="text-label text-white">Next</Text>
-        </Pressable>
+        <Link href="./sign-up" asChild>
+          <Pressable className="h-14 items-center justify-center rounded-bestlist-md bg-accent">
+            <Text className="font-body text-[14px] font-bold leading-[18px] text-white">
+              Next
+            </Text>
+          </Pressable>
+        </Link>
       </View>
     </SafeAreaView>
   );
