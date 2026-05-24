@@ -1,4 +1,4 @@
-import { router } from "expo-router";
+import { Link, router } from "expo-router";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -25,11 +25,13 @@ export default function HowItWorks() {
             </Text>
           </Pressable>
 
-          <Pressable className="px-1 py-2">
-            <Text className="font-body text-[13px] font-medium leading-[16px] text-secondary">
-              Skip
-            </Text>
-          </Pressable>
+          <Link href="./sign-up" asChild>
+            <Pressable className="px-1 py-2">
+              <Text className="font-body text-[13px] font-medium leading-[16px] text-secondary">
+                Skip
+              </Text>
+            </Pressable>
+          </Link>
         </View>
 
         <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
@@ -71,11 +73,13 @@ export default function HowItWorks() {
           </View>
         </ScrollView>
 
-        <Pressable className="h-14 items-center justify-center rounded-bestlist-md bg-accent">
-          <Text className="font-body text-[14px] font-bold leading-[18px] text-white">
-            Next
-          </Text>
-        </Pressable>
+        <Link href="./sign-up" asChild>
+          <Pressable className="h-14 items-center justify-center rounded-bestlist-md bg-accent">
+            <Text className="font-body text-[14px] font-bold leading-[18px] text-white">
+              Next
+            </Text>
+          </Pressable>
+        </Link>
       </View>
     </SafeAreaView>
   );
