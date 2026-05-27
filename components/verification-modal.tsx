@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
+  Alert,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -11,8 +12,11 @@ import {
   View,
 } from "react-native";
 
+import { sendEmailOtp, verifyEmailOtp, type EmailAuthMode } from "@/lib/auth";
+
 type VerificationModalProps = {
   email: string;
+  mode: EmailAuthMode;
   visible: boolean;
   onClose: () => void;
 };
@@ -21,11 +25,14 @@ const CODE_LENGTH = 6;
 
 export function VerificationModal({
   email,
+  mode,
   visible,
   onClose,
 }: VerificationModalProps) {
   const inputRef = useRef<TextInput>(null);
   const [code, setCode] = useState("");
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [isResending, setIsResending] = useState(false);
 
   useEffect(() => {
     if (!visible) {
@@ -37,15 +44,37 @@ export function VerificationModal({
     return () => clearTimeout(focusTimer);
   }, [visible]);
 
-  const handleCodeChange = (value: string) => {
+  const handleCodeChange = async (value: string) => {
     const nextCode = value.replace(/\D/g, "").slice(0, CODE_LENGTH);
     setCode(nextCode);
 
     if (nextCode.length === CODE_LENGTH) {
-      setTimeout(() => {
+      setIsVerifying(true);
+
+      try {
+        await verifyEmailOtp(email, nextCode);
         onClose();
-        router.replace("./home");
-      }, 120);
+        router.replace("/");
+      } catch (error) {
+        setCode("");
+        Alert.alert("Verification error", getErrorMessage(error));
+      } finally {
+        setIsVerifying(false);
+      }
+    }
+  };
+
+  const handleResendPress = async () => {
+    setIsResending(true);
+
+    try {
+      await sendEmailOtp(email, mode);
+      setCode("");
+      inputRef.current?.focus();
+    } catch (error) {
+      Alert.alert("Authentication error", getErrorMessage(error));
+    } finally {
+      setIsResending(false);
     }
   };
 
@@ -110,7 +139,9 @@ export function VerificationModal({
           <View className="mt-6 flex-row items-center justify-between">
             <Text className="font-body text-[15px] leading-[19px] text-secondary">
               Didn&apos;t get it?{" "}
-              <Text className="font-bold text-accent">Resend</Text>
+              <Text className="font-bold text-accent" onPress={handleResendPress}>
+                Resend
+              </Text>
             </Text>
             <Text className="font-mono-bestlist text-[16px] leading-[20px] text-secondary">
               00:42
@@ -123,7 +154,11 @@ export function VerificationModal({
             inputMode="numeric"
             keyboardType="number-pad"
             maxLength={CODE_LENGTH}
-            onChangeText={handleCodeChange}
+            onChangeText={(value) => {
+              if (!isVerifying && !isResending) {
+                void handleCodeChange(value);
+              }
+            }}
             ref={inputRef}
             textContentType="oneTimeCode"
             value={code}
@@ -132,4 +167,8 @@ export function VerificationModal({
       </KeyboardAvoidingView>
     </Modal>
   );
+}
+
+function getErrorMessage(error: unknown) {
+  return error instanceof Error ? error.message : "Please try again.";
 }

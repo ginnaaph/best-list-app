@@ -1,11 +1,23 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Link, router } from "expo-router";
 import { useState } from "react";
-import { Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import {
+  Alert,
+  Pressable,
+  ScrollView,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { VerificationModal } from "@/components/verification-modal";
 import { colors } from "@/constants/theme";
+import {
+  sendEmailOtp,
+  signInWithSocialProvider,
+  type SocialAuthProvider,
+} from "@/lib/auth";
 
 type AuthScreenProps = {
   mode: "sign-up" | "sign-in";
@@ -40,14 +52,34 @@ export function AuthScreen({ mode }: AuthScreenProps) {
   const copy = authCopy[mode];
   const [email, setEmail] = useState<string>(copy.email);
   const [isVerificationVisible, setIsVerificationVisible] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [verifiedEmail, setVerifiedEmail] = useState<string>(copy.email);
 
-  const handlePrimaryPress = () => {
-    if (mode === "sign-in") {
-      router.replace("./home");
-      return;
+  const handlePrimaryPress = async () => {
+    setIsSubmitting(true);
+
+    try {
+      const normalizedEmail = await sendEmailOtp(email, mode);
+      setVerifiedEmail(normalizedEmail);
+      setIsVerificationVisible(true);
+    } catch (error) {
+      Alert.alert("Authentication error", getErrorMessage(error));
+    } finally {
+      setIsSubmitting(false);
     }
+  };
 
-    setIsVerificationVisible(true);
+  const handleSocialPress = async (provider: SocialAuthProvider) => {
+    setIsSubmitting(true);
+
+    try {
+      await signInWithSocialProvider(provider);
+      router.replace("/");
+    } catch (error) {
+      Alert.alert("Authentication error", getErrorMessage(error));
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -100,6 +132,7 @@ export function AuthScreen({ mode }: AuthScreenProps) {
 
               <Pressable
                 className="mt-4 h-[61px] items-center justify-center rounded-bestlist-lg bg-accent"
+                disabled={isSubmitting}
                 onPress={handlePrimaryPress}
               >
                 <Text className="font-body text-[18px] font-bold leading-[22px] text-white">
@@ -123,8 +156,16 @@ export function AuthScreen({ mode }: AuthScreenProps) {
                 <View className="h-px flex-1 bg-[#E5E3DF]" />
               </View>
 
-              <SocialButton icon="google" label="Continue with Google" />
-              <SocialButton icon="apple" label="Continue with Apple" />
+              <SocialButton
+                icon="google"
+                label="Continue with Google"
+                onPress={() => handleSocialPress("google")}
+              />
+              <SocialButton
+                icon="apple"
+                label="Continue with Apple"
+                onPress={() => handleSocialPress("apple")}
+              />
             </View>
           </View>
 
@@ -144,7 +185,8 @@ export function AuthScreen({ mode }: AuthScreenProps) {
       </ScrollView>
 
       <VerificationModal
-        email={email || copy.email}
+        email={verifiedEmail}
+        mode={mode}
         onClose={() => setIsVerificationVisible(false)}
         visible={isVerificationVisible}
       />
@@ -155,13 +197,17 @@ export function AuthScreen({ mode }: AuthScreenProps) {
 type SocialButtonProps = {
   icon: "google" | "apple";
   label: string;
+  onPress: () => void;
 };
 
-function SocialButton({ icon, label }: SocialButtonProps) {
+function SocialButton({ icon, label, onPress }: SocialButtonProps) {
   const isGoogle = icon === "google";
 
   return (
-    <Pressable className="h-[61px] flex-row items-center rounded-bestlist-md border border-subtle bg-card px-6">
+    <Pressable
+      className="h-[61px] flex-row items-center rounded-bestlist-md border border-subtle bg-card px-6"
+      onPress={onPress}
+    >
       <View className="w-8 items-center">
         {isGoogle ? (
           <Text className="font-body text-[28px] font-bold leading-[32px] text-[#4285F4]">
@@ -177,4 +223,8 @@ function SocialButton({ icon, label }: SocialButtonProps) {
       <View className="w-8" />
     </Pressable>
   );
+}
+
+function getErrorMessage(error: unknown) {
+  return error instanceof Error ? error.message : "Please try again.";
 }

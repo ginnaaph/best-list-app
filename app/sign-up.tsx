@@ -1,5 +1,18 @@
+import { Redirect } from "expo-router";
+
 import { AuthScreen } from "@/components/auth-screen";
+import { useAuthSession } from "@/hooks/use-auth-session";
 
 export default function SignUp() {
+  const { isLoading, session } = useAuthSession();
+
+  if (isLoading) {
+    return null;
+  }
+
+  if (session) {
+    return <Redirect href="/" />;
+  }
+
   return <AuthScreen mode="sign-up" />;
 }
