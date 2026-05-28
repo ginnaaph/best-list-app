@@ -32,7 +32,7 @@ export default function Onboarding() {
               <Text className="font-display text-[34px] font-bold leading-9.5 text-primary">
                 BestList
               </Text>
-              <Text className="max-w-44 text-center font-display text-[18px] leading-[16px] text-secondary">
+              <Text className="max-w-44 text-center font-display text-[18px] leading-4 text-secondary">
                 A place store to your favorite food — ranked, remembered, and
                 ready to share.
               </Text>

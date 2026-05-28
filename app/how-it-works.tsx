@@ -20,14 +20,14 @@ export default function HowItWorks() {
             className="h-8 w-8 items-center justify-center rounded-full border border-subtle bg-white"
             onPress={() => router.back()}
           >
-            <Text className="font-body text-[18px] leading-[20px] text-accent">
+            <Text className="font-body text-[18px] leading-5 text-accent">
               ‹
             </Text>
           </Pressable>
 
           <Link href="./sign-up" asChild>
             <Pressable className="px-1 py-2">
-              <Text className="font-body text-[13px] font-medium leading-[16px] text-secondary">
+              <Text className="font-body text-[13px] font-medium leading-4 text-secondary">
                 Skip
               </Text>
             </Pressable>
@@ -37,10 +37,10 @@ export default function HowItWorks() {
         <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
           <View className="gap-5 pb-5 pt-4">
             <View>
-              <Text className="font-mono-bestlist text-[11px] font-bold uppercase leading-[14px] text-accent">
+              <Text className="font-mono-bestlist text-[11px] font-bold uppercase leading-3.5 text-accent">
                 The idea
               </Text>
-              <Text className="max-w-[320px] font-display text-[38px] font-bold leading-[43px] text-primary">
+              <Text className="max-w-80 font-display text-[38px] font-bold leading-10.75 text-primary">
                 One bite, one score, one running ranking.
               </Text>
             </View>
@@ -75,7 +75,7 @@ export default function HowItWorks() {
 
         <Link href="./sign-up" asChild>
           <Pressable className="h-14 items-center justify-center rounded-bestlist-md bg-accent">
-            <Text className="font-body text-[14px] font-bold leading-[18px] text-white">
+            <Text className="font-body text-[14px] font-bold leading-4.5 text-white">
               Next
             </Text>
           </Pressable>
