@@ -1,11 +1,22 @@
-import { Link } from "expo-router";
+import { Link, Redirect } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { OnboardingCardStack } from "@/components";
 import { colors } from "@/constants/theme";
+import { useAuthSession } from "@/hooks/use-auth-session";
 
 export default function Onboarding() {
+  const { isLoading, session } = useAuthSession();
+
+  if (isLoading) {
+    return null;
+  }
+
+  if (session) {
+    return <Redirect href="/" />;
+  }
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
       <View className="flex-1 px-5 pb-7 pt-4">

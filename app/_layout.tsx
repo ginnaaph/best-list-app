@@ -1,10 +1,13 @@
 import "../global.css";
 
-import { Stack } from "expo-router";
+import { router, Stack } from "expo-router";
+import * as Linking from "expo-linking";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 
 import { useAppFonts } from "@/hooks/use-app-fonts";
+import { createSessionFromUrl } from "@/lib/auth";
+import { isSupabaseConfigured } from "@/lib/supabase";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -16,6 +19,37 @@ export default function RootLayout() {
       SplashScreen.hideAsync();
     }
   }, [fontsLoaded]);
+
+  useEffect(() => {
+    if (!isSupabaseConfigured) {
+      return;
+    }
+
+    const handleUrl = async (url: string | null) => {
+      if (!url) {
+        return;
+      }
+
+      try {
+        const session = await createSessionFromUrl(url);
+        if (session) {
+          router.replace("/");
+        }
+      } catch (error) {
+        console.warn("Unable to complete Supabase auth redirect.", error);
+      }
+    };
+
+    Linking.getInitialURL().then(handleUrl);
+
+    const subscription = Linking.addEventListener("url", ({ url }) => {
+      void handleUrl(url);
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, []);
 
   if (!fontsLoaded) {
     return null;

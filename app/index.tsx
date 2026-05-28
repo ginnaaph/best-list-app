@@ -1,50 +1,18 @@
-import { Link } from "expo-router";
-import { Pressable, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Redirect } from "expo-router";
 
-import { OnboardingCardStack } from "@/components";
-import { colors } from "@/constants/theme";
+import { HomeScreen } from "@/components";
+import { useAuthSession } from "@/hooks/use-auth-session";
 
 export default function Index() {
-  return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
-      <View className="flex-1 px-5 pb-7 pt-4">
-        <View className="items-center">
-          <Text className="font-mono-bestlist text-[10px] font-bold uppercase text-secondary"></Text>
-        </View>
+  const { isLoading, session } = useAuthSession();
 
-        <View className="flex-1 items-center justify-center pb-14">
-          <View className="items-center gap-7">
-            <OnboardingCardStack />
+  if (isLoading) {
+    return null;
+  }
 
-            <View className="items-center gap-3">
-              <Text className="font-display text-[34px] font-bold leading-9.5 text-primary">
-                BestList
-              </Text>
-              <Text className="max-w-44 text-center font-display text-[18px] leading-[16px] text-secondary">
-                A field guide to your favorite food — ranked, remembered, and
-                ready to share.
-              </Text>
-            </View>
-          </View>
-        </View>
+  if (!session) {
+    return <Redirect href="/onboarding" />;
+  }
 
-        <View className="gap-4">
-          <Link href="./how-it-works" asChild>
-            <Pressable className="h-12 items-center justify-center rounded-bestlist-md bg-accent">
-              <Text className="text-label text-white">Get started</Text>
-            </Pressable>
-          </Link>
-
-          <Link href="./sign-in" asChild>
-            <Pressable className="items-center py-1">
-              <Text className="text-caption text-secondary">
-                I already have an account
-              </Text>
-            </Pressable>
-          </Link>
-        </View>
-      </View>
-    </SafeAreaView>
-  );
+  return <HomeScreen />;
 }
