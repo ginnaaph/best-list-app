@@ -39,7 +39,7 @@ const authCopy = {
     eyebrow: "Welcome back",
     title: "Sign in to your lists.",
     subtitle: "",
-    email: "kev@bestlist.app",
+    email: "gina@bestlist.app",
     button: "Sign in",
     footerLead: "New to BestList?",
     footerAction: "Create an account",

@@ -7,10 +7,7 @@ import { AppState, Platform } from "react-native";
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const supabasePublishableKey = process.env.EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 
-export const isSupabaseConfigured = Boolean(
-  supabaseUrl && supabasePublishableKey,
-);
-
+export const isSupabaseConfigured = !!(supabaseUrl && supabasePublishableKey);
 export function assertSupabaseConfigured() {
   if (!isSupabaseConfigured) {
     throw new Error(
@@ -20,8 +17,8 @@ export function assertSupabaseConfigured() {
 }
 
 export const supabase = createClient(
-  supabaseUrl ?? "https://missing-project.supabase.co",
-  supabasePublishableKey ?? "missing-publishable-key",
+  supabaseUrl as string,
+  supabasePublishableKey as string,
   {
     auth: {
       ...(Platform.OS !== "web" ? { storage: AsyncStorage } : {}),
