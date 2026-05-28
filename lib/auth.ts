@@ -23,12 +23,12 @@ export async function sendEmailOtp(email: string, mode: EmailAuthMode) {
     email: normalizedEmail,
     options: {
       emailRedirectTo: authRedirectTo,
-      shouldCreateUser: mode === "sign-up",
+      shouldCreateUser: true,
     },
   });
 
   if (error) {
-    throw error;
+    throw new Error(getAuthErrorMessage(error.message, mode));
   }
 
   return normalizedEmail;
@@ -72,8 +72,20 @@ export async function signInWithSocialProvider(provider: SocialAuthProvider) {
   const result = await WebBrowser.openAuthSessionAsync(data.url, authRedirectTo);
 
   if (result.type === "success") {
-    await createSessionFromUrl(result.url);
+    const session = await createSessionFromUrl(result.url);
+    if (!session) {
+      throw new Error(
+        "Supabase returned from OAuth without a session. Check the provider and redirect URL settings.",
+      );
+    }
+    return;
   }
+
+  if (result.type === "cancel") {
+    throw new Error("Google or Apple sign in was canceled.");
+  }
+
+  throw new Error("Google or Apple sign in did not complete.");
 }
 
 export async function createSessionFromUrl(url: string) {
@@ -124,4 +136,14 @@ function getAuthParams(url: string) {
   }
 
   return params;
+}
+
+function getAuthErrorMessage(message: string, mode: EmailAuthMode) {
+  if (message.toLowerCase().includes("signups not allowed")) {
+    return mode === "sign-up"
+      ? "Email sign up is disabled in Supabase Auth settings."
+      : "No account exists for this email yet. Create an account first.";
+  }
+
+  return message;
 }
