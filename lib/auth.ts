@@ -10,7 +10,7 @@ export type SocialAuthProvider = "google" | "apple";
 
 export const authRedirectTo = Linking.createURL("auth/callback");
 
-export async function sendEmailOtp(email: string, mode: EmailAuthMode) {
+export async function sendEmailOtp(email: string, _mode: EmailAuthMode) {
   assertSupabaseConfigured();
 
   const normalizedEmail = email.trim().toLowerCase();
@@ -23,7 +23,7 @@ export async function sendEmailOtp(email: string, mode: EmailAuthMode) {
     email: normalizedEmail,
     options: {
       emailRedirectTo: authRedirectTo,
-      shouldCreateUser: mode === "sign-up",
+      shouldCreateUser: true,
     },
   });
 
@@ -69,6 +69,11 @@ export async function signInWithSocialProvider(provider: SocialAuthProvider) {
     throw new Error("Supabase did not return an OAuth URL.");
   }
 
+  const oauthError = await getOAuthProviderError(data.url, provider);
+  if (oauthError) {
+    throw new Error(oauthError);
+  }
+
   const result = await WebBrowser.openAuthSessionAsync(data.url, authRedirectTo);
 
   if (result.type === "success") {
@@ -112,6 +117,44 @@ export async function createSessionFromUrl(url: string) {
   }
 
   return data.session;
+}
+
+async function getOAuthProviderError(url: string, provider: SocialAuthProvider) {
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      redirect: "manual",
+    });
+
+    const contentType = response.headers.get("content-type");
+    if (!contentType?.includes("application/json")) {
+      return null;
+    }
+
+    const body: unknown = await response.json();
+
+    if (!isOAuthErrorBody(body)) {
+      return null;
+    }
+
+    if (body.msg.includes("provider is not enabled")) {
+      const providerName = provider === "google" ? "Google" : "Apple";
+      return `${providerName} sign-in is not enabled yet. Use email sign-in for now.`;
+    }
+
+    return body.msg;
+  } catch {
+    return null;
+  }
+}
+
+function isOAuthErrorBody(body: unknown): body is { msg: string } {
+  return (
+    typeof body === "object" &&
+    body !== null &&
+    "msg" in body &&
+    typeof body.msg === "string"
+  );
 }
 
 function getAuthParams(url: string) {
