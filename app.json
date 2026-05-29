@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "best-list-app",
-    "slug": "best-list-app",
+    "name": "BestList.",
+    "slug": "BestList.",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/BestList1.png",
-    "scheme": "bestlistapp",
+    "scheme": "bestlist://",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
