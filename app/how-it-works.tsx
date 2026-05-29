@@ -75,7 +75,7 @@ export default function HowItWorks() {
 
         <Link href="./sign-up" asChild>
           <Pressable className="h-14 items-center justify-center rounded-bestlist-md bg-accent">
-            <Text className="font-body text-[14px] font-bold leading-[18px] text-white">
+            <Text className="font-body text-[14px] font-bold leading-4.5 text-white">
               Next
             </Text>
           </Pressable>

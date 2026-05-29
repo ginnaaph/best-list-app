@@ -7,9 +7,9 @@ const dishCards = [
 ];
 
 const scoreRows = [
-  { label: "Taste", value: "9.5", width: "w-[162px]" },
-  { label: "Value", value: "9.0", width: "w-[146px]" },
-  { label: "Portion", value: "9.5", width: "w-[162px]" },
+  { label: "Taste", value: "9.5", width: "w-40.5" },
+  { label: "Value", value: "9.0", width: "w-36.5" },
+  { label: "Portion", value: "9.5", width: "w-40.5" },
 ];
 
 const rankingRows = [
@@ -22,15 +22,15 @@ export function DishCardPreview() {
   return (
     <View className="flex-row gap-2 pt-1">
       {dishCards.map((card, index) => (
-        <View key={index} className={`h-[88px] w-[88px] overflow-hidden rounded-bestlist-sm ${card.color}`}>
+        <View key={index} className={`h-22 w-22 overflow-hidden rounded-bestlist-sm ${card.color}`}>
           <View className="absolute inset-0 -rotate-45 opacity-25">
-            <View className="h-[190px] w-[18px] translate-x-5 bg-white" />
-            <View className="h-[190px] w-[18px] translate-x-12 -translate-y-[190px] bg-white" />
-            <View className="h-[190px] w-[18px] translate-x-20 -translate-y-[380px] bg-white" />
+            <View className="h-47.5 w-4.5 translate-x-5 bg-white" />
+            <View className="h-47.5 w-4.5 translate-x-12 -translate-y-47.5 bg-white" />
+            <View className="h-47.5 w-4.5 translate-x-20 -translate-y-95 bg-white" />
           </View>
           {card.badge ? (
-            <View className="absolute right-2 top-2 h-[24px] w-[24px] items-center justify-center rounded-full bg-white">
-              <Text className="font-body text-[10px] font-bold leading-[12px] text-accent">{card.badge}</Text>
+            <View className="absolute right-2 top-2 h-6 w-6 items-center justify-center rounded-full bg-white">
+              <Text className="font-body text-[10px] font-bold leading-3 text-accent">{card.badge}</Text>
             </View>
           ) : null}
         </View>
@@ -45,11 +45,11 @@ export function ScorePreview() {
       <View className="gap-4">
         {scoreRows.map((row) => (
           <View key={row.label} className="flex-row items-center gap-4">
-            <Text className="w-16 font-body text-[14px] font-bold leading-[17px] text-primary">{row.label}</Text>
+            <Text className="w-16 font-body text-[14px] font-bold leading-4.25 text-primary">{row.label}</Text>
             <View className="h-1 flex-1 rounded-full bg-[#DAD8D3]">
               <View className={`h-1 rounded-full bg-accent ${row.width}`} />
             </View>
-            <Text className="w-9 text-right font-body text-[14px] font-bold leading-[17px] text-accent">
+            <Text className="w-9 text-right font-body text-[14px] font-bold leading-4.25 text-accent">
               {row.value}
             </Text>
           </View>
@@ -65,10 +65,10 @@ export function RankingPreview() {
       <View className="gap-2">
         {rankingRows.map((row) => (
           <View key={row.name} className="flex-row items-center">
-            <Text className="w-6 font-body text-[14px] font-bold leading-[17px] text-primary">{row.rank}</Text>
-            <Text className="flex-1 font-display text-[16px] font-bold leading-[19px] text-primary">{row.name}</Text>
+            <Text className="w-6 font-body text-[14px] font-bold leading-4.25 text-primary">{row.rank}</Text>
+            <Text className="flex-1 font-display text-[16px] font-bold leading-4.75 text-primary">{row.name}</Text>
             {row.bar ? <View className="mr-4 h-2.5 w-16 rounded-full bg-accent" /> : null}
-            <Text className="w-9 text-right font-body text-[14px] font-bold leading-[17px] text-accent">
+            <Text className="w-9 text-right font-body text-[14px] font-bold leading-4.25 text-accent">
               {row.score}
             </Text>
           </View>

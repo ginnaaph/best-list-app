@@ -39,7 +39,7 @@ const authCopy = {
     eyebrow: "Welcome back",
     title: "Sign in to your lists.",
     subtitle: "",
-    email: "kev@bestlist.app",
+    email: "gina@bestlist.app",
     button: "Sign in",
     footerLead: "New to BestList?",
     footerAction: "Create an account",
@@ -92,34 +92,34 @@ export function AuthScreen({ mode }: AuthScreenProps) {
       >
         <View className="min-h-full justify-between">
           <View>
-            <Text className="text-center font-display text-[41px] font-bold leading-[47px] text-primary">
+            <Text className="text-center font-display text-[41px] font-bold leading-11.75 text-primary">
               BestList
               <Text className="text-accent">.</Text>
             </Text>
 
-            <View className="mt-[74px] gap-4">
+            <View className="mt-18.5 gap-4">
               <View className="gap-3">
-                <Text className="font-mono-bestlist text-[13px] font-bold uppercase leading-[18px] tracking-[5px] text-accent">
+                <Text className="font-mono-bestlist text-[13px] font-bold uppercase leading-4.5 tracking-[5px] text-accent">
                   {copy.eyebrow}
                 </Text>
-                <Text className="font-display text-[39px] font-bold leading-[43px] text-primary">
+                <Text className="font-display text-[39px] font-bold leading-10.75 text-primary">
                   {copy.title}
                 </Text>
                 {copy.subtitle ? (
-                  <Text className="font-body text-[17px] leading-[24px] text-secondary">
+                  <Text className="font-body text-[17px] leading-6 text-secondary">
                     {copy.subtitle}
                   </Text>
                 ) : null}
               </View>
 
               <View className="mt-5 gap-2">
-                <Text className="font-mono-bestlist text-[13px] font-bold uppercase leading-[16px] tracking-[4px] text-secondary">
+                <Text className="font-mono-bestlist text-[13px] font-bold uppercase leading-4 tracking-[4px] text-secondary">
                   Email
                 </Text>
                 <TextInput
                   autoCapitalize="none"
                   autoCorrect={false}
-                  className="h-[62px] rounded-bestlist-md border border-subtle bg-card px-5 font-body text-[21px] leading-[25px] text-primary"
+                  className="h-15.5 rounded-bestlist-md border border-subtle bg-card px-5 font-body text-[21px] leading-6.25 text-primary"
                   inputMode="email"
                   keyboardType="email-address"
                   onChangeText={setEmail}
@@ -131,17 +131,17 @@ export function AuthScreen({ mode }: AuthScreenProps) {
               </View>
 
               <Pressable
-                className="mt-4 h-[61px] items-center justify-center rounded-bestlist-lg bg-accent"
+                className="mt-4 h-15.25 items-center justify-center rounded-bestlist-lg bg-accent"
                 disabled={isSubmitting}
                 onPress={handlePrimaryPress}
               >
-                <Text className="font-body text-[18px] font-bold leading-[22px] text-white">
+                <Text className="font-body text-[18px] font-bold leading-5.5 text-white">
                   {copy.button}
                 </Text>
               </Pressable>
 
               {copy.legal ? (
-                <Text className="text-center font-body text-[14px] leading-[19px] text-secondary">
+                <Text className="text-center font-body text-[14px] leading-4.75 text-secondary">
                   By signing up you agree to our{" "}
                   <Text className="text-primary underline">Terms</Text> and{" "}
                   <Text className="text-primary underline">Privacy</Text>.
@@ -150,7 +150,7 @@ export function AuthScreen({ mode }: AuthScreenProps) {
 
               <View className="my-4 flex-row items-center gap-4">
                 <View className="h-px flex-1 bg-[#E5E3DF]" />
-                <Text className="font-mono-bestlist text-[13px] font-bold uppercase leading-[16px] text-secondary">
+                <Text className="font-mono-bestlist text-[13px] font-bold uppercase leading-4 text-secondary">
                   Or
                 </Text>
                 <View className="h-px flex-1 bg-[#E5E3DF]" />
@@ -172,7 +172,7 @@ export function AuthScreen({ mode }: AuthScreenProps) {
           <View className="items-center pt-14">
             <Link href={copy.footerHref} asChild>
               <Pressable className="py-2">
-                <Text className="font-body text-[16px] leading-[20px] text-secondary">
+                <Text className="font-body text-[16px] leading-5 text-secondary">
                   {copy.footerLead}{" "}
                   <Text className="font-bold text-accent">
                     {copy.footerAction}
@@ -205,19 +205,19 @@ function SocialButton({ icon, label, onPress }: SocialButtonProps) {
 
   return (
     <Pressable
-      className="h-[61px] flex-row items-center rounded-bestlist-md border border-subtle bg-card px-6"
+      className="h-15.25 flex-row items-center rounded-bestlist-md border border-subtle bg-card px-6"
       onPress={onPress}
     >
       <View className="w-8 items-center">
         {isGoogle ? (
-          <Text className="font-body text-[28px] font-bold leading-[32px] text-[#4285F4]">
+          <Text className="font-body text-[28px] font-bold leading-8 text-[#4285F4]">
             G
           </Text>
         ) : (
           <Ionicons name="logo-apple" size={31} color="#000000" />
         )}
       </View>
-      <Text className="flex-1 text-center font-body text-[18px] font-bold leading-[22px] text-primary">
+      <Text className="flex-1 text-center font-body text-[18px] font-bold leading-5.5 text-primary">
         {label}
       </Text>
       <View className="w-8" />
