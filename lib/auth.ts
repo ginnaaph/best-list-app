@@ -73,8 +73,12 @@ export async function signInWithSocialProvider(provider: SocialAuthProvider) {
   if (oauthError) {
     throw new Error(oauthError);
   }
+  await WebBrowser.coolDownAsync();
 
-  const result = await WebBrowser.openAuthSessionAsync(data.url, authRedirectTo);
+  const result = await WebBrowser.openAuthSessionAsync(
+    data.url,
+    authRedirectTo,
+  );
 
   if (result.type === "success") {
     await createSessionFromUrl(result.url);
@@ -119,7 +123,10 @@ export async function createSessionFromUrl(url: string) {
   return data.session;
 }
 
-async function getOAuthProviderError(url: string, provider: SocialAuthProvider) {
+async function getOAuthProviderError(
+  url: string,
+  provider: SocialAuthProvider,
+) {
   try {
     const response = await fetch(url, {
       method: "GET",
