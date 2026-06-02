@@ -1,5 +1,9 @@
 export { AuthScreen } from "@/components/auth-screen";
 export { CategoryCard } from "@/components/category-card";
+export {
+  CategoryDetailScreen,
+  CategoryNotFoundScreen,
+} from "@/components/category-detail-screen";
 export { CategoryGrid } from "@/components/category-grid";
 export { FloatingAddButton } from "@/components/floating-add-button";
 export { HomeHeader } from "@/components/home-header";
