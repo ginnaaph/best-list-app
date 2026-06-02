@@ -36,13 +36,18 @@ export function OnboardingCardStack() {
           key={card.rotation}
           className={`absolute h-24 w-20 rounded-bestlist-sm border-2 border-white shadow-card ${card.className}`}
           style={{
-            transform: [{ translateX: card.offsetX }, { rotate: card.rotation }],
+            transform: [
+              { translateX: card.offsetX },
+              { rotate: card.rotation },
+            ],
             zIndex: card.zIndex,
           }}
         >
           {index === 1 ? (
             <View className="absolute left-2 top-2 h-4 w-4 items-center justify-center rounded-full bg-accent">
-              <Text className="text-[8px] font-bold leading-[10px] text-white">1</Text>
+              <Text className="text-[8px] font-bold leading-2.5 text-white">
+                1
+              </Text>
             </View>
           ) : null}
         </View>
