@@ -37,10 +37,10 @@ export default function HowItWorks() {
         <ScrollView className="flex-1" showsVerticalScrollIndicator={false}>
           <View className="gap-5 pb-5 pt-4">
             <View>
-              <Text className="font-mono-bestlist text-[11px] font-bold uppercase leading-[14px] text-accent">
+              <Text className="font-mono-bestlist text-[11px] font-bold uppercase leading-3.5 text-accent">
                 The idea
               </Text>
-              <Text className="max-w-[320px] font-display text-[38px] font-bold leading-[43px] text-primary">
+              <Text className="max-w-[320px] font-display text-[38px] font-bold leading-10.75 text-primary">
                 One bite, one score, one running ranking.
               </Text>
             </View>
