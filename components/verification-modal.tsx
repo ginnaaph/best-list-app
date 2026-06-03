@@ -95,7 +95,7 @@ export function VerificationModal({
           <View className="items-center gap-4">
             <View className="h-1 w-11 rounded-full bg-[#E5E3DF]" />
 
-            <View className="h-[58px] w-[58px] items-center justify-center rounded-full bg-[#EAF2EE]">
+            <View className="h-14.5 w-14.5 items-center justify-center rounded-full bg-[#EAF2EE]">
               <Ionicons name="mail-outline" size={32} color="#2D6A4F" />
             </View>
 
@@ -103,10 +103,10 @@ export function VerificationModal({
               <Text className="font-mono-bestlist text-[13px] font-bold uppercase leading-[16px] tracking-[4px] text-accent">
                 Check your inbox
               </Text>
-              <Text className="text-center font-display text-[29px] font-bold leading-[33px] text-primary">
+              <Text className="text-center font-display text-[29px] font-bold leading-8.25 text-primary">
                 Enter your verification code
               </Text>
-              <Text className="text-center font-body text-[16px] leading-[22px] text-secondary">
+              <Text className="text-center font-body text-[16px] leading-5.5 text-secondary">
                 We sent a 6-digit code to{"\n"}
                 <Text className="font-bold text-primary">{email}</Text>
               </Text>
@@ -119,11 +119,12 @@ export function VerificationModal({
           >
             {Array.from({ length: CODE_LENGTH }).map((_, index) => {
               const digit = code[index];
-              const isActive = index === code.length && code.length < CODE_LENGTH;
+              const isActive =
+                index === code.length && code.length < CODE_LENGTH;
 
               return (
                 <View
-                  className={`h-[61px] flex-1 items-center justify-center rounded-bestlist-md border bg-card ${
+                  className={`h-15.25 flex-1 items-center justify-center rounded-bestlist-md border bg-card ${
                     isActive ? "border-accent" : "border-subtle"
                   }`}
                   key={index}
@@ -137,9 +138,12 @@ export function VerificationModal({
           </Pressable>
 
           <View className="mt-6 flex-row items-center justify-between">
-            <Text className="font-body text-[15px] leading-[19px] text-secondary">
+            <Text className="font-body text-[15px] leading-4.75 text-secondary">
               Didn&apos;t get it?{" "}
-              <Text className="font-bold text-accent" onPress={handleResendPress}>
+              <Text
+                className="font-bold text-accent"
+                onPress={handleResendPress}
+              >
                 Resend
               </Text>
             </Text>
