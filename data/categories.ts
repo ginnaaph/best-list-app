@@ -5,7 +5,7 @@ export const categories: Category[] = [
     id: "breakfast-burrito",
     name: "Breakfast Burrito",
     topEntry: "Nopalito",
-    entryCount: 14,
+    entryCount: 8,
     tone: "gold",
   },
   {
