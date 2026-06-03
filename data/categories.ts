@@ -37,9 +37,9 @@ export const categories: Category[] = [
     tone: "espresso",
   },
   {
-    id: "dumplings",
-    name: "Dumplings",
-    topEntry: "Dumpling Home",
+    id: "cookies",
+    name: "Cookies",
+    topEntry: "cookies Home",
     entryCount: 9,
     tone: "caramel",
   },
