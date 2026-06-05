@@ -20,14 +20,14 @@ export default function HowItWorks() {
             className="h-8 w-8 items-center justify-center rounded-full border border-subtle bg-white"
             onPress={() => router.back()}
           >
-            <Text className="font-body text-[18px] leading-[20px] text-accent">
+            <Text className="font-body text-[18px] leading-5 text-accent">
               ‹
             </Text>
           </Pressable>
 
           <Link href="./sign-up" asChild>
             <Pressable className="px-1 py-2">
-              <Text className="font-body text-[13px] font-medium leading-[16px] text-secondary">
+              <Text className="font-body text-[13px] font-medium leading-4 text-secondary">
                 Skip
               </Text>
             </Pressable>

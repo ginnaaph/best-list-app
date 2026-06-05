@@ -1,7 +1,7 @@
 import type { Session } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
 
-import { isSupabaseConfigured, supabase } from "@/lib/supabase";
+import { getSupabaseClient, isSupabaseConfigured } from "@/lib/supabase";
 
 export function useAuthSession() {
   const [session, setSession] = useState<Session | null>(null);
@@ -15,6 +15,8 @@ export function useAuthSession() {
       setIsLoading(false);
       return;
     }
+
+    const supabase = getSupabaseClient();
 
     supabase.auth.getSession().then(({ data }) => {
       if (!isMounted) {

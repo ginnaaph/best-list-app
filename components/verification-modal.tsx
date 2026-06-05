@@ -100,7 +100,7 @@ export function VerificationModal({
             </View>
 
             <View className="items-center gap-2">
-              <Text className="font-mono-bestlist text-[13px] font-bold uppercase leading-[16px] tracking-[4px] text-accent">
+              <Text className="font-mono-bestlist text-[13px] font-bold uppercase leading-4 tracking-[4px] text-accent">
                 Check your inbox
               </Text>
               <Text className="text-center font-display text-[29px] font-bold leading-8.25 text-primary">
@@ -129,7 +129,7 @@ export function VerificationModal({
                   }`}
                   key={index}
                 >
-                  <Text className="font-body text-[28px] font-bold leading-[32px] text-primary">
+                  <Text className="font-body text-[28px] font-bold leading-8 text-primary">
                     {digit ?? (isActive ? "|" : "")}
                   </Text>
                 </View>
@@ -147,7 +147,7 @@ export function VerificationModal({
                 Resend
               </Text>
             </Text>
-            <Text className="font-mono-bestlist text-[16px] leading-[20px] text-secondary">
+            <Text className="font-mono-bestlist text-[16px] leading-5 text-secondary">
               00:42
             </Text>
           </View>

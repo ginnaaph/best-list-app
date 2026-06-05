@@ -1,7 +1,7 @@
 import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
 
-import { assertSupabaseConfigured, supabase } from "@/lib/supabase";
+import { getSupabaseClient } from "@/lib/supabase";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -28,14 +28,14 @@ export async function sendEmailOtp(email: string, _mode: EmailAuthMode) {
   });
 
   if (error) {
-    throw error;
+    throw new Error(getAuthErrorMessage(error.message, mode));
   }
 
   return normalizedEmail;
 }
 
 export async function verifyEmailOtp(email: string, code: string) {
-  assertSupabaseConfigured();
+  const supabase = getSupabaseClient();
 
   const { data, error } = await supabase.auth.verifyOtp({
     email: email.trim().toLowerCase(),
@@ -51,7 +51,7 @@ export async function verifyEmailOtp(email: string, code: string) {
 }
 
 export async function signInWithSocialProvider(provider: SocialAuthProvider) {
-  assertSupabaseConfigured();
+  const supabase = getSupabaseClient();
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,
@@ -81,12 +81,24 @@ export async function signInWithSocialProvider(provider: SocialAuthProvider) {
   );
 
   if (result.type === "success") {
-    await createSessionFromUrl(result.url);
+    const session = await createSessionFromUrl(result.url);
+    if (!session) {
+      throw new Error(
+        "Supabase returned from OAuth without a session. Check the provider and redirect URL settings.",
+      );
+    }
+    return;
   }
+
+  if (result.type === "cancel") {
+    throw new Error(`${getProviderLabel(provider)} sign in was canceled.`);
+  }
+
+  throw new Error(`${getProviderLabel(provider)} sign in did not complete.`);
 }
 
 export async function createSessionFromUrl(url: string) {
-  assertSupabaseConfigured();
+  const supabase = getSupabaseClient();
 
   const params = getAuthParams(url);
   const errorCode = params.get("error_code") ?? params.get("error");
@@ -174,4 +186,18 @@ function getAuthParams(url: string) {
   }
 
   return params;
+}
+
+function getAuthErrorMessage(message: string, mode: EmailAuthMode) {
+  if (message.toLowerCase().includes("signups not allowed")) {
+    return mode === "sign-up"
+      ? "Email sign up is disabled in Supabase Auth settings."
+      : "No account exists for this email yet. Create an account first.";
+  }
+
+  return message;
+}
+
+function getProviderLabel(provider?: SocialAuthProvider | null) {
+  return provider ?? "Social provider";
 }
