@@ -119,7 +119,8 @@ export function VerificationModal({
           >
             {Array.from({ length: CODE_LENGTH }).map((_, index) => {
               const digit = code[index];
-              const isActive = index === code.length && code.length < CODE_LENGTH;
+              const isActive =
+                index === code.length && code.length < CODE_LENGTH;
 
               return (
                 <View
@@ -139,7 +140,10 @@ export function VerificationModal({
           <View className="mt-6 flex-row items-center justify-between">
             <Text className="font-body text-[15px] leading-4.75 text-secondary">
               Didn&apos;t get it?{" "}
-              <Text className="font-bold text-accent" onPress={handleResendPress}>
+              <Text
+                className="font-bold text-accent"
+                onPress={handleResendPress}
+              >
                 Resend
               </Text>
             </Text>

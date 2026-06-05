@@ -1,2 +1,3 @@
 export { authRedirectTo } from "@/lib/auth";
-export { getSupabaseClient } from "@/lib/supabase";
+export { calculateOverallScore } from "@/lib/entry-score";
+export { supabase } from "@/lib/supabase";

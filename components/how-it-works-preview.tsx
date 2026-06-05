@@ -1,9 +1,11 @@
-import { Text, View } from "react-native";
+import { Image, Text, View } from "react-native";
+
+import { images } from "@/constants/images";
 
 const dishCards = [
-  { color: "bg-category-gold", badge: "12" },
-  { color: "bg-[#C8AD9C]" },
-  { color: "bg-[#958D86]" },
+  { image: images.food.breakfastBurrito, badge: "12" },
+  { image: images.food.tacos },
+  { image: images.food.ramen },
 ];
 
 const scoreRows = [
@@ -22,12 +24,12 @@ export function DishCardPreview() {
   return (
     <View className="flex-row gap-2 pt-1">
       {dishCards.map((card, index) => (
-        <View key={index} className={`h-22 w-22 overflow-hidden rounded-bestlist-sm ${card.color}`}>
-          <View className="absolute inset-0 -rotate-45 opacity-25">
-            <View className="h-47.5 w-4.5 translate-x-5 bg-white" />
-            <View className="h-47.5 w-4.5 translate-x-12 -translate-y-47.5 bg-white" />
-            <View className="h-47.5 w-4.5 translate-x-20 -translate-y-95 bg-white" />
-          </View>
+        <View key={index} className="h-22 w-22 overflow-hidden rounded-bestlist-sm">
+          <Image
+            source={card.image}
+            resizeMode="cover"
+            className="h-full w-full"
+          />
           {card.badge ? (
             <View className="absolute right-2 top-2 h-6 w-6 items-center justify-center rounded-full bg-white">
               <Text className="font-body text-[10px] font-bold leading-3 text-accent">{card.badge}</Text>

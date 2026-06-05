@@ -40,7 +40,7 @@ export default function HowItWorks() {
               <Text className="font-mono-bestlist text-[11px] font-bold uppercase leading-3.5 text-accent">
                 The idea
               </Text>
-              <Text className="max-w-80 font-display text-[38px] font-bold leading-10.75 text-primary">
+              <Text className="max-w-[320px] font-display text-[38px] font-bold leading-10.75 text-primary">
                 One bite, one score, one running ranking.
               </Text>
             </View>

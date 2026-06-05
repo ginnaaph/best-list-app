@@ -11,8 +11,8 @@ export function HomeHeader() {
       </View>
 
       <View className="h-7 w-7 items-center justify-center rounded-full bg-white shadow-card">
-        <View className="h-5 w-5 items-center justify-center rounded-full bg-accent">
-          <Text className="text-label text-white">G</Text>
+        <View className="h-7 w-7 items-center justify-center rounded-full bg-accent">
+          <Text className="text-label text-white">g</Text>
         </View>
       </View>
     </View>

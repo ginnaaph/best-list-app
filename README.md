@@ -23,8 +23,7 @@ Overall score is auto-calculated. User can re-sort any list by any single dimens
 ## Tech Stack
 - **Framework:** React Native + Expo
 - **Styling:** NativeWind (Tailwind for RN)
-- **Backend/DB:** postgresSQL
-- **auth**: clerk 
+- **Backend/DB/auth:** Supabase
 - **IDE:** VS Code
 - **Testing:** Expo Go
 
