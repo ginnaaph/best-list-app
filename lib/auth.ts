@@ -1,7 +1,7 @@
 import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
 
-import { assertSupabaseConfigured, supabase } from "@/lib/supabase";
+import { getSupabaseClient } from "@/lib/supabase";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -11,7 +11,7 @@ export type SocialAuthProvider = "google" | "apple";
 export const authRedirectTo = Linking.createURL("auth/callback");
 
 export async function sendEmailOtp(email: string, mode: EmailAuthMode) {
-  assertSupabaseConfigured();
+  const supabase = getSupabaseClient();
 
   const normalizedEmail = email.trim().toLowerCase();
 
@@ -35,7 +35,7 @@ export async function sendEmailOtp(email: string, mode: EmailAuthMode) {
 }
 
 export async function verifyEmailOtp(email: string, code: string) {
-  assertSupabaseConfigured();
+  const supabase = getSupabaseClient();
 
   const { data, error } = await supabase.auth.verifyOtp({
     email: email.trim().toLowerCase(),
@@ -51,7 +51,7 @@ export async function verifyEmailOtp(email: string, code: string) {
 }
 
 export async function signInWithSocialProvider(provider: SocialAuthProvider) {
-  assertSupabaseConfigured();
+  const supabase = getSupabaseClient();
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,
@@ -82,14 +82,14 @@ export async function signInWithSocialProvider(provider: SocialAuthProvider) {
   }
 
   if (result.type === "cancel") {
-    throw new Error("Google or Apple sign in was canceled.");
+    throw new Error(`${getProviderLabel(provider)} sign in was canceled.`);
   }
 
-  throw new Error("Google or Apple sign in did not complete.");
+  throw new Error(`${getProviderLabel(provider)} sign in did not complete.`);
 }
 
 export async function createSessionFromUrl(url: string) {
-  assertSupabaseConfigured();
+  const supabase = getSupabaseClient();
 
   const params = getAuthParams(url);
   const errorCode = params.get("error_code") ?? params.get("error");
@@ -146,4 +146,8 @@ function getAuthErrorMessage(message: string, mode: EmailAuthMode) {
   }
 
   return message;
+}
+
+function getProviderLabel(provider?: SocialAuthProvider | null) {
+  return provider ?? "Social provider";
 }

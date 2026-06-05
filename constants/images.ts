@@ -6,17 +6,7 @@ import signUpReference from "@/assets/BL-SignUp.png";
 import verificationReference from "@/assets/BL-Verification.png";
 import designGuide from "@/assets/DesignGuide.png";
 import wireframe from "@/assets/WireFrame.png";
-<<<<<<< Updated upstream
-=======
 import entryCardFallback from "@/assets/NoImages.jpg";
-import breakfastBurrito from "@/assets/stockimages/Food/BreakfastBurrito.png";
-import cookies from "@/assets/stockimages/Food/Cookies.png";
-import iceCoffee from "@/assets/stockimages/Food/iceCoffee.png";
-import latte from "@/assets/stockimages/Food/latte.png";
-import pizza from "@/assets/stockimages/Food/pizza.png";
-import ramen from "@/assets/stockimages/Food/ramen.png";
-import tacos from "@/assets/stockimages/Food/tacos.png";
->>>>>>> Stashed changes
 
 export const images = {
   bestListMark,
@@ -27,17 +17,5 @@ export const images = {
   verificationReference,
   designGuide,
   wireframe,
-<<<<<<< Updated upstream
-=======
   entryCardFallback,
-  food: {
-    breakfastBurrito,
-    cookies,
-    iceCoffee,
-    latte,
-    pizza,
-    ramen,
-    tacos,
-  },
->>>>>>> Stashed changes
 } as const;

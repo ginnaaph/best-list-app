@@ -33,7 +33,7 @@ export default function Onboarding() {
                 BestList
               </Text>
               <Text className="max-w-44 text-center font-display text-[18px] leading-4 text-secondary">
-                A place store to your favorite food — ranked, remembered, and
+                A place to store your favorite food — ranked, remembered, and
                 ready to share.
               </Text>
             </View>
