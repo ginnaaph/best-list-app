@@ -5,6 +5,7 @@ import signInReference from "@/assets/BL-SignIn.png";
 import signUpReference from "@/assets/BL-SignUp.png";
 import verificationReference from "@/assets/BL-Verification.png";
 import designGuide from "@/assets/DesignGuide.png";
+import noImages from "@/assets/NoImages.jpg";
 import wireframe from "@/assets/WireFrame.png";
 import breakfastBurrito from "@/assets/stockimages/Food/BreakfastBurrito.png";
 import cookies from "@/assets/stockimages/Food/Cookies.png";
@@ -22,6 +23,7 @@ export const images = {
   signUpReference,
   verificationReference,
   designGuide,
+  noImages,
   wireframe,
   food: {
     breakfastBurrito,
