@@ -1,12 +1,21 @@
+import { useState } from "react";
 import { router } from "expo-router";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { EntryCard } from "@/components/entry-card";
 import { colors } from "@/constants/theme";
-import { calculateOverallScore } from "@/lib/entry-score";
+import { sortEntries, type SortDimension } from "@/lib/entry-score";
 import type { Category } from "@/types/category";
 import type { Entry } from "@/types/entry";
+
+const sortOptions: { label: string; value: SortDimension }[] = [
+  { label: "Overall", value: "overall" },
+  { label: "Taste", value: "taste" },
+  { label: "Value", value: "value" },
+  { label: "Portion", value: "portion" },
+  { label: "Vibe", value: "vibe" },
+];
 
 type CategoryDetailScreenProps = {
   category: Category;
@@ -17,10 +26,12 @@ export function CategoryDetailScreen({
   category,
   entries,
 }: CategoryDetailScreenProps) {
-  const sortedEntries = [...entries].sort(
-    (firstEntry, secondEntry) =>
-      calculateOverallScore(secondEntry) - calculateOverallScore(firstEntry),
-  );
+  const [selectedSort, setSelectedSort] =
+    useState<SortDimension>("overall");
+  const selectedSortLabel =
+    sortOptions.find((option) => option.value === selectedSort)?.label ??
+    "Overall";
+  const sortedEntries = sortEntries(entries, selectedSort);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
@@ -53,20 +64,36 @@ export function CategoryDetailScreen({
               Just {sortedEntries.length}
             </Text>
             <Text className="font-mono-bestlist text-[10px] font-bold uppercase leading-3.25 text-secondary">
-              Sort: Overall
+              Sort: {selectedSortLabel}
             </Text>
           </View>
 
-          <View className="flex-row gap-2">
-            <View className="h-8 items-center justify-center rounded-full border border-subtle bg-white px-4">
-              <Text className="text-label uppercase text-primary">Taste</Text>
-            </View>
-            <View className="h-8 items-center justify-center rounded-full border border-subtle bg-white px-4">
-              <Text className="text-label uppercase text-primary">Value</Text>
-            </View>
-            <View className="h-8 items-center justify-center rounded-full border border-subtle bg-white px-4">
-              <Text className="text-label uppercase text-primary">Portion</Text>
-            </View>
+          <View className="flex-row flex-wrap gap-2">
+            {sortOptions.map((option) => {
+              const isSelected = option.value === selectedSort;
+
+              return (
+                <Pressable
+                  key={option.value}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: isSelected }}
+                  className={`h-8 items-center justify-center rounded-full border px-4 ${
+                    isSelected
+                      ? "border-accent bg-accent"
+                      : "border-subtle bg-white"
+                  }`}
+                  onPress={() => setSelectedSort(option.value)}
+                >
+                  <Text
+                    className={`text-label uppercase ${
+                      isSelected ? "text-white" : "text-primary"
+                    }`}
+                  >
+                    {option.label}
+                  </Text>
+                </Pressable>
+              );
+            })}
           </View>
         </View>
 
