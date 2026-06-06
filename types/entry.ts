@@ -4,9 +4,9 @@ export type Entry = {
   placeName: string;
   dishName: string;
   city: string;
-  photoUrl?: string;
   notes?: string;
-  dateCreated: Date;
+  photoUrl?: string;
+  dateCreated?: Date;
   taste: number;
   value: number;
   portion: number;
