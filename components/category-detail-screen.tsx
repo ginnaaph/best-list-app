@@ -4,6 +4,7 @@ import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { EntryCard } from "@/components/entry-card";
+import { FloatingAddButton } from "@/components/floating-add-button";
 import { colors } from "@/constants/theme";
 import { sortEntries, type SortDimension } from "@/lib/entry-score";
 import type { Category } from "@/types/category";
@@ -32,6 +33,7 @@ export function CategoryDetailScreen({
     sortOptions.find((option) => option.value === selectedSort)?.label ??
     "Overall";
   const sortedEntries = sortEntries(entries, selectedSort);
+  const hasEntries = sortedEntries.length > 0;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
@@ -101,12 +103,32 @@ export function CategoryDetailScreen({
           className="mt-6 flex-1"
           showsVerticalScrollIndicator={false}
         >
-          <View className="gap-4 pb-24">
-            {sortedEntries.map((entry, index) => (
-              <EntryCard key={entry.id} entry={entry} rank={index + 1} />
-            ))}
-          </View>
+          {hasEntries ? (
+            <View className="gap-4 pb-24">
+              {sortedEntries.map((entry, index) => (
+                <EntryCard key={entry.id} entry={entry} rank={index + 1} />
+              ))}
+            </View>
+          ) : (
+            <View className="items-center gap-4 pb-24 pt-20">
+              <Text className="text-center text-screen-title text-primary">
+                No entries yet. Add the first one!
+              </Text>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Add the first entry"
+                onPress={() => router.push("/entry/new")}
+                className="h-11 items-center justify-center rounded-full bg-accent px-6 shadow-card"
+              >
+                <Text className="text-label uppercase text-white">
+                  Add Entry
+                </Text>
+              </Pressable>
+            </View>
+          )}
         </ScrollView>
+
+        <FloatingAddButton accessibilityLabel="Add entry" />
       </View>
     </SafeAreaView>
   );
