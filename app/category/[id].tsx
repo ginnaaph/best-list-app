@@ -1,12 +1,12 @@
 import { useLocalSearchParams } from "expo-router";
 
 import { CategoryDetailScreen, CategoryNotFoundScreen } from "@/components";
-import { categories, mockEntries } from "@/data";
+import { categories, entriesByCategory } from "@/data";
 
 export default function CategoryDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const category = categories.find((item) => item.id === id);
-  const categoryEntries = mockEntries.filter((entry) => entry.categoryId === id);
+  const categoryEntries = id ? (entriesByCategory[id] ?? []) : [];
 
   if (!category) {
     return <CategoryNotFoundScreen />;
