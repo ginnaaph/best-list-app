@@ -31,13 +31,13 @@ export function EntryCard({ entry, rank }: EntryCardProps) {
               />
               <View className="min-w-0 flex-1">
                 <Text
-                  className="font-display text-[28px] font-bold leading-7.5 text-primary"
+                  className="font-display text-[24px] font-bold leading-7.5 text-primary"
                   numberOfLines={1}
                 >
                   {entry.placeName}
                 </Text>
                 <Text
-                  className="mt-.75 font-body text-[16px] leading-5 text-secondary"
+                  className="mt-.75 font-body text-[12px] leading-5 text-secondary"
                   numberOfLines={1}
                 >
                   {entry.dishName}
@@ -47,7 +47,7 @@ export function EntryCard({ entry, rank }: EntryCardProps) {
           </View>
 
           <View className="shrink-0 items-center pt-1">
-            <Text className="font-display text-[50px] font-extrabold leading-13.5 text-accent">
+            <Text className="font-display mt-1.5 text-[42px] font-extrabold leading-13.5 text-accent">
               {overallScore.toFixed(1)}
             </Text>
           </View>

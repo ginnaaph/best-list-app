@@ -1,5 +1,5 @@
-import { useState } from "react";
 import { router } from "expo-router";
+import { useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -27,8 +27,7 @@ export function CategoryDetailScreen({
   category,
   entries,
 }: CategoryDetailScreenProps) {
-  const [selectedSort, setSelectedSort] =
-    useState<SortDimension>("overall");
+  const [selectedSort, setSelectedSort] = useState<SortDimension>("overall");
   const selectedSortLabel =
     sortOptions.find((option) => option.value === selectedSort)?.label ??
     "Overall";
@@ -56,7 +55,7 @@ export function CategoryDetailScreen({
           </View>
         </View>
 
-        <View className="mt-2 gap-2">
+        <View className="gap-2">
           <Text className="text-center font-display text-[38px] font-bold leading-10 text-primary">
             {category.name}
           </Text>
@@ -127,7 +126,9 @@ export function CategoryDetailScreen({
           )}
         </ScrollView>
 
-        <FloatingAddButton accessibilityLabel="Add entry" />
+        {hasEntries ? (
+          <FloatingAddButton accessibilityLabel="Add entry" />
+        ) : null}
       </View>
     </SafeAreaView>
   );

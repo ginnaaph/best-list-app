@@ -14,7 +14,7 @@ const categoryImages: Record<Category["id"], number> = {
   tacos: images.food.tacos,
   pizza: images.food.pizza,
   coffee: images.food.iceCoffee,
-  dumplings: images.food.cookies,
+  cookies: images.food.cookies,
 };
 
 export function CategoryCard({ category }: CategoryCardProps) {
