@@ -1,6 +1,6 @@
-import { useState } from "react";
 import { router } from "expo-router";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { useState } from "react";
+import { Alert, Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { EntryCard } from "@/components/entry-card";
@@ -27,13 +27,15 @@ export function CategoryDetailScreen({
   category,
   entries,
 }: CategoryDetailScreenProps) {
-  const [selectedSort, setSelectedSort] =
-    useState<SortDimension>("overall");
+  const [selectedSort, setSelectedSort] = useState<SortDimension>("overall");
   const selectedSortLabel =
     sortOptions.find((option) => option.value === selectedSort)?.label ??
     "Overall";
   const sortedEntries = sortEntries(entries, selectedSort);
   const hasEntries = sortedEntries.length > 0;
+  const handleAddEntry = () => {
+    Alert.alert("Add entry", `Add an entry to ${category.name}.`);
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
@@ -56,7 +58,7 @@ export function CategoryDetailScreen({
           </View>
         </View>
 
-        <View className="mt-2 gap-2">
+        <View className="gap-2">
           <Text className="text-center font-display text-[38px] font-bold leading-10 text-primary">
             {category.name}
           </Text>
@@ -128,7 +130,12 @@ export function CategoryDetailScreen({
           )}
         </ScrollView>
 
-        <FloatingAddButton accessibilityLabel="Add entry" />
+        {hasEntries ? (
+          <FloatingAddButton
+            accessibilityLabel="Add entry"
+            onPress={handleAddEntry}
+          />
+        ) : null}
       </View>
     </SafeAreaView>
   );
@@ -151,7 +158,7 @@ export function CategoryNotFoundScreen() {
 
           <View className="h-7 w-7 items-center justify-center rounded-full bg-white shadow-card">
             <View className="h-5 w-5 items-center justify-center rounded-full bg-accent">
-              <Text className="text-label text-white">K</Text>
+              <Text className="text-label text-white">g</Text>
             </View>
           </View>
         </View>
