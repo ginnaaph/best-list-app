@@ -119,6 +119,7 @@ export function CategoryDetailScreen({
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="Add the first entry"
+                onPress={() => router.push("/entry/new")}
                 className="h-11 items-center justify-center rounded-full bg-accent px-6 shadow-card"
               >
                 <Text className="text-label uppercase text-white">
