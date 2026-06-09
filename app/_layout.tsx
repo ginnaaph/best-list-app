@@ -4,6 +4,7 @@ import { router, Stack } from "expo-router";
 import * as Linking from "expo-linking";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { useAppFonts } from "@/hooks/use-app-fonts";
 import { createSessionFromUrl } from "@/lib/auth";
@@ -56,11 +57,13 @@ export default function RootLayout() {
   }
 
   return (
-    <Stack
-      screenOptions={{
-        contentStyle: { backgroundColor: "#F8F8F7" },
-        headerShown: false,
-      }}
-    />
+    <GestureHandlerRootView className="flex-1">
+      <Stack
+        screenOptions={{
+          contentStyle: { backgroundColor: "#F8F8F7" },
+          headerShown: false,
+        }}
+      />
+    </GestureHandlerRootView>
   );
 }

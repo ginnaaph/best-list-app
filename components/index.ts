@@ -13,4 +13,5 @@ export { DishCardPreview, RankingPreview, ScorePreview } from "@/components/how-
 export { HowItWorksStep } from "@/components/how-it-works-step";
 export { OnboardingCardStack } from "@/components/onboarding-card-stack";
 export { SearchPill } from "@/components/search-pill";
+export { ScoreSlider } from "@/components/score-slider";
 export { VerificationModal } from "@/components/verification-modal";

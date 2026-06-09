@@ -40,7 +40,7 @@ export function EntryCard({ entry, rank }: EntryCardProps) {
                   className="mt-.75 font-body text-[12px] leading-5 text-secondary"
                   numberOfLines={1}
                 >
-                  {entry.dishName}
+                  {entry.city}
                 </Text>
               </View>
             </View>

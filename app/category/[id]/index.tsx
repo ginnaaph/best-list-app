@@ -2,11 +2,12 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useEffect } from "react";
 
 import { CategoryDetailScreen, CategoryNotFoundScreen } from "@/components";
-import { categories } from "@/data";
+import { sortEntries } from "@/lib/entry-score";
 import { useStore } from "@/store";
 
 export default function CategoryDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const categories = useStore((state) => state.categories);
   const category = categories.find((item) => item.id === id);
 
   const entries = useStore((state) => state.entries);
@@ -26,9 +27,16 @@ export default function CategoryDetail() {
     return <CategoryNotFoundScreen />;
   }
 
+  const topEntry = sortEntries(categoryEntries, "overall")[0];
+  const categoryWithStats = {
+    ...category,
+    entryCount: categoryEntries.length,
+    topEntry: topEntry?.placeName ?? "No entries yet",
+  };
+
   return (
     <CategoryDetailScreen
-      category={category}
+      category={categoryWithStats}
       entries={categoryEntries}
       onAddEntry={() => router.push(`/category/${category.id}/add-entry`)}
     />

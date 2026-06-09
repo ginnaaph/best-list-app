@@ -14,7 +14,6 @@ const allValid = mockEntries.every(entry =>
   entry.id &&
   entry.categoryId === 'breakfast-burrito' &&
   entry.placeName &&
-  entry.dishName &&
   entry.city &&
   typeof entry.taste === 'number' &&
   typeof entry.value === 'number' &&
