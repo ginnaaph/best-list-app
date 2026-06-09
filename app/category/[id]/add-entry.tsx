@@ -84,8 +84,10 @@ function TextField({
 }
 
 function parseScore(raw: string): number | null {
-  const n = parseFloat(raw);
-  if (isNaN(n) || n < 1 || n > 10) return null;
+  const normalized = raw.trim();
+  if (!/^\d+(\.\d+)?$/.test(normalized)) return null;
+  const n = Number(normalized);
+  if (!Number.isFinite(n) || n < 1 || n > 10) return null;
   return n;
 }
 
