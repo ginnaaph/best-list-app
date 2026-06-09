@@ -1,5 +1,11 @@
 import { Link } from "expo-router";
-import { Image, Pressable, Text, View } from "react-native";
+import {
+  Image,
+  type ImageSourcePropType,
+  Pressable,
+  Text,
+  View,
+} from "react-native";
 
 import { images } from "@/constants/images";
 import type { Category } from "@/types/category";
@@ -8,7 +14,7 @@ type CategoryCardProps = {
   category: Category;
 };
 
-const categoryImages: Record<Category["id"], number> = {
+const categoryImages: Partial<Record<string, ImageSourcePropType>> = {
   "breakfast-burrito": images.food.breakfastBurrito,
   ramen: images.food.ramen,
   tacos: images.food.tacos,
@@ -18,12 +24,14 @@ const categoryImages: Record<Category["id"], number> = {
 };
 
 export function CategoryCard({ category }: CategoryCardProps) {
+  const categoryImage = categoryImages[category.id] ?? images.noImages;
+
   return (
     <Link href={`./category/${category.id}`} asChild>
       <Pressable className="w-[47%] gap-2">
         <View className="h-40 w-full overflow-hidden rounded-bestlist-md">
           <Image
-            source={categoryImages[category.id]}
+            source={categoryImage}
             resizeMode="cover"
             className="h-full w-full"
           />
