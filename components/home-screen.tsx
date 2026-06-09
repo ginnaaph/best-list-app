@@ -1,3 +1,4 @@
+import { type Href, useRouter } from "expo-router";
 import { ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -10,7 +11,11 @@ import {
 import { colors } from "@/constants/theme";
 import { categories } from "@/data";
 
+const addCategoryRoute = "/add-category" as Href;
+
 export function HomeScreen() {
+  const router = useRouter();
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
       <View className="flex-1 px-5 pb-5 pt-4">
@@ -26,7 +31,7 @@ export function HomeScreen() {
           </View>
         </ScrollView>
 
-        <FloatingAddButton />
+        <FloatingAddButton onPress={() => router.push(addCategoryRoute)} />
       </View>
     </SafeAreaView>
   );

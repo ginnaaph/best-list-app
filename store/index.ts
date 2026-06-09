@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Crypto from "expo-crypto";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import * as Crypto from "expo-crypto";
 
 import { entriesByCategory } from "@/data/entries";
 import { calculateOverallScore } from "@/lib/entry-score";
@@ -35,7 +35,7 @@ export const useStore = create<StoreState>()(
       ensureCategorySeeded: (categoryId) => {
         set((state) => {
           const hasCategoryEntries = state.entries.some(
-            (entry) => entry.categoryId === categoryId
+            (entry) => entry.categoryId === categoryId,
           );
 
           if (hasCategoryEntries) {
@@ -53,6 +53,6 @@ export const useStore = create<StoreState>()(
     {
       name: "bestlist-store",
       storage: createJSONStorage(() => AsyncStorage),
-    }
-  )
+    },
+  ),
 );
