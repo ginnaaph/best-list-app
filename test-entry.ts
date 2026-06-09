@@ -10,11 +10,11 @@ console.log(`✓ ${firstEntry.placeName} overall score: ${overallScore.toFixed(2
 console.log(`  Taste: ${firstEntry.taste}, Value: ${firstEntry.value}, Portion: ${firstEntry.portion}, Vibe: ${firstEntry.vibe}`);
 
 // Test 3: Verify all entries have required fields
-const allValid = mockEntries.every(entry => 
-  entry.id && 
+const allValid = mockEntries.every(entry =>
+  entry.id &&
   entry.categoryId === 'breakfast-burrito' &&
-  entry.placeName && 
-  entry.dishName && 
+  entry.placeName &&
+  entry.dishName &&
   entry.city &&
   typeof entry.taste === 'number' &&
   typeof entry.value === 'number' &&

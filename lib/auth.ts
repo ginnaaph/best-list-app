@@ -1,7 +1,7 @@
 import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
 
-import { getSupabaseClient } from "@/lib/supabase";
+import { getSupabaseClient, assertSupabaseConfigured } from "@/lib/supabase";
 
 WebBrowser.maybeCompleteAuthSession();
 

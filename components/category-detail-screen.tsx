@@ -21,7 +21,7 @@ const sortOptions: { label: string; value: SortDimension }[] = [
 type CategoryDetailScreenProps = {
   category: Category;
   entries: Entry[];
-  onAddEntry?: () => void;
+  onAddEntry: () => void;
 };
 
 export function CategoryDetailScreen({
@@ -35,7 +35,6 @@ export function CategoryDetailScreen({
     "Overall";
   const sortedEntries = sortEntries(entries, selectedSort);
   const hasEntries = sortedEntries.length > 0;
-  const handleAddEntry = onAddEntry ?? (() => {});
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
@@ -119,7 +118,7 @@ export function CategoryDetailScreen({
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="Add the first entry"
-                onPress={handleAddEntry}
+                onPress={onAddEntry}
                 className="h-11 items-center justify-center rounded-full bg-accent px-6 shadow-card"
               >
                 <Text className="text-label uppercase text-white">
@@ -133,7 +132,7 @@ export function CategoryDetailScreen({
         {hasEntries ? (
           <FloatingAddButton
             accessibilityLabel="Add entry"
-            onPress={handleAddEntry}
+            onPress={onAddEntry}
           />
         ) : null}
       </View>

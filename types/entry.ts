@@ -6,7 +6,7 @@ export type Entry = {
   city: string;
   notes?: string;
   photoUrl?: string;
-  createdAt?: string;
+  createdAt: string;
   taste: number;
   value: number;
   portion: number;
