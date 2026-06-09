@@ -20,7 +20,7 @@ const allValid = mockEntries.every(entry =>
   typeof entry.value === 'number' &&
   typeof entry.portion === 'number' &&
   typeof entry.vibe === 'number' &&
-  entry.dateCreated instanceof Date
+  typeof entry.createdAt === 'string'
 );
 
 console.log(`✓ All ${mockEntries.length} entries valid: ${allValid}`);

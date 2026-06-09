@@ -11,7 +11,7 @@ const seededEntries = Object.values(entriesByCategory).flat();
 
 type AddEntryInput = Omit<
   Entry,
-  "id" | "createdAt" | "dateCreated" | "overallScore"
+  "id" | "createdAt" | "overallScore"
 >;
 
 type StoreState = {
