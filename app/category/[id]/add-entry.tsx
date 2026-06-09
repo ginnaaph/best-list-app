@@ -105,6 +105,7 @@ export default function AddEntryScreen() {
   const [vibe, setVibe] = useState("");
   const [notes, setNotes] = useState("");
   const [photoUrl, setPhotoUrl] = useState<string | undefined>();
+  const [isSaving, setIsSaving] = useState(false);
 
   const handlePickPhoto = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -130,6 +131,10 @@ export default function AddEntryScreen() {
   };
 
   const handleSave = () => {
+    if (isSaving) {
+      return;
+    }
+
     if (!category) {
       return;
     }
@@ -160,20 +165,25 @@ export default function AddEntryScreen() {
       return;
     }
 
-    addEntry({
-      categoryId: category.id,
-      placeName: placeName.trim(),
-      dishName: dishName.trim(),
-      city: city.trim(),
-      taste: tasteScore,
-      value: valueScore,
-      portion: portionScore,
-      vibe: vibeScore,
-      notes: notes.trim() || undefined,
-      photoUrl,
-    });
+    try {
+      setIsSaving(true);
+      addEntry({
+        categoryId: category.id,
+        placeName: placeName.trim(),
+        dishName: dishName.trim(),
+        city: city.trim(),
+        taste: tasteScore,
+        value: valueScore,
+        portion: portionScore,
+        vibe: vibeScore,
+        notes: notes.trim() || undefined,
+        photoUrl,
+      });
 
-    router.replace(`/category/${category.id}`);
+      router.replace(`/category/${category.id}`);
+    } catch (error) {
+      setIsSaving(false);
+    }
   };
 
   if (!category) {

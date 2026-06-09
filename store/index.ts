@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import * as Crypto from "expo-crypto";
 
 import { entriesByCategory } from "@/data/entries";
 import { calculateOverallScore } from "@/lib/entry-score";
@@ -9,10 +10,7 @@ import type { Entry } from "@/types/entry";
 
 const seededEntries = Object.values(entriesByCategory).flat();
 
-type AddEntryInput = Omit<
-  Entry,
-  "id" | "createdAt" | "dateCreated" | "overallScore"
->;
+type AddEntryInput = Omit<Entry, "id" | "createdAt" | "overallScore">;
 
 type StoreState = {
   entries: Entry[];
@@ -27,7 +25,7 @@ export const useStore = create<StoreState>()(
       addEntry: (input) => {
         const newEntry: Entry = {
           ...input,
-          id: Math.random().toString(36).slice(2),
+          id: Crypto.randomUUID(),
           createdAt: new Date().toISOString(),
         };
         newEntry.overallScore = calculateOverallScore(newEntry);
