@@ -1,7 +1,6 @@
-import type { Category } from "@/types/category";
 import type { Entry } from "@/types/entry";
 
-export const entriesByCategory: Record<Category["id"], Entry[]> = {
+export const entriesByCategory: Record<string, Entry[]> = {
   "breakfast-burrito": [
     {
       id: "nopalito-breakfast-burrito",
