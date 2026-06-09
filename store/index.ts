@@ -5,7 +5,6 @@ import { createJSONStorage, persist } from "zustand/middleware";
 
 import { entriesByCategory } from "@/data/entries";
 import { calculateOverallScore } from "@/lib/entry-score";
-import type { Category } from "@/types/category";
 import type { Entry } from "@/types/entry";
 
 const seededEntries = Object.values(entriesByCategory).flat();
@@ -15,7 +14,7 @@ type AddEntryInput = Omit<Entry, "id" | "createdAt" | "overallScore">;
 type StoreState = {
   entries: Entry[];
   addEntry: (entry: AddEntryInput) => Entry;
-  ensureCategorySeeded: (categoryId: Category["id"]) => void;
+  ensureCategorySeeded: (categoryId: string) => void;
 };
 
 export const useStore = create<StoreState>()(
