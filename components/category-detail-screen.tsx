@@ -1,6 +1,6 @@
 import { router } from "expo-router";
 import { useState } from "react";
-import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { EntryCard } from "@/components/entry-card";
@@ -21,11 +21,13 @@ const sortOptions: { label: string; value: SortDimension }[] = [
 type CategoryDetailScreenProps = {
   category: Category;
   entries: Entry[];
+  onAddEntry: () => void;
 };
 
 export function CategoryDetailScreen({
   category,
   entries,
+  onAddEntry,
 }: CategoryDetailScreenProps) {
   const [selectedSort, setSelectedSort] = useState<SortDimension>("overall");
   const selectedSortLabel =
@@ -33,9 +35,6 @@ export function CategoryDetailScreen({
     "Overall";
   const sortedEntries = sortEntries(entries, selectedSort);
   const hasEntries = sortedEntries.length > 0;
-  const handleAddEntry = () => {
-    Alert.alert("Add entry", `Add an entry to ${category.name}.`);
-  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
@@ -119,7 +118,7 @@ export function CategoryDetailScreen({
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="Add the first entry"
-                onPress={() => router.push("/entry/new")}
+                onPress={onAddEntry}
                 className="h-11 items-center justify-center rounded-full bg-accent px-6 shadow-card"
               >
                 <Text className="text-label uppercase text-white">
@@ -133,7 +132,7 @@ export function CategoryDetailScreen({
         {hasEntries ? (
           <FloatingAddButton
             accessibilityLabel="Add entry"
-            onPress={handleAddEntry}
+            onPress={onAddEntry}
           />
         ) : null}
       </View>
