@@ -24,7 +24,9 @@ const categoryImages: Partial<Record<string, ImageSourcePropType>> = {
 };
 
 export function CategoryCard({ category }: CategoryCardProps) {
-  const categoryImage = categoryImages[category.id] ?? images.noImages;
+  const categoryImage: ImageSourcePropType = category.coverPhoto
+    ? { uri: category.coverPhoto }
+    : (categoryImages[category.id] ?? images.noImages);
   const entrySummary =
     category.entryCount > 0 ? `#1 - ${category.topEntry}` : "No entries yet";
 

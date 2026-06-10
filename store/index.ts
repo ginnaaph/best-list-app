@@ -71,6 +71,7 @@ export const useStore = create<StoreState>()(
               ...category,
               entryCount: categoryEntries.length,
               topEntry: topEntry?.placeName ?? "No entries yet",
+              coverPhoto: topEntry?.photoUrl ?? category.coverPhoto,
             };
           });
 

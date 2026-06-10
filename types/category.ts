@@ -5,5 +5,6 @@ export type Category = {
   name: string;
   topEntry: string;
   entryCount: number;
+  coverPhoto?: string;
   tone: CategoryCardTone;
 };
