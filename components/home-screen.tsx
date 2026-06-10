@@ -9,12 +9,27 @@ import {
   SearchPill,
 } from "@/components";
 import { colors } from "@/constants/theme";
-import { categories } from "@/data";
+import { sortEntries } from "@/lib/entry-score";
+import { useStore } from "@/store";
 
 const addCategoryRoute = "/add-category" as Href;
 
 export function HomeScreen() {
   const router = useRouter();
+  const categories = useStore((state) => state.categories);
+  const entries = useStore((state) => state.entries);
+  const categoriesWithStats = categories.map((category) => {
+    const categoryEntries = entries.filter(
+      (entry) => entry.categoryId === category.id,
+    );
+    const topEntry = sortEntries(categoryEntries, "overall")[0];
+
+    return {
+      ...category,
+      entryCount: categoryEntries.length,
+      topEntry: topEntry?.placeName ?? "No entries yet",
+    };
+  });
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
@@ -27,7 +42,7 @@ export function HomeScreen() {
         >
           <View className="gap-5 pb-24">
             <SearchPill />
-            <CategoryGrid categories={categories} />
+            <CategoryGrid categories={categoriesWithStats} />
           </View>
         </ScrollView>
 

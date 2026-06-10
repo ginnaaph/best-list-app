@@ -14,39 +14,10 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { CategoryNotFoundScreen } from "@/components";
+import { CategoryNotFoundScreen, ScoreSlider } from "@/components";
 import { categories } from "@/data";
 import { colors } from "@/constants/theme";
 import { useStore } from "@/store";
-
-function ScoreInput({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  onChange: (val: string) => void;
-}) {
-  return (
-    <View className="gap-1.5">
-      <Text className="font-mono-bestlist text-[10px] font-bold uppercase tracking-[1.5px] text-secondary">
-        {label}
-        <Text className="text-accent"> (1–10)</Text>
-      </Text>
-      <TextInput
-        className="h-11 rounded-xl border border-subtle bg-white px-4 font-body text-[15px] text-primary"
-        keyboardType="decimal-pad"
-        maxLength={4}
-        placeholder="8.5"
-        placeholderTextColor={colors.secondaryText}
-        value={value}
-        onChangeText={onChange}
-        returnKeyType="done"
-      />
-    </View>
-  );
-}
 
 function TextField({
   label,
@@ -63,7 +34,7 @@ function TextField({
 }) {
   return (
     <View className="gap-1.5">
-      <Text className="font-mono-bestlist text-[10px] font-bold uppercase tracking-[1.5px] text-secondary">
+      <Text className="font-mono-bestlist text-[10px] font-bold uppercase tracking-[1.5px] text-accent">
         {label}
       </Text>
       <TextInput
@@ -83,26 +54,18 @@ function TextField({
   );
 }
 
-function parseScore(raw: string): number | null {
-  const normalized = raw.trim();
-  if (!/^\d+(\.\d+)?$/.test(normalized)) return null;
-  const n = Number(normalized);
-  if (!Number.isFinite(n) || n < 1 || n > 10) return null;
-  return n;
-}
-
 export default function AddEntryScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const categories = useStore((state) => state.categories);
   const category = categories.find((item) => item.id === id);
   const addEntry = useStore((state) => state.addEntry);
 
   const [placeName, setPlaceName] = useState("");
-  const [dishName, setDishName] = useState("");
   const [city, setCity] = useState("");
-  const [taste, setTaste] = useState("");
-  const [value, setValue] = useState("");
-  const [portion, setPortion] = useState("");
-  const [vibe, setVibe] = useState("");
+  const [taste, setTaste] = useState(7);
+  const [value, setValue] = useState(7);
+  const [portion, setPortion] = useState(7);
+  const [vibe, setVibe] = useState(7);
   const [notes, setNotes] = useState("");
   const [photoUrl, setPhotoUrl] = useState<string | undefined>();
   const [isSaving, setIsSaving] = useState(false);
@@ -139,28 +102,10 @@ export default function AddEntryScreen() {
       return;
     }
 
-    if (!placeName.trim() || !dishName.trim() || !city.trim()) {
+    if (!placeName.trim() || !city.trim()) {
       Alert.alert(
         "Missing fields",
-        "Please fill in Place Name, Dish Name, and City."
-      );
-      return;
-    }
-
-    const tasteScore = parseScore(taste);
-    const valueScore = parseScore(value);
-    const portionScore = parseScore(portion);
-    const vibeScore = parseScore(vibe);
-
-    if (
-      tasteScore === null ||
-      valueScore === null ||
-      portionScore === null ||
-      vibeScore === null
-    ) {
-      Alert.alert(
-        "Invalid scores",
-        "Taste, Value, Portion, and Vibe must each be a number between 1 and 10."
+        "Please fill in Place Name and City."
       );
       return;
     }
@@ -170,18 +115,18 @@ export default function AddEntryScreen() {
       addEntry({
         categoryId: category.id,
         placeName: placeName.trim(),
-        dishName: dishName.trim(),
         city: city.trim(),
-        taste: tasteScore,
-        value: valueScore,
-        portion: portionScore,
-        vibe: vibeScore,
+        taste,
+        value,
+        portion,
+        vibe,
         notes: notes.trim() || undefined,
         photoUrl,
       });
 
       router.replace(`/category/${category.id}`);
     } catch (error) {
+      console.error("Failed to save entry:", error);
       setIsSaving(false);
     }
   };
@@ -271,13 +216,6 @@ export default function AddEntryScreen() {
             />
 
             <TextField
-              label="Dish Name"
-              placeholder="e.g. Breakfast Burrito"
-              value={dishName}
-              onChange={setDishName}
-            />
-
-            <TextField
               label="City"
               placeholder="e.g. San Francisco, CA"
               value={city}
@@ -285,18 +223,18 @@ export default function AddEntryScreen() {
             />
 
             <View className="rounded-2xl bg-white p-4 shadow-card">
-              <Text className="mb-3 font-mono-bestlist text-[10px] font-bold uppercase tracking-[1.5px] text-secondary">
+              <Text className="mb-3 font-mono-bestlist text-[10px] font-bold uppercase tracking-[1.5px] text-accent">
                 Scores
               </Text>
               <View className="gap-3">
-                <ScoreInput label="Taste" value={taste} onChange={setTaste} />
-                <ScoreInput label="Value" value={value} onChange={setValue} />
-                <ScoreInput
+                <ScoreSlider label="Taste" value={taste} onChange={setTaste} />
+                <ScoreSlider label="Value" value={value} onChange={setValue} />
+                <ScoreSlider
                   label="Portion"
                   value={portion}
                   onChange={setPortion}
                 />
-                <ScoreInput label="Vibe" value={vibe} onChange={setVibe} />
+                <ScoreSlider label="Vibe" value={vibe} onChange={setVibe} />
               </View>
             </View>
 

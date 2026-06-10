@@ -25,6 +25,8 @@ const categoryImages: Partial<Record<string, ImageSourcePropType>> = {
 
 export function CategoryCard({ category }: CategoryCardProps) {
   const categoryImage = categoryImages[category.id] ?? images.noImages;
+  const entrySummary =
+    category.entryCount > 0 ? `#1 - ${category.topEntry}` : "No entries yet";
 
   return (
     <Link href={`./category/${category.id}`} asChild>
@@ -47,7 +49,7 @@ export function CategoryCard({ category }: CategoryCardProps) {
             {category.name}
           </Text>
           <Text className="text-caption text-secondary" numberOfLines={1}>
-            #1 - {category.topEntry}
+            {entrySummary}
           </Text>
         </View>
       </Pressable>

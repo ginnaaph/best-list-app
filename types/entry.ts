@@ -2,7 +2,6 @@ export type Entry = {
   id: string;
   categoryId: string;
   placeName: string;
-  dishName: string;
   city: string;
   notes?: string;
   photoUrl?: string;
