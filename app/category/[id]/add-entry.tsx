@@ -56,11 +56,8 @@ function TextField({
 
 export default function AddEntryScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-export default function AddEntryScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
   const categories = useStore((state) => state.categories);
   const category = categories.find((item) => item.id === id);
-  const addEntry = useStore((state) => state.addEntry);
   const addEntry = useStore((state) => state.addEntry);
 
   const [placeName, setPlaceName] = useState("");
