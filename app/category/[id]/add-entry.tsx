@@ -15,7 +15,6 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { CategoryNotFoundScreen, ScoreSlider } from "@/components";
-import { categories } from "@/data";
 import { colors } from "@/constants/theme";
 import { useStore } from "@/store";
 
@@ -167,45 +166,39 @@ export default function AddEntryScreen() {
               <Text className="font-mono-bestlist text-[10px] font-bold uppercase tracking-[1.5px] text-secondary">
                 Photo (optional)
               </Text>
+
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={photoUrl ? "Change photo" : "Add photo"}
+                onPress={handlePickPhoto}
+              >
+                {photoUrl ? (
+                  <Image
+                    className="h-44 w-full rounded-xl bg-white"
+                    source={{ uri: photoUrl }}
+                  />
+                ) : (
+                  <View className="h-44 items-center justify-center rounded-xl border border-dashed border-subtle bg-white gap-2">
+                    <Text className="text-3xl">📷</Text>
+                    <Text className="font-body text-[14px] text-secondary">
+                      Tap to add a photo
+                    </Text>
+                  </View>
+                )}
+              </Pressable>
+
               {photoUrl ? (
-                <Image
-                  className="h-44 w-full rounded-xl bg-white"
-                  source={{ uri: photoUrl }}
-                />
-              ) : (
-                <View className="h-44 items-center justify-center rounded-xl border border-dashed border-subtle bg-white">
-                  <Text className="font-body text-[14px] text-secondary">
-                    No photo selected
-                  </Text>
-                </View>
-              )}
-              <View className="flex-row gap-3">
                 <Pressable
                   accessibilityRole="button"
-                  accessibilityLabel={
-                    photoUrl ? "Change photo" : "Choose photo"
-                  }
-                  className="h-11 flex-1 items-center justify-center rounded-full bg-primary px-4"
-                  onPress={handlePickPhoto}
+                  accessibilityLabel="Remove photo"
+                  className="h-11 items-center justify-center rounded-full border border-subtle bg-white px-4"
+                  onPress={() => setPhotoUrl(undefined)}
                 >
-                  <Text className="text-label uppercase text-white">
-                    {photoUrl ? "Change Photo" : "Choose Photo"}
+                  <Text className="font-mono-bestlist text-[10px] font-bold uppercase tracking-[1.5px] text-primary">
+                    Remove Photo
                   </Text>
                 </Pressable>
-
-                {photoUrl ? (
-                  <Pressable
-                    accessibilityRole="button"
-                    accessibilityLabel="Remove photo"
-                    className="h-11 items-center justify-center rounded-full border border-subtle bg-white px-4"
-                    onPress={() => setPhotoUrl(undefined)}
-                  >
-                    <Text className="text-label uppercase text-primary">
-                      Remove
-                    </Text>
-                  </Pressable>
-                ) : null}
-              </View>
+              ) : null}
             </View>
 
             <TextField
