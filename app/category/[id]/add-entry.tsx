@@ -128,7 +128,8 @@ export default function AddEntryScreen() {
       });
 
       router.replace(`/category/${category.id}`);
-    } catch {
+    } catch (error) {
+      console.error("Failed to save entry:", error);
       setIsSaving(false);
     }
   };
