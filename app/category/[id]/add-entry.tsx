@@ -15,7 +15,6 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { CategoryNotFoundScreen, ScoreSlider } from "@/components";
-import { categories } from "@/data";
 import { colors } from "@/constants/theme";
 import { useStore } from "@/store";
 
@@ -56,6 +55,7 @@ function TextField({
 
 export default function AddEntryScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const categories = useStore((state) => state.categories);
   const category = categories.find((item) => item.id === id);
   const addEntry = useStore((state) => state.addEntry);
 

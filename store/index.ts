@@ -5,7 +5,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 
 import { categories as seededCategories } from "@/data/categories";
 import { entriesByCategory } from "@/data/entries";
-import { calculateOverallScore } from "@/lib/entry-score";
+import { calculateOverallScore, sortEntries } from "@/lib/entry-score";
 import type { Category, CategoryCardTone } from "@/types/category";
 import type { Entry } from "@/types/entry";
 
@@ -54,7 +54,29 @@ export const useStore = create<StoreState>()(
           createdAt: new Date().toISOString(),
         };
         newEntry.overallScore = calculateOverallScore(newEntry);
-        set((state) => ({ entries: [...state.entries, newEntry] }));
+
+        set((state) => {
+          const entries = [...state.entries, newEntry];
+          const categories = state.categories.map((category) => {
+            if (category.id !== input.categoryId) {
+              return category;
+            }
+
+            const categoryEntries = entries.filter(
+              (entry) => entry.categoryId === category.id,
+            );
+            const topEntry = sortEntries(categoryEntries, "overall")[0];
+
+            return {
+              ...category,
+              entryCount: categoryEntries.length,
+              topEntry: topEntry?.placeName ?? "No entries yet",
+            };
+          });
+
+          return { categories, entries };
+        });
+
         return newEntry;
       },
       ensureCategorySeeded: (categoryId) => {
