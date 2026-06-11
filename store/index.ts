@@ -20,14 +20,44 @@ const categoryTones: CategoryCardTone[] = [
 ];
 
 type AddEntryInput = Omit<Entry, "id" | "createdAt" | "overallScore">;
+type UpdateEntryInput = Omit<
+  Entry,
+  "id" | "categoryId" | "createdAt" | "overallScore"
+>;
 
 type StoreState = {
   categories: Category[];
   entries: Entry[];
   addCategory: (name: string) => Category;
   addEntry: (entry: AddEntryInput) => Entry;
+  updateEntry: (entryId: string, entry: UpdateEntryInput) => Entry | undefined;
+  deleteEntry: (entryId: string) => Entry | undefined;
   ensureCategorySeeded: (categoryId: string) => void;
 };
+
+function updateCategorySummary(
+  categories: Category[],
+  entries: Entry[],
+  categoryId: string,
+) {
+  return categories.map((category) => {
+    if (category.id !== categoryId) {
+      return category;
+    }
+
+    const categoryEntries = entries.filter(
+      (entry) => entry.categoryId === category.id,
+    );
+    const topEntry = sortEntries(categoryEntries, "overall")[0];
+
+    return {
+      ...category,
+      entryCount: categoryEntries.length,
+      topEntry: topEntry?.placeName ?? "No entries yet",
+      coverPhoto: topEntry?.photoUrl,
+    };
+  });
+}
 
 export const useStore = create<StoreState>()(
   persist(
@@ -79,6 +109,59 @@ export const useStore = create<StoreState>()(
         });
 
         return newEntry;
+      },
+      updateEntry: (entryId, input) => {
+        let updatedEntry: Entry | undefined;
+
+        set((state) => {
+          const currentEntry = state.entries.find((entry) => entry.id === entryId);
+
+          if (!currentEntry) {
+            return state;
+          }
+
+          const nextEntry = {
+            ...currentEntry,
+            ...input,
+          };
+          nextEntry.overallScore = calculateOverallScore(nextEntry);
+          updatedEntry = nextEntry;
+
+          const entries = state.entries.map((entry) =>
+            entry.id === entryId ? nextEntry : entry,
+          );
+          const categories = updateCategorySummary(
+            state.categories,
+            entries,
+            currentEntry.categoryId,
+          );
+
+          return { categories, entries };
+        });
+
+        return updatedEntry;
+      },
+      deleteEntry: (entryId) => {
+        let deletedEntry: Entry | undefined;
+
+        set((state) => {
+          deletedEntry = state.entries.find((entry) => entry.id === entryId);
+
+          if (!deletedEntry) {
+            return state;
+          }
+
+          const entries = state.entries.filter((entry) => entry.id !== entryId);
+          const categories = updateCategorySummary(
+            state.categories,
+            entries,
+            deletedEntry.categoryId,
+          );
+
+          return { categories, entries };
+        });
+
+        return deletedEntry;
       },
       ensureCategorySeeded: (categoryId) => {
         set((state) => {
