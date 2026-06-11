@@ -92,7 +92,7 @@ export default function EntryDetailScreen() {
             accessibilityRole="button"
             accessibilityLabel="Edit entry"
             className="h-9 w-9 items-center justify-center rounded-full bg-white shadow-card"
-            onPress={() => {}}
+            onPress={() => router.push(`/entry/${entry.id}/edit`)}
           >
             <Text className="text-[18px] leading-6 text-primary">✎</Text>
           </Pressable>
