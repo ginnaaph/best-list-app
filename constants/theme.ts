@@ -24,8 +24,9 @@ export const spacing = {
 } as const;
 
 export const fonts = {
-  display: "Georgia",
-  body: "System",
+  display: "RobotoSlab_700Bold",
+  body: "Roboto_400Regular",
+  bodyBold: "Roboto_700Bold",
   mono: "Menlo",
 } as const;
 
@@ -34,43 +35,36 @@ export const typography = {
     fontFamily: fonts.display,
     fontSize: 34,
     lineHeight: 40,
-    fontWeight: "700",
   },
   screenTitle: {
     fontFamily: fonts.display,
     fontSize: 28,
     lineHeight: 34,
-    fontWeight: "700",
   },
   cardTitle: {
     fontFamily: fonts.display,
     fontSize: 18,
     lineHeight: 24,
-    fontWeight: "700",
   },
   body: {
     fontFamily: fonts.body,
     fontSize: 14,
     lineHeight: 20,
-    fontWeight: "400",
   },
   caption: {
     fontFamily: fonts.body,
     fontSize: 11,
     lineHeight: 14,
-    fontWeight: "500",
   },
   label: {
-    fontFamily: fonts.body,
+    fontFamily: fonts.bodyBold,
     fontSize: 10,
     lineHeight: 13,
-    fontWeight: "700",
   },
   score: {
-    fontFamily: fonts.body,
+    fontFamily: fonts.bodyBold,
     fontSize: 13,
     lineHeight: 16,
-    fontWeight: "700",
   },
 } as const;
 

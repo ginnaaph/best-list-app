@@ -107,7 +107,14 @@ export function CategoryDetailScreen({
           {hasEntries ? (
             <View className="gap-4 pb-24">
               {sortedEntries.map((entry, index) => (
-                <EntryCard key={entry.id} entry={entry} rank={index + 1} />
+                <Pressable
+                  key={entry.id}
+                  accessibilityRole="button"
+                  accessibilityLabel={`Open ${entry.placeName}`}
+                  onPress={() => router.push(`/entry/${entry.id}`)}
+                >
+                  <EntryCard entry={entry} rank={index + 1} />
+                </Pressable>
               ))}
             </View>
           ) : (
