@@ -54,7 +54,7 @@ function updateCategorySummary(
       ...category,
       entryCount: categoryEntries.length,
       topEntry: topEntry?.placeName ?? "No entries yet",
-      coverPhoto: topEntry?.photoUrl,
+      coverPhoto: topEntry?.photoUrl ?? category.coverPhoto,
     };
   });
 }
@@ -114,7 +114,9 @@ export const useStore = create<StoreState>()(
         let updatedEntry: Entry | undefined;
 
         set((state) => {
-          const currentEntry = state.entries.find((entry) => entry.id === entryId);
+          const currentEntry = state.entries.find(
+            (entry) => entry.id === entryId,
+          );
 
           if (!currentEntry) {
             return state;
