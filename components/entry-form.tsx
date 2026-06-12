@@ -12,8 +12,8 @@ import {
   View,
 } from "react-native";
 
-import { colors } from "@/constants/theme";
 import { ScoreSlider } from "@/components/score-slider";
+import { colors } from "@/constants/theme";
 
 export type EntryFormValues = {
   placeName: string;
@@ -53,7 +53,7 @@ function TextField({
         {label}
       </Text>
       <TextInput
-        className={`rounded-xl border border-subtle bg-white px-4 font-body text-[15px] text-primary ${
+        className={`rounded-xl border border-subtle bg-white pt-2 pb-2 mt-1 px-4 font-body text-[15px] text-primary ${
           multiline ? "py-3" : "h-11"
         }`}
         placeholder={placeholder}
