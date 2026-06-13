@@ -37,7 +37,7 @@ const categoryImages: Partial<Record<string, ImageSourcePropType>> = {
 
 export default function Profile() {
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#F5F0E8" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#f8f8f7" }}>
       <View className="flex-1 px-5 pb-3 pt-2">
         <View className="flex-row items-center justify-between">
           <Pressable
@@ -63,7 +63,7 @@ export default function Profile() {
             </Text>
           </View>
 
-          <Text className="mt-3 font-display text-[33px] font-bold leading-9 text-primary">
+          <Text className="mt-1 font-display text-[33px] font-bold leading-9 text-primary">
             {profile.displayName}
           </Text>
 
@@ -72,20 +72,20 @@ export default function Profile() {
           </Text>
 
           <Text
-            className="mt-2 max-w-[310px] text-center font-body text-[17px] leading-5.5 text-primary"
+            className="mt-2 max-w-77.5 text-center font-body text-[14px] leading-5.5 text-primary"
             numberOfLines={2}
           >
             {profile.bio}
           </Text>
 
-          <View className="mt-4 h-12 items-center justify-center rounded-full border border-subtle bg-white px-8">
-            <Text className="font-body text-[18px] font-bold leading-5 text-primary">
+          <View className="mt-2 h-10 items-center justify-center rounded-full border border-subtle bg-white px-5">
+            <Text className="font-body text-[14px] font-semibold leading-5 text-primary">
               Edit profile
             </Text>
           </View>
         </View>
 
-        <View className="mt-5 flex-row items-center rounded-bestlist-xl border border-subtle bg-white px-6 py-3.5 shadow-card">
+        <View className="mt-5 flex-row items-center rounded-bestlist-xl border border-subtle bg-white px-6 py-5 shadow-card">
           {profile.stats.map((stat, index) => (
             <View key={stat.label} className="flex-1 flex-row items-center">
               <View className="flex-1 items-center">
@@ -106,15 +106,15 @@ export default function Profile() {
 
         <View className="mt-5 flex-1">
           <View className="flex-row items-center justify-between">
-            <Text className="font-mono-bestlist text-[14px] uppercase leading-4 tracking-[5px] text-secondary">
+            <Text className="font-mono-bestlist text-[13px] uppercase leading-4 tracking-[2px] text-secondary">
               Your lists
             </Text>
-            <Text className="font-body text-[18px] font-bold leading-5 text-[#2D5016]">
+            <Text className="font-body text-[13px] font-bold leading-5 text-[#2D5016] mb-2">
               See all
             </Text>
           </View>
 
-          <View className="mt-3 flex-1 gap-2">
+          <View className="mt-1 flex-1 gap-2">
             {listCategories.map((category) => {
               const categoryImage: ImageSourcePropType = category.coverPhoto
                 ? { uri: category.coverPhoto }
@@ -135,7 +135,7 @@ export default function Profile() {
                       />
                     </View>
 
-                    <View className="min-w-0 flex-1 px-3">
+                    <View className="min-w-0 flex-1 px-2 p-4">
                       <Text
                         className="font-display text-[20px] font-bold leading-6 text-primary"
                         numberOfLines={1}
