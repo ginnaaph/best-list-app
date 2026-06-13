@@ -33,3 +33,4 @@ Overall score is auto-calculated. User can re-sort any list by any single dimens
 3. Add Entry — photo + place + weighted score sliders + note
 4. Entry Detail — full view with score breakdown
 5. Shareable List — read-only public view
+6. Profile - user stats and categories
