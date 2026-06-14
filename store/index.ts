@@ -3,13 +3,18 @@ import * as Crypto from "expo-crypto";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-import { categories as seededCategories } from "@/data/categories";
-import { entriesByCategory } from "@/data/entries";
-import { calculateOverallScore, sortEntries } from "@/lib/entry-score";
+import {
+  deleteEntry as deleteSupabaseEntry,
+  getCategories,
+  getEntries,
+  insertCategory,
+  insertEntry,
+  updateEntry as updateSupabaseEntry,
+} from "@/lib/api";
+import { sortEntries } from "@/lib/entry-score";
 import type { Category, CategoryCardTone } from "@/types/category";
 import type { Entry } from "@/types/entry";
 
-const seededEntries = Object.values(entriesByCategory).flat();
 const categoryTones: CategoryCardTone[] = [
   "gold",
   "clay",
@@ -28,6 +33,8 @@ type UpdateEntryInput = Omit<
 type StoreState = {
   categories: Category[];
   entries: Entry[];
+  isLoading: boolean;
+  syncFromSupabase: () => Promise<void>;
   addCategory: (name: string) => Category;
   addEntry: (entry: AddEntryInput) => Entry;
   updateEntry: (entryId: string, entry: UpdateEntryInput) => Entry | undefined;
@@ -35,7 +42,23 @@ type StoreState = {
   ensureCategorySeeded: (categoryId: string) => void;
 };
 
-function updateCategorySummary(
+function updateCategorySummaries(categories: Category[], entries: Entry[]) {
+  return categories.map((category) => {
+    const categoryEntries = entries.filter(
+      (entry) => entry.categoryId === category.id,
+    );
+    const topEntry = sortEntries(categoryEntries, "overall")[0];
+
+    return {
+      ...category,
+      entryCount: categoryEntries.length,
+      topEntry: topEntry?.placeName ?? "No entries yet",
+      coverPhoto: topEntry?.photoUrl ?? category.coverPhoto,
+    };
+  });
+}
+
+function updateCategorySummaryById(
   categories: Category[],
   entries: Entry[],
   categoryId: string,
@@ -59,11 +82,33 @@ function updateCategorySummary(
   });
 }
 
+function reportMutationError(action: string, error: unknown) {
+  console.error(`Failed to ${action}:`, error);
+}
+
 export const useStore = create<StoreState>()(
   persist(
     (set, get) => ({
-      categories: seededCategories,
-      entries: seededEntries,
+      categories: [],
+      entries: [],
+      isLoading: false,
+      syncFromSupabase: async () => {
+        set({ isLoading: true });
+
+        try {
+          const [categories, entries] = await Promise.all([
+            getCategories(),
+            getEntries(),
+          ]);
+
+          set({
+            categories: updateCategorySummaries(categories, entries),
+            entries,
+          });
+        } finally {
+          set({ isLoading: false });
+        }
+      },
       addCategory: (name) => {
         const newCategory: Category = {
           id: Crypto.randomUUID(),
@@ -73,119 +118,113 @@ export const useStore = create<StoreState>()(
           tone: categoryTones[get().categories.length % categoryTones.length],
         };
 
-        set((state) => ({ categories: [...state.categories, newCategory] }));
+        void insertCategory(newCategory)
+          .then((savedCategory) => {
+            set((state) => ({
+              categories: updateCategorySummaries(
+                [...state.categories, savedCategory],
+                state.entries,
+              ),
+            }));
+          })
+          .catch((error: unknown) => reportMutationError("add category", error));
 
         return newCategory;
       },
       addEntry: (input) => {
-        const newEntry: Entry = {
+        const pendingEntry: Entry = {
           ...input,
           id: Crypto.randomUUID(),
           createdAt: new Date().toISOString(),
         };
-        newEntry.overallScore = calculateOverallScore(newEntry);
 
-        set((state) => {
-          const entries = [...state.entries, newEntry];
-          const categories = state.categories.map((category) => {
-            if (category.id !== input.categoryId) {
-              return category;
-            }
+        void insertEntry(pendingEntry)
+          .then((newEntry) => {
+            set((state) => {
+              const entries = [...state.entries, newEntry];
+              const categories = updateCategorySummaryById(
+                state.categories,
+                entries,
+                newEntry.categoryId,
+              );
 
-            const categoryEntries = entries.filter(
-              (entry) => entry.categoryId === category.id,
-            );
-            const topEntry = sortEntries(categoryEntries, "overall")[0];
+              return { categories, entries };
+            });
+          })
+          .catch((error: unknown) => reportMutationError("add entry", error));
 
-            return {
-              ...category,
-              entryCount: categoryEntries.length,
-              topEntry: topEntry?.placeName ?? "No entries yet",
-              coverPhoto: topEntry?.photoUrl ?? category.coverPhoto,
-            };
-          });
-
-          return { categories, entries };
-        });
-
-        return newEntry;
+        return pendingEntry;
       },
       updateEntry: (entryId, input) => {
-        let updatedEntry: Entry | undefined;
+        const currentEntry = get().entries.find((entry) => entry.id === entryId);
 
-        set((state) => {
-          const currentEntry = state.entries.find(
-            (entry) => entry.id === entryId,
+        if (!currentEntry) {
+          return undefined;
+        }
+
+        const pendingEntry: Entry = {
+          ...currentEntry,
+          ...input,
+        };
+
+        void updateSupabaseEntry(entryId, input)
+          .then((updatedEntry) => {
+            set((state) => {
+              const entries = state.entries.map((entry) =>
+                entry.id === entryId ? updatedEntry : entry,
+              );
+              const categories = updateCategorySummaryById(
+                state.categories,
+                entries,
+                updatedEntry.categoryId,
+              );
+
+              return { categories, entries };
+            });
+          })
+          .catch((error: unknown) =>
+            reportMutationError("update entry", error),
           );
 
-          if (!currentEntry) {
-            return state;
-          }
-
-          const nextEntry = {
-            ...currentEntry,
-            ...input,
-          };
-          nextEntry.overallScore = calculateOverallScore(nextEntry);
-          updatedEntry = nextEntry;
-
-          const entries = state.entries.map((entry) =>
-            entry.id === entryId ? nextEntry : entry,
-          );
-          const categories = updateCategorySummary(
-            state.categories,
-            entries,
-            currentEntry.categoryId,
-          );
-
-          return { categories, entries };
-        });
-
-        return updatedEntry;
+        return pendingEntry;
       },
       deleteEntry: (entryId) => {
-        let deletedEntry: Entry | undefined;
+        const currentEntry = get().entries.find((entry) => entry.id === entryId);
 
-        set((state) => {
-          deletedEntry = state.entries.find((entry) => entry.id === entryId);
+        if (!currentEntry) {
+          return undefined;
+        }
 
-          if (!deletedEntry) {
-            return state;
-          }
+        void deleteSupabaseEntry(entryId)
+          .then((deletedEntry) => {
+            set((state) => {
+              const entries = state.entries.filter(
+                (entry) => entry.id !== entryId,
+              );
+              const categories = updateCategorySummaryById(
+                state.categories,
+                entries,
+                deletedEntry.categoryId,
+              );
 
-          const entries = state.entries.filter((entry) => entry.id !== entryId);
-          const categories = updateCategorySummary(
-            state.categories,
-            entries,
-            deletedEntry.categoryId,
+              return { categories, entries };
+            });
+          })
+          .catch((error: unknown) =>
+            reportMutationError("delete entry", error),
           );
 
-          return { categories, entries };
-        });
-
-        return deletedEntry;
+        return currentEntry;
       },
-      ensureCategorySeeded: (categoryId) => {
-        set((state) => {
-          const hasCategoryEntries = state.entries.some(
-            (entry) => entry.categoryId === categoryId,
-          );
-
-          if (hasCategoryEntries) {
-            return state;
-          }
-
-          const categoryEntries = entriesByCategory[categoryId] ?? [];
-
-          return {
-            entries: [...state.entries, ...categoryEntries],
-          };
-        });
-      },
+      ensureCategorySeeded: () => {},
     }),
     {
       name: "bestlist-store",
       storage: createJSONStorage(() => AsyncStorage),
+      partialize: (state) => ({
+        categories: state.categories,
+        entries: state.entries,
+      }),
     },
   ),
 );

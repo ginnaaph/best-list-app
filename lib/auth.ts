@@ -10,7 +10,7 @@ export type SocialAuthProvider = "google" | "apple";
 
 export const authRedirectTo = Linking.createURL("auth/callback");
 
-export async function sendEmailOtp(email: string, _mode: EmailAuthMode) {
+export async function sendEmailOtp(email: string, mode: EmailAuthMode) {
   assertSupabaseConfigured();
 
   const normalizedEmail = email.trim().toLowerCase();
@@ -18,6 +18,8 @@ export async function sendEmailOtp(email: string, _mode: EmailAuthMode) {
   if (!normalizedEmail) {
     throw new Error("Enter an email address.");
   }
+
+  const supabase = getSupabaseClient();
 
   const { error } = await supabase.auth.signInWithOtp({
     email: normalizedEmail,
