@@ -1,4 +1,5 @@
 import { Link, router } from "expo-router";
+import { useState } from "react";
 import {
   Image,
   type ImageSourcePropType,
@@ -10,6 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { images } from "@/constants/images";
 import { categories } from "@/data";
+import { getSupabaseClient } from "@/lib/supabase";
 
 const profile = {
   initials: "G",
@@ -36,6 +38,30 @@ const categoryImages: Partial<Record<string, ImageSourcePropType>> = {
 };
 
 export default function Profile() {
+  const [isSigningOut, setIsSigningOut] = useState(false);
+
+  async function handleSignOut() {
+    if (isSigningOut) {
+      return;
+    }
+
+    setIsSigningOut(true);
+
+    try {
+      const supabase = getSupabaseClient();
+      const { error } = await supabase.auth.signOut();
+
+      if (error) {
+        console.error("Sign out failed:", error.message);
+        return;
+      }
+
+      router.replace("/sign-in");
+    } finally {
+      setIsSigningOut(false);
+    }
+  }
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f8f8f7" }}>
       <View className="flex-1 px-5 pb-3 pt-2">
@@ -50,9 +76,11 @@ export default function Profile() {
           </Pressable>
 
           <View className="h-11 w-11 items-center justify-center rounded-full border border-subtle bg-white">
-            <Text className="font-body text-[22px] leading-6 text-primary">
-              ☼
-            </Text>
+            <Image
+              source={images.setting}
+              resizeMode="contain"
+              className="h-5 w-5"
+            />
           </View>
         </View>
 
@@ -159,6 +187,18 @@ export default function Profile() {
             })}
           </View>
         </View>
+
+        <Pressable
+          onPress={handleSignOut}
+          disabled={isSigningOut}
+          className={`mt-4 h-10 items-center justify-center rounded-full border border-subtle bg-white px-5 ${
+            isSigningOut ? "opacity-60" : "opacity-100"
+          }`}
+        >
+          <Text className="font-body text-[14px] font-semibold leading-5 text-red-500">
+            {isSigningOut ? "Signing out..." : "Sign Out"}
+          </Text>
+        </Pressable>
       </View>
     </SafeAreaView>
   );

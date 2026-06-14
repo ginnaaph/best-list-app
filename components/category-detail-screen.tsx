@@ -1,10 +1,11 @@
 import { router } from "expo-router";
 import { useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Image, Pressable, ScrollView, Share, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { EntryCard } from "@/components/entry-card";
 import { FloatingAddButton } from "@/components/floating-add-button";
+import { images } from "@/constants/images";
 import { colors } from "@/constants/theme";
 import { sortEntries, type SortDimension } from "@/lib/entry-score";
 import type { Category } from "@/types/category";
@@ -35,6 +36,11 @@ export function CategoryDetailScreen({
     "Overall";
   const sortedEntries = sortEntries(entries, selectedSort);
   const hasEntries = sortedEntries.length > 0;
+  const shareCategory = () => {
+    void Share.share({
+      message: `My best ${category.name} list on BestList 🌮\nbestlist://share/${category.id}`,
+    });
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
@@ -50,9 +56,24 @@ export function CategoryDetailScreen({
             <Text className="text-card-title text-primary">‹</Text>
           </Pressable>
 
-          <View className="h-7 w-7 items-center justify-center rounded-full bg-white shadow-card">
-            <View className="h-7 w-7 items-center justify-center rounded-full bg-accent">
-              <Text className="text-label text-white">G</Text>
+          <View className="flex-row items-center gap-2">
+            <Pressable
+              accessibilityLabel={`Share ${category.name}`}
+              accessibilityRole="button"
+              className="h-9 w-9 items-center justify-center rounded-full bg-white shadow-card"
+              onPress={shareCategory}
+            >
+              <Image
+                source={images.shareIcon}
+                className="h-5 w-5"
+                resizeMode="contain"
+              />
+            </Pressable>
+
+            <View className="h-7 w-7 items-center justify-center rounded-full bg-white shadow-card">
+              <View className="h-7 w-7 items-center justify-center rounded-full bg-accent">
+                <Text className="text-label text-white">G</Text>
+              </View>
             </View>
           </View>
         </View>
