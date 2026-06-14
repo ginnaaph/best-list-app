@@ -94,7 +94,10 @@ export default function EntryDetailScreen() {
             className="h-9 w-9 items-center justify-center rounded-full bg-white shadow-card"
             onPress={() => router.push(`/entry/${entry.id}/edit`)}
           >
-            <Text className="text-[18px] leading-6 text-primary">✎</Text>
+            <Image
+              className="h-5 w-5"
+              source={images.editIcon}
+            />
           </Pressable>
         </View>
 

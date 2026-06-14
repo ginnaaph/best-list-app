@@ -5,6 +5,7 @@ import signInReference from "@/assets/BL-SignIn.png";
 import signUpReference from "@/assets/BL-SignUp.png";
 import verificationReference from "@/assets/BL-Verification.png";
 import designGuide from "@/assets/DesignGuide.png";
+import editIcon from "@/assets/icons/edit.png";
 import setting from "@/assets/icons/setting.png";
 import shareIcon from "@/assets/icons/share.png";
 import noImages from "@/assets/NoImages.jpg";
@@ -26,6 +27,7 @@ export const images = {
   verificationReference,
   designGuide,
   noImages,
+  editIcon,
   shareIcon,
   wireframe,
   setting,
