@@ -70,9 +70,11 @@ export default function Profile() {
           </Pressable>
 
           <View className="h-11 w-11 items-center justify-center rounded-full border border-subtle bg-white">
-            <Text className="font-body text-[22px] leading-6 text-primary">
-              ☼
-            </Text>
+            <Image
+              source={images.setting}
+              resizeMode="contain"
+              className="h-5 w-5"
+            />
           </View>
         </View>
 

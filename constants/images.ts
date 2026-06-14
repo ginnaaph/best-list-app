@@ -5,8 +5,9 @@ import signInReference from "@/assets/BL-SignIn.png";
 import signUpReference from "@/assets/BL-SignUp.png";
 import verificationReference from "@/assets/BL-Verification.png";
 import designGuide from "@/assets/DesignGuide.png";
+import setting from "@/assets/icons/setting.png";
+import shareIcon from "@/assets/icons/share.png";
 import noImages from "@/assets/NoImages.jpg";
-import wireframe from "@/assets/WireFrame.png";
 import breakfastBurrito from "@/assets/stockimages/Food/BreakfastBurrito.png";
 import cookies from "@/assets/stockimages/Food/Cookies.png";
 import iceCoffee from "@/assets/stockimages/Food/iceCoffee.png";
@@ -14,6 +15,7 @@ import latte from "@/assets/stockimages/Food/latte.png";
 import pizza from "@/assets/stockimages/Food/pizza.png";
 import ramen from "@/assets/stockimages/Food/ramen.png";
 import tacos from "@/assets/stockimages/Food/tacos.png";
+import wireframe from "@/assets/WireFrame.png";
 
 export const images = {
   bestListMark,
@@ -24,7 +26,9 @@ export const images = {
   verificationReference,
   designGuide,
   noImages,
+  shareIcon,
   wireframe,
+  setting,
   food: {
     breakfastBurrito,
     cookies,
