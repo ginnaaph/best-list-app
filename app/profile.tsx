@@ -1,4 +1,5 @@
 import { Link, router } from "expo-router";
+import { useState } from "react";
 import {
   Image,
   type ImageSourcePropType,
@@ -10,6 +11,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { images } from "@/constants/images";
 import { categories } from "@/data";
+import { getSupabaseClient } from "@/lib/supabase";
 
 const profile = {
   initials: "G",
@@ -36,6 +38,24 @@ const categoryImages: Partial<Record<string, ImageSourcePropType>> = {
 };
 
 export default function Profile() {
+  const [isSigningOut, setIsSigningOut] = useState(false);
+
+  async function handleSignOut() {
+    if (isSigningOut) {
+      return;
+    }
+
+    setIsSigningOut(true);
+
+    try {
+      const supabase = getSupabaseClient();
+      await supabase.auth.signOut();
+      router.replace("/sign-in");
+    } finally {
+      setIsSigningOut(false);
+    }
+  }
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f8f8f7" }}>
       <View className="flex-1 px-5 pb-3 pt-2">
@@ -159,6 +179,18 @@ export default function Profile() {
             })}
           </View>
         </View>
+
+        <Pressable
+          onPress={handleSignOut}
+          disabled={isSigningOut}
+          className={`mt-4 h-10 items-center justify-center rounded-full border border-subtle bg-white px-5 ${
+            isSigningOut ? "opacity-60" : "opacity-100"
+          }`}
+        >
+          <Text className="font-body text-[14px] font-semibold leading-5 text-red-500">
+            {isSigningOut ? "Signing out..." : "Sign Out"}
+          </Text>
+        </Pressable>
       </View>
     </SafeAreaView>
   );
