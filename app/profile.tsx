@@ -49,7 +49,13 @@ export default function Profile() {
 
     try {
       const supabase = getSupabaseClient();
-      await supabase.auth.signOut();
+      const { error } = await supabase.auth.signOut();
+
+      if (error) {
+        console.error("Sign out failed:", error.message);
+        return;
+      }
+
       router.replace("/sign-in");
     } finally {
       setIsSigningOut(false);
