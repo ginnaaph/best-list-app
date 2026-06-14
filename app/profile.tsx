@@ -10,8 +10,8 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { images } from "@/constants/images";
-import { categories } from "@/data";
 import { getSupabaseClient } from "@/lib/supabase";
+import { useStore } from "@/store";
 
 const profile = {
   initials: "G",
@@ -19,14 +19,7 @@ const profile = {
   handle: "@gina",
   location: "SAN FRANCISCO",
   bio: "Eating my way through the Bay one burrito at a time. Ranking is a contact sport.",
-  stats: [
-    { label: "Logged", value: "108" },
-    { label: "Categories", value: "14" },
-    { label: "Lists", value: "8" },
-  ],
 };
-
-const listCategories = categories.slice(0, 4);
 
 const categoryImages: Partial<Record<string, ImageSourcePropType>> = {
   "breakfast-burrito": images.food.breakfastBurrito,
@@ -38,7 +31,14 @@ const categoryImages: Partial<Record<string, ImageSourcePropType>> = {
 };
 
 export default function Profile() {
+  const categories = useStore((state) => state.categories);
+  const entries = useStore((state) => state.entries);
   const [isSigningOut, setIsSigningOut] = useState(false);
+  const listCategories = categories.slice(0, 4);
+  const stats = [
+    { label: "Logged", value: String(entries.length) },
+    { label: "Categories", value: String(categories.length) },
+  ];
 
   async function handleSignOut() {
     if (isSigningOut) {
@@ -114,7 +114,7 @@ export default function Profile() {
         </View>
 
         <View className="mt-5 flex-row items-center rounded-bestlist-xl border border-subtle bg-white px-6 py-5 shadow-card">
-          {profile.stats.map((stat, index) => (
+          {stats.map((stat, index) => (
             <View key={stat.label} className="flex-1 flex-row items-center">
               <View className="flex-1 items-center">
                 <Text className="font-display text-[31px] font-bold leading-8.5 text-primary">
@@ -125,7 +125,7 @@ export default function Profile() {
                 </Text>
               </View>
 
-              {index < profile.stats.length - 1 ? (
+              {index < stats.length - 1 ? (
                 <View className="h-10 w-px bg-bestlist-border" />
               ) : null}
             </View>
@@ -142,7 +142,7 @@ export default function Profile() {
             </Text>
           </View>
 
-          <View className="mt-1 flex-1 gap-2">
+          <View className="mt-1  gap-2">
             {listCategories.map((category) => {
               const categoryImage: ImageSourcePropType = category.coverPhoto
                 ? { uri: category.coverPhoto }
@@ -154,8 +154,8 @@ export default function Profile() {
                   href={`./category/${category.id}`}
                   asChild
                 >
-                  <Pressable className="flex-1 flex-row items-center rounded-bestlist-xl border border-subtle bg-white px-3 py-2 shadow-card">
-                    <View className="h-14 w-14 overflow-hidden rounded-bestlist-md">
+                  <Pressable className="flex-row items-center rounded-bestlist-xl border border-subtle bg-white px-3 gap-2 shadow-card">
+                    <View className="h-20 w-20 overflow-hidden rounded-bestlist-md">
                       <Image
                         source={categoryImage}
                         resizeMode="cover"
@@ -165,7 +165,7 @@ export default function Profile() {
 
                     <View className="min-w-0 flex-1 px-2 p-4">
                       <Text
-                        className="font-display text-[20px] font-bold leading-6 text-primary"
+                        className="font-display text-[22px] font-bold leading-6 text-primary"
                         numberOfLines={1}
                       >
                         {category.name}
