@@ -24,6 +24,8 @@ const categoryTones: CategoryCardTone[] = [
   "caramel",
 ];
 
+const storeStorageKey = "bestlist-store";
+
 type AddEntryInput = Omit<Entry, "id" | "createdAt" | "overallScore">;
 type UpdateEntryInput = Omit<
   Entry,
@@ -35,6 +37,7 @@ type StoreState = {
   entries: Entry[];
   isLoading: boolean;
   syncFromSupabase: () => Promise<void>;
+  clearStore: () => Promise<void>;
   addCategory: (name: string) => Category;
   addEntry: (entry: AddEntryInput) => Entry;
   updateEntry: (entryId: string, entry: UpdateEntryInput) => Entry | undefined;
@@ -108,6 +111,10 @@ export const useStore = create<StoreState>()(
         } finally {
           set({ isLoading: false });
         }
+      },
+      clearStore: async () => {
+        set({ categories: [], entries: [], isLoading: false });
+        await AsyncStorage.removeItem(storeStorageKey);
       },
       addCategory: (name) => {
         const newCategory: Category = {
@@ -219,7 +226,7 @@ export const useStore = create<StoreState>()(
       ensureCategorySeeded: () => {},
     }),
     {
-      name: "bestlist-store",
+      name: storeStorageKey,
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state) => ({
         categories: state.categories,

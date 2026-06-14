@@ -8,12 +8,15 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 import { useAppFonts } from "@/hooks/use-app-fonts";
 import { createSessionFromUrl } from "@/lib/auth";
-import { isSupabaseConfigured } from "@/lib/supabase";
+import { isSupabaseConfigured, supabase } from "@/lib/supabase";
+import { useStore } from "@/store";
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const { fontsLoaded } = useAppFonts();
+  const syncFromSupabase = useStore((state) => state.syncFromSupabase);
+  const clearStore = useStore((state) => state.clearStore);
 
   useEffect(() => {
     if (fontsLoaded) {
@@ -51,6 +54,32 @@ export default function RootLayout() {
       subscription.remove();
     };
   }, []);
+
+  useEffect(() => {
+    if (!isSupabaseConfigured) {
+      return;
+    }
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_IN") {
+        void syncFromSupabase().catch((error: unknown) => {
+          console.warn("Unable to sync BestList data after sign in.", error);
+        });
+      }
+
+      if (event === "SIGNED_OUT") {
+        void clearStore().catch((error: unknown) => {
+          console.warn("Unable to clear BestList data after sign out.", error);
+        });
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [clearStore, syncFromSupabase]);
 
   if (!fontsLoaded) {
     return null;
