@@ -40,11 +40,16 @@ function EntryNotFoundScreen() {
             <Text className="text-card-title text-primary">‹</Text>
           </Pressable>
 
-          <View className="h-7 w-7 items-center justify-center rounded-full bg-white shadow-card">
+          <Pressable
+            accessibilityLabel="Open profile"
+            accessibilityRole="button"
+            className="h-7 w-7 items-center justify-center rounded-full bg-white shadow-card"
+            onPress={() => router.push("/profile")}
+          >
             <View className="h-5 w-5 items-center justify-center rounded-full bg-accent">
               <Text className="text-label text-white">g</Text>
             </View>
-          </View>
+          </Pressable>
         </View>
 
         <View className="mt-6 gap-3">
