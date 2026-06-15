@@ -1,6 +1,14 @@
 import { router } from "expo-router";
 import { useState } from "react";
-import { Image, Pressable, ScrollView, Share, Text, View } from "react-native";
+import {
+  Image,
+  Pressable,
+  ScrollView,
+  Share,
+  Switch,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { EntryCard } from "@/components/entry-card";
@@ -23,12 +31,16 @@ type CategoryDetailScreenProps = {
   category: Category;
   entries: Entry[];
   onAddEntry: () => void;
+  onPublicChange: (isPublic: boolean) => void;
+  toggleDisabled: boolean;
 };
 
 export function CategoryDetailScreen({
   category,
   entries,
   onAddEntry,
+  onPublicChange,
+  toggleDisabled,
 }: CategoryDetailScreenProps) {
   const [selectedSort, setSelectedSort] = useState<SortDimension>("overall");
   const selectedSortLabel =
@@ -37,6 +49,10 @@ export function CategoryDetailScreen({
   const sortedEntries = sortEntries(entries, selectedSort);
   const hasEntries = sortedEntries.length > 0;
   const shareCategory = () => {
+    if (!category.isPublic) {
+      return;
+    }
+
     void Share.share({
       message: `My best ${category.name} list on BestList 🌮\nbestlist://share/${category.id}`,
     });
@@ -58,19 +74,6 @@ export function CategoryDetailScreen({
 
           <View className="flex-row items-center gap-2">
             <Pressable
-              accessibilityLabel={`Share ${category.name}`}
-              accessibilityRole="button"
-              className="h-9 w-9 items-center justify-center rounded-full bg-white shadow-card"
-              onPress={shareCategory}
-            >
-              <Image
-                source={images.shareIcon}
-                className="h-5 w-5"
-                resizeMode="contain"
-              />
-            </Pressable>
-
-            <Pressable
               accessibilityLabel="Open profile"
               accessibilityRole="button"
               className="h-7 w-7 items-center justify-center rounded-full bg-white shadow-card"
@@ -79,6 +82,32 @@ export function CategoryDetailScreen({
               <View className="h-7 w-7 items-center justify-center rounded-full bg-accent">
                 <Text className="text-label text-white">G</Text>
               </View>
+            </Pressable>
+
+            <View className="h-9 justify-center rounded-full bg-white px-2 shadow-card">
+              <Switch
+                accessibilityLabel="Make list public"
+                disabled={toggleDisabled}
+                onValueChange={onPublicChange}
+                value={category.isPublic}
+              />
+            </View>
+
+            <Pressable
+              accessibilityLabel={`Share ${category.name}`}
+              accessibilityRole="button"
+              accessibilityState={{ disabled: !category.isPublic }}
+              className={`h-9 w-9 items-center justify-center rounded-full bg-white shadow-card ${
+                category.isPublic ? "" : "opacity-50"
+              }`}
+              disabled={!category.isPublic}
+              onPress={shareCategory}
+            >
+              <Image
+                source={images.shareIcon}
+                className="h-5 w-5"
+                resizeMode="contain"
+              />
             </Pressable>
           </View>
         </View>

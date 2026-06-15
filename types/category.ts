@@ -7,4 +7,5 @@ export type Category = {
   entryCount: number;
   coverPhoto?: string;
   tone: CategoryCardTone;
+  isPublic: boolean;
 };
