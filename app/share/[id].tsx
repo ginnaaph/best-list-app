@@ -1,10 +1,11 @@
 import { useLocalSearchParams } from "expo-router";
-import { ScrollView, Text, View } from "react-native";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { categories } from "@/data/categories";
-import { entriesByCategory } from "@/data/entries";
+import { getPublicCategory, getPublicEntries } from "@/lib/api";
 import { calculateOverallScore, sortEntries } from "@/lib/entry-score";
+import type { Category } from "@/types/category";
 import type { Entry } from "@/types/entry";
 
 type ScoreDimension = keyof Pick<Entry, "taste" | "value" | "portion" | "vibe">;
@@ -18,9 +19,76 @@ const scoreDimensions: { label: string; key: ScoreDimension }[] = [
 
 export default function ShareListScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const category = categories.find((item) => item.id === id);
-  const entries = category ? entriesByCategory[category.id] ?? [] : [];
+  const [category, setCategory] = useState<Category | null>(null);
+  const [entries, setEntries] = useState<Entry[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const sortedEntries = sortEntries(entries, "overall");
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function fetchSharedList() {
+      if (!id) {
+        setIsLoading(false);
+        return;
+      }
+
+      setIsLoading(true);
+
+      try {
+        const publicCategory = await getPublicCategory(id);
+
+        if (!isMounted) {
+          return;
+        }
+
+        if (!publicCategory) {
+          setCategory(null);
+          setEntries([]);
+          return;
+        }
+
+        const publicEntries = await getPublicEntries(publicCategory.id);
+
+        if (!isMounted) {
+          return;
+        }
+
+        setCategory(publicCategory);
+        setEntries(publicEntries);
+      } catch (error: unknown) {
+        console.error(
+          "Failed to load shared list:",
+          error instanceof Error ? error.message : String(error),
+        );
+
+        if (isMounted) {
+          setCategory(null);
+          setEntries([]);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    }
+
+    void fetchSharedList();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [id]);
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: "#F5F0E8" }}>
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator color="#2D5016" />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   if (!category) {
     return (

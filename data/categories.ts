@@ -7,6 +7,7 @@ export const categories: Category[] = [
     topEntry: "Nopalito",
     entryCount: 8,
     tone: "gold",
+    isPublic: false,
   },
   {
     id: "ramen",
@@ -14,6 +15,7 @@ export const categories: Category[] = [
     topEntry: "Marufuku",
     entryCount: 5,
     tone: "clay",
+    isPublic: false,
   },
   {
     id: "tacos",
@@ -21,6 +23,7 @@ export const categories: Category[] = [
     topEntry: "La Taqueria",
     entryCount: 5,
     tone: "tomato",
+    isPublic: false,
   },
   {
     id: "pizza",
@@ -28,6 +31,7 @@ export const categories: Category[] = [
     topEntry: "Tony's",
     entryCount: 15,
     tone: "brick",
+    isPublic: false,
   },
   {
     id: "coffee",
@@ -35,6 +39,7 @@ export const categories: Category[] = [
     topEntry: "Sightglass",
     entryCount: 5,
     tone: "espresso",
+    isPublic: false,
   },
   {
     id: "cookies",
@@ -42,5 +47,6 @@ export const categories: Category[] = [
     topEntry: "Cookies Home",
     entryCount: 9,
     tone: "caramel",
+    isPublic: false,
   },
 ];

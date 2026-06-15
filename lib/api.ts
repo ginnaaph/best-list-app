@@ -1,4 +1,4 @@
-import { getSupabaseClient } from "@/lib/supabase";
+import { getSupabaseClient, supabase } from "@/lib/supabase";
 import type { Category, CategoryCardTone } from "@/types/category";
 import type { Entry } from "@/types/entry";
 
@@ -7,6 +7,7 @@ type CategoryRow = {
   name: string;
   cover_photo: string | null;
   tone: string;
+  is_public: boolean;
   created_at: string;
 };
 
@@ -39,7 +40,7 @@ type UpdateEntryPayload = Omit<
   "id" | "categoryId" | "createdAt" | "overallScore"
 >;
 
-const categoryColumns = "id,name,cover_photo,tone,created_at";
+const categoryColumns = "id,name,cover_photo,tone,is_public,created_at";
 const entryColumns =
   "id,category_id,place_name,city,notes,photo_url,created_at,taste,value,portion,vibe,overall_score";
 
@@ -68,6 +69,7 @@ function mapCategory(row: CategoryRow): Category {
     entryCount: 0,
     coverPhoto: row.cover_photo ?? undefined,
     tone: toCategoryTone(row.tone),
+    isPublic: row.is_public,
   };
 }
 
@@ -154,6 +156,7 @@ export async function insertCategory(
       name: category.name,
       tone: category.tone,
       cover_photo: category.coverPhoto ?? null,
+      is_public: false,
     })
     .select(categoryColumns)
     .single()
@@ -164,6 +167,58 @@ export async function insertCategory(
   }
 
   return mapCategory(data);
+}
+
+export async function updateCategoryVisibility(
+  categoryId: string,
+  isPublic: boolean,
+): Promise<Category> {
+  const { data, error } = await getSupabaseClient()
+    .from("categories")
+    .update({ is_public: isPublic })
+    .eq("id", categoryId)
+    .select(categoryColumns)
+    .single()
+    .returns<CategoryRow>();
+
+  if (error) {
+    throw error;
+  }
+
+  return mapCategory(data);
+}
+
+export async function getPublicCategory(
+  categoryId: string,
+): Promise<Category | null> {
+  const { data, error } = await supabase
+    .from("categories")
+    .select(categoryColumns)
+    .eq("id", categoryId)
+    .eq("is_public", true)
+    .maybeSingle()
+    .returns<CategoryRow | null>();
+
+  if (error) {
+    throw error;
+  }
+
+  return data ? mapCategory(data) : null;
+}
+
+export async function getPublicEntries(categoryId: string): Promise<Entry[]> {
+  const { data, error } = await supabase
+    .from("entries")
+    .select(entryColumns)
+    .eq("category_id", categoryId)
+    .order("created_at", { ascending: true })
+    .returns<EntryRow[]>();
+
+  if (error) {
+    throw error;
+  }
+
+  return data.map(mapEntry);
 }
 
 export async function insertEntry(entry: InsertEntryPayload): Promise<Entry> {

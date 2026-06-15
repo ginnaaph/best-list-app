@@ -1,6 +1,14 @@
 import { router } from "expo-router";
 import { useState } from "react";
-import { Image, Pressable, ScrollView, Share, Text, View } from "react-native";
+import {
+  Image,
+  Pressable,
+  ScrollView,
+  Share,
+  Switch,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { EntryCard } from "@/components/entry-card";
@@ -23,12 +31,16 @@ type CategoryDetailScreenProps = {
   category: Category;
   entries: Entry[];
   onAddEntry: () => void;
+  onPublicChange: (isPublic: boolean) => void;
+  toggleDisabled: boolean;
 };
 
 export function CategoryDetailScreen({
   category,
   entries,
   onAddEntry,
+  onPublicChange,
+  toggleDisabled,
 }: CategoryDetailScreenProps) {
   const [selectedSort, setSelectedSort] = useState<SortDimension>("overall");
   const selectedSortLabel =
@@ -36,7 +48,12 @@ export function CategoryDetailScreen({
     "Overall";
   const sortedEntries = sortEntries(entries, selectedSort);
   const hasEntries = sortedEntries.length > 0;
+  const shareDisabled = toggleDisabled || !category.isPublic;
   const shareCategory = () => {
+    if (shareDisabled) {
+      return;
+    }
+
     void Share.share({
       message: `My best ${category.name} list on BestList 🌮\nbestlist://share/${category.id}`,
     });
@@ -56,11 +73,34 @@ export function CategoryDetailScreen({
             <Text className="text-card-title text-primary">‹</Text>
           </Pressable>
 
-          <View className="flex-row items-center gap-2">
+          <View className="flex-row items-center gap-2 ">
+            <View className="h-11 flex-row items-center justify-center gap-2 rounded-full bg-white px-3 shadow-card">
+              <Text className="font-mono-bestlist text-[10px] font-bold uppercase text-secondary">
+                {category.isPublic ? "Public" : "Private"}
+              </Text>
+              <View className="pt-0.5">
+                <Switch
+                  accessibilityLabel={
+                    category.isPublic
+                      ? "Make list private"
+                      : "Make list public"
+                  }
+                  disabled={toggleDisabled}
+                  onValueChange={onPublicChange}
+                  trackColor={{ false: "#D1C9BA", true: "#2D5016" }}
+                  value={category.isPublic}
+                />
+              </View>
+            </View>
+
             <Pressable
               accessibilityLabel={`Share ${category.name}`}
               accessibilityRole="button"
-              className="h-9 w-9 items-center justify-center rounded-full bg-white shadow-card"
+              accessibilityState={{ disabled: shareDisabled }}
+              className={`h-9 w-9 items-center justify-center rounded-full bg-white shadow-card ${
+                shareDisabled ? "opacity-50" : ""
+              }`}
+              disabled={shareDisabled}
               onPress={shareCategory}
             >
               <Image

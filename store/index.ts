@@ -9,6 +9,7 @@ import {
   getEntries,
   insertCategory,
   insertEntry,
+  updateCategoryVisibility,
   updateEntry as updateSupabaseEntry,
 } from "@/lib/api";
 import { sortEntries } from "@/lib/entry-score";
@@ -41,6 +42,7 @@ type StoreState = {
   clearStore: () => Promise<void>;
   addCategory: (name: string) => Category;
   addEntry: (entry: AddEntryInput) => Entry;
+  setCategoryPublic: (categoryId: string, isPublic: boolean) => Promise<void>;
   updateEntry: (entryId: string, entry: UpdateEntryInput) => Entry | undefined;
   deleteEntry: (entryId: string) => Entry | undefined;
   ensureCategorySeeded: (categoryId: string) => void;
@@ -132,6 +134,7 @@ export const useStore = create<StoreState>()(
           topEntry: "No entries yet",
           entryCount: 0,
           tone: categoryTones[get().categories.length % categoryTones.length],
+          isPublic: false,
         };
 
         void insertCategory(newCategory)
@@ -170,6 +173,56 @@ export const useStore = create<StoreState>()(
           .catch((error: unknown) => reportMutationError("add entry", error));
 
         return pendingEntry;
+      },
+      setCategoryPublic: async (categoryId, isPublic) => {
+        const currentCategory = get().categories.find(
+          (category) => category.id === categoryId,
+        );
+
+        if (!currentCategory) {
+          return;
+        }
+
+        const previousIsPublic = currentCategory.isPublic;
+
+        set((state) => ({
+          categories: state.categories.map((category) =>
+            category.id === categoryId ? { ...category, isPublic } : category,
+          ),
+        }));
+
+        try {
+          const savedCategory = await updateCategoryVisibility(
+            categoryId,
+            isPublic,
+          );
+
+          set((state) => {
+            const categories = state.categories.map((category) =>
+              category.id === categoryId
+                ? { ...category, ...savedCategory }
+                : category,
+            );
+
+            return {
+              categories: updateCategorySummaryById(
+                categories,
+                state.entries,
+                categoryId,
+              ),
+            };
+          });
+        } catch (error: unknown) {
+          reportMutationError("update category visibility", error);
+
+          set((state) => ({
+            categories: state.categories.map((category) =>
+              category.id === categoryId
+                ? { ...category, isPublic: previousIsPublic }
+                : category,
+            ),
+          }));
+        }
       },
       updateEntry: (entryId, input) => {
         const currentEntry = get().entries.find((entry) => entry.id === entryId);

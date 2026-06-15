@@ -9,8 +9,12 @@ create table if not exists public.categories (
   name text not null,
   cover_photo text,
   tone text not null,
+  is_public boolean not null default false,
   created_at timestamptz not null default now()
 );
+
+alter table public.categories
+  add column if not exists is_public boolean not null default false;
 
 create table if not exists public.entries (
   id uuid primary key default gen_random_uuid(),
@@ -43,8 +47,11 @@ alter table public.categories enable row level security;
 alter table public.entries enable row level security;
 
 grant usage on schema public to authenticated;
+grant usage on schema public to anon;
 grant select, insert, update, delete on public.categories to authenticated;
 grant select, insert, update, delete on public.entries to authenticated;
+grant select on public.categories to anon;
+grant select on public.entries to anon;
 
 drop policy if exists "Users can select their own categories" on public.categories;
 create policy "Users can select their own categories"
@@ -52,6 +59,11 @@ create policy "Users can select their own categories"
   for select
   to authenticated
   using ((select auth.uid()) = user_id);
+
+drop policy if exists "Public categories are viewable by anyone" on public.categories;
+create policy "Public categories are viewable by anyone"
+  on public.categories for select
+  using (is_public = true);
 
 drop policy if exists "Users can insert their own categories" on public.categories;
 create policy "Users can insert their own categories"
@@ -81,6 +93,17 @@ create policy "Users can select their own entries"
   for select
   to authenticated
   using ((select auth.uid()) = user_id);
+
+drop policy if exists "Entries in public categories are viewable by anyone" on public.entries;
+create policy "Entries in public categories are viewable by anyone"
+  on public.entries for select
+  using (
+    exists (
+      select 1 from public.categories
+      where categories.id = entries.category_id
+        and categories.is_public = true
+    )
+  );
 
 drop policy if exists "Users can insert entries in their own categories" on public.entries;
 create policy "Users can insert entries in their own categories"
