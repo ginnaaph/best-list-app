@@ -21,7 +21,7 @@ export function EntryCard({ entry, rank }: EntryCardProps) {
       <View className="gap-3.5">
         <View className="flex-row items-start justify-between gap-3">
           <View className="flex-1 pr-2">
-            <Text className="font-mono-bestlist text-[11px] font-bold uppercase leading-5 tracking-[2px] text-secondary">
+            <Text className="font-mono-bestlist text-[11px] font-bold uppercase leading-5 mb-1.5 tracking-[2px] text-secondary">
               {rankingLabel}
             </Text>
             <View className="mt-1 flex-row items-center gap-3">
@@ -29,7 +29,7 @@ export function EntryCard({ entry, rank }: EntryCardProps) {
                 className="h-16 w-16 rounded-lg"
                 source={entryImageSource}
               />
-              <View className="min-w-0 flex-1">
+              <View className="min-w-0 flex-1 gap-1">
                 <Text
                   className="font-display text-[24px] font-bold leading-7.5 text-primary"
                   numberOfLines={1}
@@ -46,7 +46,7 @@ export function EntryCard({ entry, rank }: EntryCardProps) {
             </View>
           </View>
 
-          <View className="shrink-0 items-center pt-1">
+          <View className="shrink-0 items-center pt-4">
             <Text className="font-display mt-1.5 text-[42px] font-extrabold leading-13.5 text-accent">
               {overallScore.toFixed(1)}
             </Text>
