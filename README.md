@@ -27,6 +27,20 @@ Overall score is auto-calculated. User can re-sort any list by any single dimens
 - **IDE:** VS Code
 - **Testing:** Expo Go
 
+## Environment Variables
+Create a local `.env` file from the example template before running the app:
+
+```bash
+cp .env.example .env
+```
+
+Set these Supabase values in `.env`:
+
+- `EXPO_PUBLIC_SUPABASE_URL` — your Supabase project URL.
+- `EXPO_PUBLIC_SUPABASE_ANON_KEY` — your Supabase anon key used by the Expo client.
+
+You can find both values in your Supabase project settings under API configuration. Restart the Expo dev server after changing environment variables.
+
 ## Screens (MVP)
 1. Home — category grid tiles
 2. Category / Ranked List — ranked entry cards, sortable
