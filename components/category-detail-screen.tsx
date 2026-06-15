@@ -55,7 +55,8 @@ export function CategoryDetailScreen({
     }
 
     void Share.share({
-      message: `My best ${category.name} list on BestList 🌮\nbestlist://share/${category.id}`,
+      // TODO: replace with real domain when universal links are configured
+      message: `My best ${category.name} list on BestList 🌮\nhttps://bestlist.app/share/${category.id}`,
     });
   };
 
