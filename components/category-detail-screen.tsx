@@ -86,9 +86,12 @@ export function CategoryDetailScreen({
 
             <View className="h-9 justify-center rounded-full bg-white px-2 shadow-card">
               <Switch
-                accessibilityLabel="Make list public"
+                accessibilityLabel={
+                  category.isPublic ? "Make list private" : "Make list public"
+                }
                 disabled={toggleDisabled}
                 onValueChange={onPublicChange}
+                trackColor={{ false: "#D1C9BA", true: "#2D5016" }}
                 value={category.isPublic}
               />
             </View>
