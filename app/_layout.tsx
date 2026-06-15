@@ -63,7 +63,7 @@ export default function RootLayout() {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_IN") {
+      if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
         void syncFromSupabase().catch((error: unknown) => {
           console.warn("Unable to sync BestList data after sign in.", error);
         });
