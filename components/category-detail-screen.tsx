@@ -73,28 +73,24 @@ export function CategoryDetailScreen({
             <Text className="text-card-title text-primary">‹</Text>
           </Pressable>
 
-          <View className="flex-row items-center gap-2">
-            <Pressable
-              accessibilityLabel="Open profile"
-              accessibilityRole="button"
-              className="h-7 w-7 items-center justify-center rounded-full bg-white shadow-card"
-              onPress={() => router.push("/profile")}
-            >
-              <View className="h-7 w-7 items-center justify-center rounded-full bg-accent">
-                <Text className="text-label text-white">G</Text>
+          <View className="flex-row items-center gap-2 ">
+            <View className="h-11 flex-row items-center justify-center gap-2 rounded-full bg-white px-3 shadow-card">
+              <Text className="font-mono-bestlist text-[10px] font-bold uppercase text-secondary">
+                {category.isPublic ? "Public" : "Private"}
+              </Text>
+              <View className="pt-0.5">
+                <Switch
+                  accessibilityLabel={
+                    category.isPublic
+                      ? "Make list private"
+                      : "Make list public"
+                  }
+                  disabled={toggleDisabled}
+                  onValueChange={onPublicChange}
+                  trackColor={{ false: "#D1C9BA", true: "#2D5016" }}
+                  value={category.isPublic}
+                />
               </View>
-            </Pressable>
-
-            <View className="h-9 justify-center rounded-full bg-white px-2 shadow-card">
-              <Switch
-                accessibilityLabel={
-                  category.isPublic ? "Make list private" : "Make list public"
-                }
-                disabled={toggleDisabled}
-                onValueChange={onPublicChange}
-                trackColor={{ false: "#D1C9BA", true: "#2D5016" }}
-                value={category.isPublic}
-              />
             </View>
 
             <Pressable
@@ -112,6 +108,17 @@ export function CategoryDetailScreen({
                 className="h-5 w-5"
                 resizeMode="contain"
               />
+            </Pressable>
+
+            <Pressable
+              accessibilityLabel="Open profile"
+              accessibilityRole="button"
+              className="h-7 w-7 items-center justify-center rounded-full bg-white shadow-card"
+              onPress={() => router.push("/profile")}
+            >
+              <View className="h-7 w-7 items-center justify-center rounded-full bg-accent">
+                <Text className="text-label text-white">G</Text>
+              </View>
             </Pressable>
           </View>
         </View>
