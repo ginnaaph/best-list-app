@@ -25,6 +25,7 @@ const categoryTones: CategoryCardTone[] = [
 ];
 
 const storeStorageKey = "bestlist-store";
+let syncGeneration = 0;
 
 type AddEntryInput = Omit<Entry, "id" | "createdAt" | "overallScore">;
 type UpdateEntryInput = Omit<
@@ -96,6 +97,7 @@ export const useStore = create<StoreState>()(
       entries: [],
       isLoading: false,
       syncFromSupabase: async () => {
+        const generation = syncGeneration;
         set({ isLoading: true });
 
         try {
@@ -104,15 +106,22 @@ export const useStore = create<StoreState>()(
             getEntries(),
           ]);
 
+          if (generation !== syncGeneration) {
+            return;
+          }
+
           set({
             categories: updateCategorySummaries(categories, entries),
             entries,
           });
         } finally {
-          set({ isLoading: false });
+          if (generation === syncGeneration) {
+            set({ isLoading: false });
+          }
         }
       },
       clearStore: async () => {
+        syncGeneration += 1;
         set({ categories: [], entries: [], isLoading: false });
         await AsyncStorage.removeItem(storeStorageKey);
       },
