@@ -194,8 +194,8 @@ export function CategoryNotFoundScreen() {
             className="h-7 w-7 items-center justify-center rounded-full bg-white shadow-card"
             onPress={() => router.push("/profile")}
           >
-            <View className="h-5 w-5 items-center justify-center rounded-full bg-accent">
-              <Text className="text-label text-white">g</Text>
+            <View className="h-7 w-7 items-center justify-center rounded-full bg-accent">
+              <Text className="text-label text-white">G</Text>
             </View>
           </Pressable>
         </View>
