@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { calculateOverallScore, sortEntries } from "@/lib/entry-score";
 import { getPublicCategory, getPublicEntries } from "@/lib/api";
+import { calculateOverallScore, sortEntries } from "@/lib/entry-score";
 import type { Category } from "@/types/category";
 import type { Entry } from "@/types/entry";
 
@@ -57,7 +57,10 @@ export default function ShareListScreen() {
         setCategory(publicCategory);
         setEntries(publicEntries);
       } catch (error: unknown) {
-        console.error("Failed to load shared list:", error);
+        console.error(
+          "Failed to load shared list:",
+          error instanceof Error ? error.message : String(error),
+        );
 
         if (isMounted) {
           setCategory(null);
