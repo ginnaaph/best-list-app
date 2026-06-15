@@ -48,8 +48,9 @@ export function CategoryDetailScreen({
     "Overall";
   const sortedEntries = sortEntries(entries, selectedSort);
   const hasEntries = sortedEntries.length > 0;
+  const shareDisabled = toggleDisabled || !category.isPublic;
   const shareCategory = () => {
-    if (!category.isPublic) {
+    if (shareDisabled) {
       return;
     }
 
@@ -99,11 +100,11 @@ export function CategoryDetailScreen({
             <Pressable
               accessibilityLabel={`Share ${category.name}`}
               accessibilityRole="button"
-              accessibilityState={{ disabled: !category.isPublic }}
+              accessibilityState={{ disabled: shareDisabled }}
               className={`h-9 w-9 items-center justify-center rounded-full bg-white shadow-card ${
-                category.isPublic ? "" : "opacity-50"
+                shareDisabled ? "opacity-50" : ""
               }`}
-              disabled={!category.isPublic}
+              disabled={shareDisabled}
               onPress={shareCategory}
             >
               <Image
