@@ -17,8 +17,13 @@ import { useStore } from "@/store";
 export default function AddCategoryScreen() {
   const addCategory = useStore((state) => state.addCategory);
   const [name, setName] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    if (isSaving) {
+      return;
+    }
+
     const trimmedName = name.trim();
 
     if (!trimmedName) {
@@ -26,8 +31,16 @@ export default function AddCategoryScreen() {
       return;
     }
 
-    const newCategory = addCategory(trimmedName);
-    router.replace(`/category/${newCategory.id}`);
+    try {
+      setIsSaving(true);
+      const newCategory = await addCategory(trimmedName);
+      router.replace(`/category/${newCategory.id}`);
+    } catch (error: unknown) {
+      console.error("Failed to save category:", error);
+      Alert.alert("Save failed", "Unable to save this category. Try again.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -68,18 +81,25 @@ export default function AddCategoryScreen() {
                 returnKeyType="done"
                 value={name}
                 onChangeText={setName}
-                onSubmitEditing={handleSave}
+                onSubmitEditing={() => {
+                  void handleSave();
+                }}
               />
             </View>
 
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Save category"
-              className="h-13 items-center justify-center rounded-full bg-accent shadow-card"
-              onPress={handleSave}
+              className={`h-13 items-center justify-center rounded-full bg-accent shadow-card ${
+                isSaving ? "opacity-60" : ""
+              }`}
+              disabled={isSaving}
+              onPress={() => {
+                void handleSave();
+              }}
             >
               <Text className="font-body text-[15px] font-bold uppercase tracking-[1px] text-white">
-                Save Category
+                {isSaving ? "Saving..." : "Save Category"}
               </Text>
             </Pressable>
           </View>

@@ -40,10 +40,13 @@ type StoreState = {
   isLoading: boolean;
   syncFromSupabase: () => Promise<void>;
   clearStore: () => Promise<void>;
-  addCategory: (name: string) => Category;
-  addEntry: (entry: AddEntryInput) => Entry;
+  addCategory: (name: string) => Promise<Category>;
+  addEntry: (entry: AddEntryInput) => Promise<Entry>;
   setCategoryPublic: (categoryId: string, isPublic: boolean) => Promise<void>;
-  updateEntry: (entryId: string, entry: UpdateEntryInput) => Entry | undefined;
+  updateEntry: (
+    entryId: string,
+    entry: UpdateEntryInput,
+  ) => Promise<Entry | undefined>;
   deleteEntry: (entryId: string) => Entry | undefined;
   ensureCategorySeeded: (categoryId: string) => void;
 };
@@ -127,7 +130,7 @@ export const useStore = create<StoreState>()(
         set({ categories: [], entries: [], isLoading: false });
         await AsyncStorage.removeItem(storeStorageKey);
       },
-      addCategory: (name) => {
+      addCategory: async (name) => {
         const newCategory: Category = {
           id: Crypto.randomUUID(),
           name: name.trim(),
@@ -137,42 +140,48 @@ export const useStore = create<StoreState>()(
           isPublic: false,
         };
 
-        void insertCategory(newCategory)
-          .then((savedCategory) => {
-            set((state) => ({
-              categories: updateCategorySummaries(
-                [...state.categories, savedCategory],
-                state.entries,
-              ),
-            }));
-          })
-          .catch((error: unknown) => reportMutationError("add category", error));
+        try {
+          const savedCategory = await insertCategory(newCategory);
 
-        return newCategory;
+          set((state) => ({
+            categories: updateCategorySummaries(
+              [...state.categories, savedCategory],
+              state.entries,
+            ),
+          }));
+
+          return savedCategory;
+        } catch (error: unknown) {
+          reportMutationError("add category", error);
+          throw error;
+        }
       },
-      addEntry: (input) => {
+      addEntry: async (input) => {
         const pendingEntry: Entry = {
           ...input,
           id: Crypto.randomUUID(),
           createdAt: new Date().toISOString(),
         };
 
-        void insertEntry(pendingEntry)
-          .then((newEntry) => {
-            set((state) => {
-              const entries = [...state.entries, newEntry];
-              const categories = updateCategorySummaryById(
-                state.categories,
-                entries,
-                newEntry.categoryId,
-              );
+        try {
+          const newEntry = await insertEntry(pendingEntry);
 
-              return { categories, entries };
-            });
-          })
-          .catch((error: unknown) => reportMutationError("add entry", error));
+          set((state) => {
+            const entries = [...state.entries, newEntry];
+            const categories = updateCategorySummaryById(
+              state.categories,
+              entries,
+              newEntry.categoryId,
+            );
 
-        return pendingEntry;
+            return { categories, entries };
+          });
+
+          return newEntry;
+        } catch (error: unknown) {
+          reportMutationError("add entry", error);
+          throw error;
+        }
       },
       setCategoryPublic: async (categoryId, isPublic) => {
         const currentCategory = get().categories.find(
@@ -224,38 +233,34 @@ export const useStore = create<StoreState>()(
           }));
         }
       },
-      updateEntry: (entryId, input) => {
+      updateEntry: async (entryId, input) => {
         const currentEntry = get().entries.find((entry) => entry.id === entryId);
 
         if (!currentEntry) {
           return undefined;
         }
 
-        const pendingEntry: Entry = {
-          ...currentEntry,
-          ...input,
-        };
+        try {
+          const updatedEntry = await updateSupabaseEntry(entryId, input);
 
-        void updateSupabaseEntry(entryId, input)
-          .then((updatedEntry) => {
-            set((state) => {
-              const entries = state.entries.map((entry) =>
-                entry.id === entryId ? updatedEntry : entry,
-              );
-              const categories = updateCategorySummaryById(
-                state.categories,
-                entries,
-                updatedEntry.categoryId,
-              );
+          set((state) => {
+            const entries = state.entries.map((entry) =>
+              entry.id === entryId ? updatedEntry : entry,
+            );
+            const categories = updateCategorySummaryById(
+              state.categories,
+              entries,
+              updatedEntry.categoryId,
+            );
 
-              return { categories, entries };
-            });
-          })
-          .catch((error: unknown) =>
-            reportMutationError("update entry", error),
-          );
+            return { categories, entries };
+          });
 
-        return pendingEntry;
+          return updatedEntry;
+        } catch (error: unknown) {
+          reportMutationError("update entry", error);
+          throw error;
+        }
       },
       deleteEntry: (entryId) => {
         const currentEntry = get().entries.find((entry) => entry.id === entryId);

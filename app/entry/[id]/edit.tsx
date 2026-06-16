@@ -44,7 +44,7 @@ export default function EditEntryScreen() {
   const deleteEntry = useStore((state) => state.deleteEntry);
   const [isSaving, setIsSaving] = useState(false);
 
-  const handleSave = (values: EntryFormValues) => {
+  const handleSave = async (values: EntryFormValues) => {
     if (isSaving || !entry) {
       return;
     }
@@ -56,7 +56,7 @@ export default function EditEntryScreen() {
 
     try {
       setIsSaving(true);
-      updateEntry(entry.id, {
+      await updateEntry(entry.id, {
         placeName: values.placeName.trim(),
         city: values.city.trim(),
         taste: values.taste,
@@ -68,8 +68,10 @@ export default function EditEntryScreen() {
       });
 
       router.replace(`/entry/${entry.id}`);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Failed to update entry:", error);
+      Alert.alert("Save failed", "Unable to save this entry. Try again.");
+    } finally {
       setIsSaving(false);
     }
   };
@@ -89,8 +91,29 @@ export default function EditEntryScreen() {
           style: "destructive",
           onPress: () => {
             const categoryId = entry.categoryId;
-            deleteEntry(entry.id);
-            router.replace(`/category/${categoryId}`);
+            setIsSaving(true);
+
+            try {
+              const deletedEntry = deleteEntry(entry.id);
+
+              if (!deletedEntry) {
+                Alert.alert(
+                  "Delete failed",
+                  "Unable to delete this entry. Try again.",
+                );
+                return;
+              }
+
+              router.replace(`/category/${categoryId}`);
+            } catch (error: unknown) {
+              console.error("Failed to delete entry:", error);
+              Alert.alert(
+                "Delete failed",
+                "Unable to delete this entry. Try again.",
+              );
+            } finally {
+              setIsSaving(false);
+            }
           },
         },
       ],
@@ -130,7 +153,7 @@ export default function EditEntryScreen() {
           notes: entry.notes ?? "",
           photoUrl: entry.photoUrl,
         }}
-        saveLabel="Save"
+        saveLabel={isSaving ? "Saving..." : "Save"}
         saving={isSaving}
         onSave={handleSave}
         onDelete={handleDelete}
