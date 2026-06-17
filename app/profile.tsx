@@ -53,12 +53,13 @@ export default function Profile() {
 
       if (error) {
         console.error("Sign out failed:", error.message);
-        return;
       }
-
-      router.replace("/sign-in");
+    } catch (error) {
+      console.error("Sign out failed:", error);
     } finally {
+      useStore.getState().clearStore();
       setIsSigningOut(false);
+      router.replace("/sign-in");
     }
   }
 
