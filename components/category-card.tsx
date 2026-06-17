@@ -135,21 +135,26 @@ export function CategoryCard({ category }: CategoryCardProps) {
               {category.entryCount}
             </Text>
           </View>
-          <Pressable
-            accessibilityLabel={`Open actions for ${category.name}`}
-            accessibilityRole="button"
-            className="absolute bottom-2 right-2 h-8 w-8 items-center justify-center rounded-full bg-white shadow-card"
-            hitSlop={8}
-            onPress={handleMenuPress}
-          >
-            <Text className="text-[24px] leading-6 text-primary">⋮</Text>
-          </Pressable>
         </View>
 
         <View className="gap-0.5">
-          <Text className="text-card-title text-primary" numberOfLines={1}>
-            {category.name}
-          </Text>
+          <View className="flex-row items-center justify-between gap-1">
+            <Text
+              className="min-w-0 flex-1 text-card-title text-primary"
+              numberOfLines={1}
+            >
+              {category.name}
+            </Text>
+            <Pressable
+              accessibilityLabel={`Open actions for ${category.name}`}
+              accessibilityRole="button"
+              className="-mr-1 h-6 w-6 items-center justify-center"
+              hitSlop={8}
+              onPress={handleMenuPress}
+            >
+              <Text className="text-[24px] leading-6 text-primary">⋮</Text>
+            </Pressable>
+          </View>
           <Text className="text-caption text-secondary" numberOfLines={1}>
             {entrySummary}
           </Text>
