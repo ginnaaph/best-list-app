@@ -1,5 +1,5 @@
-import { router } from "expo-router";
-import { useState } from "react";
+import { router, useLocalSearchParams } from "expo-router";
+import { useEffect, useState } from "react";
 import {
   Alert,
   KeyboardAvoidingView,
@@ -15,9 +15,35 @@ import { colors } from "@/constants/theme";
 import { useStore } from "@/store";
 
 export default function AddCategoryScreen() {
+  const { categoryId: categoryIdParam } = useLocalSearchParams<{
+    categoryId?: string | string[];
+  }>();
+  const categoryId = Array.isArray(categoryIdParam)
+    ? categoryIdParam[0]
+    : categoryIdParam;
+  const isEditMode = Boolean(categoryId);
+  const categories = useStore((state) => state.categories);
   const addCategory = useStore((state) => state.addCategory);
+  const updateCategory = useStore((state) => state.updateCategory);
+  const category = categoryId
+    ? categories.find((item) => item.id === categoryId)
+    : undefined;
   const [name, setName] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    if (!isEditMode) {
+      return;
+    }
+
+    if (!category) {
+      Alert.alert("Category not found", "Unable to edit this category.");
+      router.back();
+      return;
+    }
+
+    setName(category.name);
+  }, [category, isEditMode]);
 
   const handleSave = async () => {
     if (isSaving) {
@@ -33,6 +59,22 @@ export default function AddCategoryScreen() {
 
     try {
       setIsSaving(true);
+
+      if (categoryId) {
+        const updatedCategory = await updateCategory(categoryId, {
+          name: trimmedName,
+        });
+
+        if (!updatedCategory) {
+          Alert.alert("Category not found", "Unable to edit this category.");
+          router.back();
+          return;
+        }
+
+        router.back();
+        return;
+      }
+
       const newCategory = await addCategory(trimmedName);
       router.replace(`/category/${newCategory.id}`);
     } catch (error: unknown) {
@@ -61,7 +103,7 @@ export default function AddCategoryScreen() {
             </Pressable>
 
             <Text className="font-display text-[18px] font-bold text-primary">
-              Add Category
+              {isEditMode ? "Edit Category" : "Add Category"}
             </Text>
 
             <View className="h-9 w-[77px]" />
