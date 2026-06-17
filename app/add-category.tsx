@@ -1,5 +1,5 @@
 import { router, useLocalSearchParams } from "expo-router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Alert,
   KeyboardAvoidingView,
@@ -28,22 +28,8 @@ export default function AddCategoryScreen() {
   const category = categoryId
     ? categories.find((item) => item.id === categoryId)
     : undefined;
-  const [name, setName] = useState("");
+  const [name, setName] = useState(() => category?.name ?? "");
   const [isSaving, setIsSaving] = useState(false);
-
-  useEffect(() => {
-    if (!isEditMode) {
-      return;
-    }
-
-    if (!category) {
-      Alert.alert("Category not found", "Unable to edit this category.");
-      router.back();
-      return;
-    }
-
-    setName(category.name);
-  }, [category, isEditMode]);
 
   const handleSave = async () => {
     if (isSaving) {
@@ -106,7 +92,7 @@ export default function AddCategoryScreen() {
               {isEditMode ? "Edit Category" : "Add Category"}
             </Text>
 
-            <View className="h-9 w-[77px]" />
+            <View className="h-9 w-19.25" />
           </View>
 
           <View className="mt-8 gap-5">
