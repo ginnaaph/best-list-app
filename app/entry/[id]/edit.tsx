@@ -89,12 +89,13 @@ export default function EditEntryScreen() {
         {
           text: "Delete",
           style: "destructive",
-          onPress: () => {
+          onPress: async () => {
+            if (isSaving) return;
             const categoryId = entry.categoryId;
             setIsSaving(true);
 
             try {
-              const deletedEntry = deleteEntry(entry.id);
+              const deletedEntry = await deleteEntry(entry.id);
 
               if (!deletedEntry) {
                 Alert.alert(
