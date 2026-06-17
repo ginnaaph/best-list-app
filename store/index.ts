@@ -4,11 +4,13 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 import {
+  deleteCategory as deleteSupabaseCategory,
   deleteEntry as deleteSupabaseEntry,
   getCategories,
   getEntries,
   insertCategory,
   insertEntry,
+  updateCategory as updateSupabaseCategory,
   updateCategoryVisibility,
   updateEntry as updateSupabaseEntry,
 } from "@/lib/api";
@@ -33,6 +35,7 @@ type UpdateEntryInput = Omit<
   Entry,
   "id" | "categoryId" | "createdAt" | "overallScore"
 >;
+type UpdateCategoryInput = Pick<Category, "name">;
 
 type StoreState = {
   categories: Category[];
@@ -41,6 +44,11 @@ type StoreState = {
   syncFromSupabase: () => Promise<void>;
   clearStore: () => Promise<void>;
   addCategory: (name: string) => Promise<Category>;
+  updateCategory: (
+    categoryId: string,
+    category: UpdateCategoryInput,
+  ) => Promise<Category | undefined>;
+  deleteCategory: (categoryId: string) => Promise<Category | undefined>;
   addEntry: (entry: AddEntryInput) => Promise<Entry>;
   setCategoryPublic: (categoryId: string, isPublic: boolean) => Promise<void>;
   updateEntry: (
@@ -153,6 +161,69 @@ export const useStore = create<StoreState>()(
           return savedCategory;
         } catch (error: unknown) {
           reportMutationError("add category", error);
+          throw error;
+        }
+      },
+      updateCategory: async (categoryId, input) => {
+        const currentCategory = get().categories.find(
+          (category) => category.id === categoryId,
+        );
+
+        if (!currentCategory) {
+          return undefined;
+        }
+
+        try {
+          const updatedCategory = await updateSupabaseCategory(categoryId, {
+            name: input.name.trim(),
+          });
+
+          set((state) => {
+            const categories = state.categories.map((category) =>
+              category.id === categoryId
+                ? { ...category, ...updatedCategory }
+                : category,
+            );
+
+            return {
+              categories: updateCategorySummaryById(
+                categories,
+                state.entries,
+                categoryId,
+              ),
+            };
+          });
+
+          return updatedCategory;
+        } catch (error: unknown) {
+          reportMutationError("update category", error);
+          throw error;
+        }
+      },
+      deleteCategory: async (categoryId) => {
+        const currentCategory = get().categories.find(
+          (category) => category.id === categoryId,
+        );
+
+        if (!currentCategory) {
+          return undefined;
+        }
+
+        try {
+          const deletedCategory = await deleteSupabaseCategory(categoryId);
+
+          set((state) => ({
+            categories: state.categories.filter(
+              (category) => category.id !== categoryId,
+            ),
+            entries: state.entries.filter(
+              (entry) => entry.categoryId !== categoryId,
+            ),
+          }));
+
+          return deletedCategory;
+        } catch (error: unknown) {
+          reportMutationError("delete category", error);
           throw error;
         }
       },
