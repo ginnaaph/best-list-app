@@ -42,6 +42,14 @@ export function CategoryCard({ category }: CategoryCardProps) {
   const handleShare = async () => {
     try {
       await setCategoryPublic(category.id, true);
+      const updatedCategory = useStore
+        .getState()
+        .categories.find((item) => item.id === category.id);
+
+      if (!updatedCategory?.isPublic) {
+        throw new Error("Category visibility update failed.");
+      }
+
       await Share.share({
         message: `My best ${category.name} list on BestList\n${shareLink}`,
       });
