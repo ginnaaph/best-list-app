@@ -1,13 +1,19 @@
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import {
+  ActionSheetIOS,
+  Alert,
   Image,
   type ImageSourcePropType,
+  Platform,
   Pressable,
+  Share,
   Text,
   View,
+  type GestureResponderEvent,
 } from "react-native";
 
 import { images } from "@/constants/images";
+import { useStore } from "@/store";
 import type { Category } from "@/types/category";
 
 type CategoryCardProps = {
@@ -24,11 +30,104 @@ const categoryImages: Partial<Record<string, ImageSourcePropType>> = {
 };
 
 export function CategoryCard({ category }: CategoryCardProps) {
+  const setCategoryPublic = useStore((state) => state.setCategoryPublic);
+  const deleteCategory = useStore((state) => state.deleteCategory);
   const categoryImage: ImageSourcePropType = category.coverPhoto
     ? { uri: category.coverPhoto }
     : (categoryImages[category.id] ?? images.noImages);
   const entrySummary =
     category.entryCount > 0 ? `#1 - ${category.topEntry}` : "No entries yet";
+  const shareLink = `https://bestlist.app/share/${category.id}`;
+
+  const handleShare = async () => {
+    try {
+      await setCategoryPublic(category.id, true);
+      const updatedCategory = useStore
+        .getState()
+        .categories.find((item) => item.id === category.id);
+
+      if (!updatedCategory?.isPublic) {
+        throw new Error("Category visibility update failed.");
+      }
+
+      await Share.share({
+        message: `My best ${category.name} list on BestList\n${shareLink}`,
+      });
+    } catch (error: unknown) {
+      console.error("Failed to share category:", error);
+      Alert.alert("Share failed", "Unable to share this category. Try again.");
+    }
+  };
+
+  const handleEdit = () => {
+    router.push(`/add-category?categoryId=${category.id}`);
+  };
+
+  const handleDelete = () => {
+    Alert.alert(
+      "Delete category?",
+      `This will delete "${category.name}" and its entries.`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => {
+            void deleteCategory(category.id).catch((error: unknown) => {
+              console.error("Failed to delete category:", error);
+              Alert.alert(
+                "Delete failed",
+                "Unable to delete this category. Try again.",
+              );
+            });
+          },
+        },
+      ],
+    );
+  };
+
+  const showActions = () => {
+    if (Platform.OS === "ios") {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options: ["Share", "Edit", "Delete", "Cancel"],
+          cancelButtonIndex: 3,
+          destructiveButtonIndex: 2,
+        },
+        (buttonIndex) => {
+          if (buttonIndex === 0) {
+            void handleShare();
+          }
+
+          if (buttonIndex === 1) {
+            handleEdit();
+          }
+
+          if (buttonIndex === 2) {
+            handleDelete();
+          }
+        },
+      );
+      return;
+    }
+
+    Alert.alert("Category actions", category.name, [
+      {
+        text: "Share",
+        onPress: () => {
+          void handleShare();
+        },
+      },
+      { text: "Edit", onPress: handleEdit },
+      { text: "Delete", style: "destructive", onPress: handleDelete },
+      { text: "Cancel", style: "cancel" },
+    ]);
+  };
+
+  const handleMenuPress = (event: GestureResponderEvent) => {
+    event.stopPropagation();
+    showActions();
+  };
 
   return (
     <Link href={`./category/${category.id}`} asChild>
@@ -47,9 +146,23 @@ export function CategoryCard({ category }: CategoryCardProps) {
         </View>
 
         <View className="gap-0.5">
-          <Text className="text-card-title text-primary" numberOfLines={1}>
-            {category.name}
-          </Text>
+          <View className="flex-row items-center justify-between gap-1">
+            <Text
+              className="min-w-0 flex-1 text-card-title text-primary"
+              numberOfLines={1}
+            >
+              {category.name}
+            </Text>
+            <Pressable
+              accessibilityLabel={`Open actions for ${category.name}`}
+              accessibilityRole="button"
+              className="-mr-1 h-6 w-6 items-center justify-center"
+              hitSlop={8}
+              onPress={handleMenuPress}
+            >
+              <Text className="text-[24px] leading-6 text-primary">⋮</Text>
+            </Pressable>
+          </View>
           <Text className="text-caption text-secondary" numberOfLines={1}>
             {entrySummary}
           </Text>

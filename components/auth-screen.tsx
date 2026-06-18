@@ -3,6 +3,7 @@ import { Link, router } from "expo-router";
 import { useState } from "react";
 import {
   Alert,
+  Image,
   Pressable,
   ScrollView,
   Text,
@@ -12,6 +13,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { VerificationModal } from "@/components/verification-modal";
+import { images } from "@/constants/images";
 import { colors } from "@/constants/theme";
 import {
   sendEmailOtp,
@@ -210,9 +212,7 @@ function SocialButton({ icon, label, onPress }: SocialButtonProps) {
     >
       <View className="w-8 items-center">
         {isGoogle ? (
-          <Text className="font-body text-[28px] font-bold leading-8 text-[#4285F4]">
-            G
-          </Text>
+          <Image source={images.googleLogo} className="size-7" />
         ) : (
           <Ionicons name="logo-apple" size={31} color="#000000" />
         )}

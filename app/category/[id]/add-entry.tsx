@@ -15,7 +15,7 @@ export default function AddEntryScreen() {
   const addEntry = useStore((state) => state.addEntry);
   const [isSaving, setIsSaving] = useState(false);
 
-  const handleSave = (values: EntryFormValues) => {
+  const handleSave = async (values: EntryFormValues) => {
     if (isSaving) {
       return;
     }
@@ -31,7 +31,7 @@ export default function AddEntryScreen() {
 
     try {
       setIsSaving(true);
-      addEntry({
+      await addEntry({
         categoryId: category.id,
         placeName: values.placeName.trim(),
         city: values.city.trim(),
@@ -44,8 +44,10 @@ export default function AddEntryScreen() {
       });
 
       router.replace(`/category/${category.id}`);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Failed to save entry:", error);
+      Alert.alert("Save failed", "Unable to save this entry. Try again.");
+    } finally {
       setIsSaving(false);
     }
   };
@@ -83,7 +85,7 @@ export default function AddEntryScreen() {
           notes: "",
           photoUrl: undefined,
         }}
-        saveLabel="Save Entry"
+        saveLabel={isSaving ? "Saving..." : "Save Entry"}
         saving={isSaving}
         onSave={handleSave}
       />

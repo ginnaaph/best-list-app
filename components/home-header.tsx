@@ -1,14 +1,21 @@
 import { Link, type Href } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 
+import { useStore } from "@/store";
+
 const profileRoute = "/profile" as Href;
 
 export function HomeHeader() {
+  const entries = useStore((state) => state.entries);
+  const loggedCount = entries.length;
+  const cityCount = new Set(entries.map((entry) => entry.city).filter(Boolean))
+    .size;
+
   return (
     <View className="flex-row items-center justify-between">
       <View className="gap-2">
         <Text className="text-caption uppercase text-secondary">
-          108 logged - 14 cities
+          {loggedCount} logged - {cityCount} cities
         </Text>
         <Text className="text-brand text-primary">BestList</Text>
       </View>

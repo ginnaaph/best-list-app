@@ -33,6 +33,10 @@ type InsertCategoryPayload = {
   coverPhoto?: string;
 };
 
+type UpdateCategoryPayload = {
+  name: string;
+};
+
 type InsertEntryPayload = Omit<Entry, "createdAt" | "overallScore">;
 
 type UpdateEntryPayload = Omit<
@@ -176,6 +180,41 @@ export async function updateCategoryVisibility(
   const { data, error } = await getSupabaseClient()
     .from("categories")
     .update({ is_public: isPublic })
+    .eq("id", categoryId)
+    .select(categoryColumns)
+    .single()
+    .returns<CategoryRow>();
+
+  if (error) {
+    throw error;
+  }
+
+  return mapCategory(data);
+}
+
+export async function updateCategory(
+  categoryId: string,
+  category: UpdateCategoryPayload,
+): Promise<Category> {
+  const { data, error } = await getSupabaseClient()
+    .from("categories")
+    .update({ name: category.name })
+    .eq("id", categoryId)
+    .select(categoryColumns)
+    .single()
+    .returns<CategoryRow>();
+
+  if (error) {
+    throw error;
+  }
+
+  return mapCategory(data);
+}
+
+export async function deleteCategory(categoryId: string): Promise<Category> {
+  const { data, error } = await getSupabaseClient()
+    .from("categories")
+    .delete()
     .eq("id", categoryId)
     .select(categoryColumns)
     .single()

@@ -1,4 +1,4 @@
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import {
   Alert,
@@ -15,10 +15,27 @@ import { colors } from "@/constants/theme";
 import { useStore } from "@/store";
 
 export default function AddCategoryScreen() {
+  const { categoryId: categoryIdParam } = useLocalSearchParams<{
+    categoryId?: string | string[];
+  }>();
+  const categoryId = Array.isArray(categoryIdParam)
+    ? categoryIdParam[0]
+    : categoryIdParam;
+  const isEditMode = Boolean(categoryId);
+  const categories = useStore((state) => state.categories);
   const addCategory = useStore((state) => state.addCategory);
-  const [name, setName] = useState("");
+  const updateCategory = useStore((state) => state.updateCategory);
+  const category = categoryId
+    ? categories.find((item) => item.id === categoryId)
+    : undefined;
+  const [name, setName] = useState(() => category?.name ?? "");
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    if (isSaving) {
+      return;
+    }
+
     const trimmedName = name.trim();
 
     if (!trimmedName) {
@@ -26,8 +43,32 @@ export default function AddCategoryScreen() {
       return;
     }
 
-    const newCategory = addCategory(trimmedName);
-    router.replace(`/category/${newCategory.id}`);
+    try {
+      setIsSaving(true);
+
+      if (categoryId) {
+        const updatedCategory = await updateCategory(categoryId, {
+          name: trimmedName,
+        });
+
+        if (!updatedCategory) {
+          Alert.alert("Category not found", "Unable to edit this category.");
+          router.back();
+          return;
+        }
+
+        router.back();
+        return;
+      }
+
+      const newCategory = await addCategory(trimmedName);
+      router.replace(`/category/${newCategory.id}`);
+    } catch (error: unknown) {
+      console.error("Failed to save category:", error);
+      Alert.alert("Save failed", "Unable to save this category. Try again.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -48,10 +89,10 @@ export default function AddCategoryScreen() {
             </Pressable>
 
             <Text className="font-display text-[18px] font-bold text-primary">
-              Add Category
+              {isEditMode ? "Edit Category" : "Add Category"}
             </Text>
 
-            <View className="h-9 w-[77px]" />
+            <View className="h-9 w-19.25" />
           </View>
 
           <View className="mt-8 gap-5">
@@ -68,18 +109,25 @@ export default function AddCategoryScreen() {
                 returnKeyType="done"
                 value={name}
                 onChangeText={setName}
-                onSubmitEditing={handleSave}
+                onSubmitEditing={() => {
+                  void handleSave();
+                }}
               />
             </View>
 
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Save category"
-              className="h-13 items-center justify-center rounded-full bg-accent shadow-card"
-              onPress={handleSave}
+              className={`h-13 items-center justify-center rounded-full bg-accent shadow-card ${
+                isSaving ? "opacity-60" : ""
+              }`}
+              disabled={isSaving}
+              onPress={() => {
+                void handleSave();
+              }}
             >
               <Text className="font-body text-[15px] font-bold uppercase tracking-[1px] text-white">
-                Save Category
+                {isSaving ? "Saving..." : "Save Category"}
               </Text>
             </Pressable>
           </View>

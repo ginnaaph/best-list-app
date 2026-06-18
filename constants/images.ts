@@ -8,6 +8,7 @@ import designGuide from "@/assets/DesignGuide.png";
 import editIcon from "@/assets/icons/edit.png";
 import setting from "@/assets/icons/setting.png";
 import shareIcon from "@/assets/icons/share.png";
+import googleLogo from "@/assets/logos/google.png";
 import noImages from "@/assets/NoImages.jpg";
 import breakfastBurrito from "@/assets/stockimages/Food/BreakfastBurrito.png";
 import cookies from "@/assets/stockimages/Food/Cookies.png";
@@ -28,6 +29,7 @@ export const images = {
   designGuide,
   noImages,
   editIcon,
+  googleLogo,
   shareIcon,
   wireframe,
   setting,
