@@ -57,7 +57,7 @@ export default function Profile() {
     } catch (error) {
       console.error("Sign out failed:", error);
     } finally {
-      useStore.getState().clearStore();
+      await useStore.getState().clearStore();
       setIsSigningOut(false);
       router.replace("/sign-in");
     }
