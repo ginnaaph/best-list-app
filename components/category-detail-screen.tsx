@@ -1,7 +1,7 @@
 import { router } from "expo-router";
 import { useState } from "react";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 import {
-  Image,
   Pressable,
   ScrollView,
   Share,
@@ -13,7 +13,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { EntryCard } from "@/components/entry-card";
 import { FloatingAddButton } from "@/components/floating-add-button";
-import { images } from "@/constants/images";
 import { colors } from "@/constants/theme";
 import { sortEntries, type SortDimension } from "@/lib/entry-score";
 import type { Category } from "@/types/category";
@@ -76,6 +75,11 @@ export function CategoryDetailScreen({
 
           <View className="flex-row items-center gap-2 ">
             <View className="h-11 flex-row items-center justify-center gap-2 rounded-full bg-white px-3 shadow-card">
+              <FontAwesome
+                name={category.isPublic ? "users" : "lock"}
+                size={14}
+                color="#000000"
+              />
               <Text className="font-mono-bestlist text-[10px] font-bold uppercase text-secondary">
                 {category.isPublic ? "Public" : "Private"}
               </Text>
@@ -104,11 +108,7 @@ export function CategoryDetailScreen({
               disabled={shareDisabled}
               onPress={shareCategory}
             >
-              <Image
-                source={images.shareIcon}
-                className="h-5 w-5"
-                resizeMode="contain"
-              />
+              <FontAwesome name="share" size={16} color="#000000" />
             </Pressable>
 
             <Pressable

@@ -17,7 +17,10 @@ export function HomeHeader() {
         <Text className="text-caption uppercase text-secondary">
           {loggedCount} logged - {cityCount} cities
         </Text>
-        <Text className="text-brand text-primary">BestList</Text>
+        <View className="flex-row">
+          <Text className="text-brand text-primary">Best</Text>
+          <Text className="text-brand text-bestlist-green">List</Text>
+        </View>
       </View>
 
       <Link href={profileRoute} asChild>

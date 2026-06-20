@@ -4,6 +4,7 @@ import {
   Image,
   type ImageSourcePropType,
   Pressable,
+  ScrollView,
   Text,
   View,
 } from "react-native";
@@ -65,7 +66,10 @@ export default function Profile() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f8f8f7" }}>
-      <View className="flex-1 px-5 pb-3 pt-2">
+      <ScrollView
+        contentContainerClassName="grow px-5 pb-3 pt-2"
+        showsVerticalScrollIndicator={false}
+      >
         <View className="flex-row items-center justify-between">
           <Pressable
             onPress={() => router.back()}
@@ -200,7 +204,7 @@ export default function Profile() {
             {isSigningOut ? "Signing out..." : "Sign Out"}
           </Text>
         </Pressable>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }

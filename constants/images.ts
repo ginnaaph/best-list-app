@@ -1,5 +1,5 @@
 import bestListMark from "@/assets/BestList1.png";
-import bestListLogo from "@/assets/BestListFull.png";
+import bestListSplash from "@/assets/BestList-splash.gif";
 import onboardingReference from "@/assets/BL-Onboarding.png";
 import signInReference from "@/assets/BL-SignIn.png";
 import signUpReference from "@/assets/BL-SignUp.png";
@@ -21,7 +21,7 @@ import wireframe from "@/assets/WireFrame.png";
 
 export const images = {
   bestListMark,
-  bestListLogo,
+  bestListSplash,
   onboardingReference,
   signInReference,
   signUpReference,

@@ -12,3 +12,8 @@ declare module "*.jpeg" {
   const value: number;
   export default value;
 }
+
+declare module "*.gif" {
+  const value: number;
+  export default value;
+}
