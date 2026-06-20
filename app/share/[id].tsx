@@ -3,7 +3,10 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { getPublicCategory, getPublicEntries } from "@/lib/api";
+import {
+  getPublicCategoryByShareId,
+  getPublicEntries,
+} from "@/lib/api";
 import { calculateOverallScore, sortEntries } from "@/lib/entry-score";
 import type { Category } from "@/types/category";
 import type { Entry } from "@/types/entry";
@@ -36,7 +39,7 @@ export default function ShareListScreen() {
       setIsLoading(true);
 
       try {
-        const publicCategory = await getPublicCategory(id);
+        const publicCategory = await getPublicCategoryByShareId(id);
 
         if (!isMounted) {
           return;

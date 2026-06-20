@@ -13,6 +13,7 @@ import {
 } from "react-native";
 
 import { images } from "@/constants/images";
+import { getCategoryShareUrl } from "@/lib/category-sharing";
 import { useStore } from "@/store";
 import type { Category } from "@/types/category";
 
@@ -30,26 +31,24 @@ const categoryImages: Partial<Record<string, ImageSourcePropType>> = {
 };
 
 export function CategoryCard({ category }: CategoryCardProps) {
-  const setCategoryPublic = useStore((state) => state.setCategoryPublic);
   const deleteCategory = useStore((state) => state.deleteCategory);
   const categoryImage: ImageSourcePropType = category.coverPhoto
     ? { uri: category.coverPhoto }
     : (categoryImages[category.id] ?? images.noImages);
   const entrySummary =
     category.entryCount > 0 ? `#1 - ${category.topEntry}` : "No entries yet";
-  const shareLink = `https://bestlist.app/share/${category.id}`;
+  const shareLink = getCategoryShareUrl(category.shareId);
 
   const handleShare = async () => {
+    if (!category.isPublic || !shareLink) {
+      Alert.alert(
+        "Sharing is off",
+        "Open this list and turn on sharing before sharing its public link.",
+      );
+      return;
+    }
+
     try {
-      await setCategoryPublic(category.id, true);
-      const updatedCategory = useStore
-        .getState()
-        .categories.find((item) => item.id === category.id);
-
-      if (!updatedCategory?.isPublic) {
-        throw new Error("Category visibility update failed.");
-      }
-
       await Share.share({
         message: `My best ${category.name} list on BestList\n${shareLink}`,
       });

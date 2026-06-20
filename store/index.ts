@@ -14,6 +14,7 @@ import {
   updateCategoryVisibility,
   updateEntry as updateSupabaseEntry,
 } from "@/lib/api";
+import { getNextCategorySharingState } from "@/lib/category-sharing";
 import { sortEntries } from "@/lib/entry-score";
 import type { Category, CategoryCardTone } from "@/types/category";
 import type { Entry } from "@/types/entry";
@@ -263,11 +264,21 @@ export const useStore = create<StoreState>()(
           return;
         }
 
-        const previousIsPublic = currentCategory.isPublic;
+        const previousSharingState = {
+          isPublic: currentCategory.isPublic,
+          shareId: currentCategory.shareId,
+        };
+        const nextSharingState = getNextCategorySharingState(
+          currentCategory,
+          isPublic,
+          Crypto.randomUUID,
+        );
 
         set((state) => ({
           categories: state.categories.map((category) =>
-            category.id === categoryId ? { ...category, isPublic } : category,
+            category.id === categoryId
+              ? { ...category, ...nextSharingState }
+              : category,
           ),
         }));
 
@@ -275,6 +286,7 @@ export const useStore = create<StoreState>()(
           const savedCategory = await updateCategoryVisibility(
             categoryId,
             isPublic,
+            nextSharingState.shareId,
           );
 
           set((state) => {
@@ -298,7 +310,7 @@ export const useStore = create<StoreState>()(
           set((state) => ({
             categories: state.categories.map((category) =>
               category.id === categoryId
-                ? { ...category, isPublic: previousIsPublic }
+                ? { ...category, ...previousSharingState }
                 : category,
             ),
           }));

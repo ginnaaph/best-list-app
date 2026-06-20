@@ -25,12 +25,16 @@ create table if not exists public.categories (
   name text not null,
   cover_photo text,
   tone text not null,
-  is_public boolean not null default false,
+  is_shared boolean not null default false,
+  share_id uuid,
   created_at timestamptz not null default now()
 );
 
 alter table public.categories
-  add column if not exists is_public boolean not null default false;
+  add column if not exists is_shared boolean not null default false;
+
+alter table public.categories
+  add column if not exists share_id uuid;
 
 create table if not exists public.entries (
   id uuid primary key default gen_random_uuid(),
@@ -52,6 +56,9 @@ create table if not exists public.entries (
 
 create index if not exists categories_user_id_idx
   on public.categories(user_id);
+
+create unique index if not exists categories_share_id_key
+  on public.categories(share_id);
 
 create index if not exists entries_user_id_idx
   on public.entries(user_id);
@@ -77,9 +84,11 @@ create policy "Users can select their own categories"
   using ((select auth.uid()) = user_id);
 
 drop policy if exists "Public categories are viewable by anyone" on public.categories;
-create policy "Public categories are viewable by anyone"
+drop policy if exists "Shared categories are viewable by anyone" on public.categories;
+create policy "Shared categories are viewable by anyone"
   on public.categories for select
-  using (is_public = true);
+  to anon
+  using (is_shared = true);
 
 drop policy if exists "Users can insert their own categories" on public.categories;
 create policy "Users can insert their own categories"
@@ -111,13 +120,15 @@ create policy "Users can select their own entries"
   using ((select auth.uid()) = user_id);
 
 drop policy if exists "Entries in public categories are viewable by anyone" on public.entries;
-create policy "Entries in public categories are viewable by anyone"
+drop policy if exists "Entries in shared categories are viewable by anyone" on public.entries;
+create policy "Entries in shared categories are viewable by anyone"
   on public.entries for select
+  to anon
   using (
     exists (
       select 1 from public.categories
       where categories.id = entries.category_id
-        and categories.is_public = true
+        and categories.is_shared = true
     )
   );
 
