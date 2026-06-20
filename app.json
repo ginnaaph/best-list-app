@@ -30,13 +30,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/BestListFull.png",
-          "imageWidth": 120,
-          "resizeMode": "contain",
-          "backgroundColor": "#F8F8F7",
-          "dark": {
-            "backgroundColor": "#1A1A1A"
-          }
+          "backgroundColor": "#F5F0E8"
         }
       ]
     ],
