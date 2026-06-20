@@ -1,6 +1,7 @@
 import { router, useLocalSearchParams } from "expo-router";
 import { Image, Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 import { images } from "@/constants/images";
 import { colors } from "@/constants/theme";
@@ -99,10 +100,7 @@ export default function EntryDetailScreen() {
             className="h-9 w-9 items-center justify-center rounded-full bg-white shadow-card"
             onPress={() => router.push(`/entry/${entry.id}/edit`)}
           >
-            <Image
-              className="h-5 w-5"
-              source={images.editIcon}
-            />
+            <FontAwesome name="edit" size={20} color="#000000" />
           </Pressable>
         </View>
 
