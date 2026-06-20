@@ -55,7 +55,7 @@ type StoreState = {
     entryId: string,
     entry: UpdateEntryInput,
   ) => Promise<Entry | undefined>;
-  deleteEntry: (entryId: string) => Entry | undefined;
+  deleteEntry: (entryId: string) => Promise<Entry | undefined>;
   ensureCategorySeeded: (categoryId: string) => void;
 };
 
@@ -333,33 +333,34 @@ export const useStore = create<StoreState>()(
           throw error;
         }
       },
-      deleteEntry: (entryId) => {
+      deleteEntry: async (entryId) => {
         const currentEntry = get().entries.find((entry) => entry.id === entryId);
 
         if (!currentEntry) {
           return undefined;
         }
 
-        void deleteSupabaseEntry(entryId)
-          .then((deletedEntry) => {
-            set((state) => {
-              const entries = state.entries.filter(
-                (entry) => entry.id !== entryId,
-              );
-              const categories = updateCategorySummaryById(
-                state.categories,
-                entries,
-                deletedEntry.categoryId,
-              );
+        try {
+          const deletedEntry = await deleteSupabaseEntry(entryId);
 
-              return { categories, entries };
-            });
-          })
-          .catch((error: unknown) =>
-            reportMutationError("delete entry", error),
-          );
+          set((state) => {
+            const entries = state.entries.filter(
+              (entry) => entry.id !== entryId,
+            );
+            const categories = updateCategorySummaryById(
+              state.categories,
+              entries,
+              deletedEntry.categoryId,
+            );
 
-        return currentEntry;
+            return { categories, entries };
+          });
+
+          return deletedEntry;
+        } catch (error: unknown) {
+          reportMutationError("delete entry", error);
+          throw error;
+        }
       },
       ensureCategorySeeded: () => {},
     }),
