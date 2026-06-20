@@ -1,3 +1,4 @@
+import { resolveEntryPhotoInput } from "@/lib/entry-photo-upload";
 import { getSupabaseClient, supabase } from "@/lib/supabase";
 import type { Category, CategoryCardTone } from "@/types/category";
 import type { Entry } from "@/types/entry";
@@ -261,9 +262,14 @@ export async function getPublicEntries(categoryId: string): Promise<Entry[]> {
 }
 
 export async function insertEntry(entry: InsertEntryPayload): Promise<Entry> {
-  const { data, error } = await getSupabaseClient()
+  const client = getSupabaseClient();
+  const entryWithPhoto = await resolveEntryPhotoInput(entry, {
+    client,
+    entryId: entry.id,
+  });
+  const { data, error } = await client
     .from("entries")
-    .insert(toInsertEntryPayload(entry))
+    .insert(toInsertEntryPayload(entryWithPhoto))
     .select(entryColumns)
     .single()
     .returns<EntryRow>();
@@ -279,9 +285,14 @@ export async function updateEntry(
   entryId: string,
   entry: UpdateEntryPayload,
 ): Promise<Entry> {
-  const { data, error } = await getSupabaseClient()
+  const client = getSupabaseClient();
+  const entryWithPhoto = await resolveEntryPhotoInput(entry, {
+    client,
+    entryId,
+  });
+  const { data, error } = await client
     .from("entries")
-    .update(toUpdateEntryPayload(entry))
+    .update(toUpdateEntryPayload(entryWithPhoto))
     .eq("id", entryId)
     .select(entryColumns)
     .single()

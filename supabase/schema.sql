@@ -3,6 +3,22 @@
 
 create extension if not exists pgcrypto;
 
+insert into storage.buckets (id, name, public)
+values ('entry-photos', 'entry-photos', true)
+on conflict (id) do update
+set public = excluded.public;
+
+drop policy if exists "Users can upload their own entry photos"
+  on storage.objects;
+create policy "Users can upload their own entry photos"
+  on storage.objects
+  for insert
+  to authenticated
+  with check (
+    bucket_id = 'entry-photos'
+    and (storage.foldername(name))[1] = (select auth.uid()::text)
+  );
+
 create table if not exists public.categories (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
