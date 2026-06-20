@@ -67,7 +67,7 @@ export default function Profile() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f8f8f7" }}>
       <ScrollView
-        contentContainerClassName="flex-grow px-5 pb-3 pt-2"
+        contentContainerClassName="grow px-5 pb-3 pt-2"
         showsVerticalScrollIndicator={false}
       >
         <View className="flex-row items-center justify-between">
