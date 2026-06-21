@@ -103,6 +103,11 @@ export async function resolveEntryPhotoUrl({
   }
 
   const response = await fetchFile(photoUrl);
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch photo: ${response.status} ${response.statusText}`
+    );
+  }
   const imageBytes = await response.arrayBuffer();
   const { contentType, extension } = getImageMetadata(photoUrl, response);
   const path = `${user.id}/${entryId}/${createFileName()}.${extension}`;
