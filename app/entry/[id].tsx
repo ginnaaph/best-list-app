@@ -110,7 +110,7 @@ export default function EntryDetailScreen() {
         >
           <View className="gap-6 pb-8">
             <Image
-              className="h-55 w-full rounded-bestlist-xl bg-white"
+              className="aspect-square w-full rounded-bestlist-xl bg-white"
               source={entryImageSource}
             />
 
