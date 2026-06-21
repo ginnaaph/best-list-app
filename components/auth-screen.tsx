@@ -41,7 +41,7 @@ const authCopy = {
     eyebrow: "Welcome back",
     title: "Sign in to your lists.",
     subtitle: "",
-    email: "gina@bestlist.app",
+    email: "gina@best-list.vercel.app",
     button: "Sign in",
     footerLead: "New to BestList?",
     footerAction: "Create an account",
