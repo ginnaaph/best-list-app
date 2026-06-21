@@ -14,6 +14,7 @@ import {
   updateCategoryVisibility,
   updateEntry as updateSupabaseEntry,
 } from "@/lib/api";
+import { getNextCategorySharingState } from "@/lib/category-sharing";
 import { sortEntries } from "@/lib/entry-score";
 import type { Category, CategoryCardTone } from "@/types/category";
 import type { Entry } from "@/types/entry";
@@ -55,7 +56,7 @@ type StoreState = {
     entryId: string,
     entry: UpdateEntryInput,
   ) => Promise<Entry | undefined>;
-  deleteEntry: (entryId: string) => Entry | undefined;
+  deleteEntry: (entryId: string) => Promise<Entry | undefined>;
   ensureCategorySeeded: (categoryId: string) => void;
 };
 
@@ -263,11 +264,21 @@ export const useStore = create<StoreState>()(
           return;
         }
 
-        const previousIsPublic = currentCategory.isPublic;
+        const previousSharingState = {
+          isPublic: currentCategory.isPublic,
+          shareId: currentCategory.shareId,
+        };
+        const nextSharingState = getNextCategorySharingState(
+          currentCategory,
+          isPublic,
+          Crypto.randomUUID,
+        );
 
         set((state) => ({
           categories: state.categories.map((category) =>
-            category.id === categoryId ? { ...category, isPublic } : category,
+            category.id === categoryId
+              ? { ...category, ...nextSharingState }
+              : category,
           ),
         }));
 
@@ -275,6 +286,7 @@ export const useStore = create<StoreState>()(
           const savedCategory = await updateCategoryVisibility(
             categoryId,
             isPublic,
+            nextSharingState.shareId,
           );
 
           set((state) => {
@@ -298,7 +310,7 @@ export const useStore = create<StoreState>()(
           set((state) => ({
             categories: state.categories.map((category) =>
               category.id === categoryId
-                ? { ...category, isPublic: previousIsPublic }
+                ? { ...category, ...previousSharingState }
                 : category,
             ),
           }));
@@ -333,33 +345,34 @@ export const useStore = create<StoreState>()(
           throw error;
         }
       },
-      deleteEntry: (entryId) => {
+      deleteEntry: async (entryId) => {
         const currentEntry = get().entries.find((entry) => entry.id === entryId);
 
         if (!currentEntry) {
           return undefined;
         }
 
-        void deleteSupabaseEntry(entryId)
-          .then((deletedEntry) => {
-            set((state) => {
-              const entries = state.entries.filter(
-                (entry) => entry.id !== entryId,
-              );
-              const categories = updateCategorySummaryById(
-                state.categories,
-                entries,
-                deletedEntry.categoryId,
-              );
+        try {
+          const deletedEntry = await deleteSupabaseEntry(entryId);
 
-              return { categories, entries };
-            });
-          })
-          .catch((error: unknown) =>
-            reportMutationError("delete entry", error),
-          );
+          set((state) => {
+            const entries = state.entries.filter(
+              (entry) => entry.id !== entryId,
+            );
+            const categories = updateCategorySummaryById(
+              state.categories,
+              entries,
+              deletedEntry.categoryId,
+            );
 
-        return currentEntry;
+            return { categories, entries };
+          });
+
+          return deletedEntry;
+        } catch (error: unknown) {
+          reportMutationError("delete entry", error);
+          throw error;
+        }
       },
       ensureCategorySeeded: () => {},
     }),

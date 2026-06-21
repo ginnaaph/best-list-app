@@ -14,6 +14,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { EntryCard } from "@/components/entry-card";
 import { FloatingAddButton } from "@/components/floating-add-button";
 import { colors } from "@/constants/theme";
+import { getCategoryShareUrl } from "@/lib/category-sharing";
 import { sortEntries, type SortDimension } from "@/lib/entry-score";
 import type { Category } from "@/types/category";
 import type { Entry } from "@/types/entry";
@@ -47,15 +48,15 @@ export function CategoryDetailScreen({
     "Overall";
   const sortedEntries = sortEntries(entries, selectedSort);
   const hasEntries = sortedEntries.length > 0;
-  const shareDisabled = toggleDisabled || !category.isPublic;
+  const shareUrl = getCategoryShareUrl(category.shareId);
+  const shareDisabled = toggleDisabled || !category.isPublic || !shareUrl;
   const shareCategory = () => {
-    if (shareDisabled) {
+    if (shareDisabled || !shareUrl) {
       return;
     }
 
     void Share.share({
-      // TODO: replace with real domain when universal links are configured
-      message: `My best ${category.name} list on BestList 🌮\nhttps://bestlist.app/share/${category.id}`,
+      message: `My best ${category.name} list on BestList 🌮\n${shareUrl}`,
     });
   };
 
@@ -123,6 +124,17 @@ export function CategoryDetailScreen({
             </Pressable>
           </View>
         </View>
+
+        {category.isPublic && shareUrl ? (
+          <View className="items-end pb-2 pt-3">
+            <Text
+              selectable
+              className="max-w-full text-right font-mono-bestlist text-[10px] font-bold leading-4 text-secondary"
+            >
+              {shareUrl}
+            </Text>
+          </View>
+        ) : null}
 
         <View className="gap-2">
           <Text className="text-center font-display text-[38px] font-bold leading-10 text-primary">

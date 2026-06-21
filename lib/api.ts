@@ -1,4 +1,8 @@
-import { getSupabaseClient, supabase } from "@/lib/supabase";
+import { resolveEntryPhotoInput } from "@/lib/entry-photo-upload";
+import {
+  getPublicSupabaseClient,
+  getSupabaseClient,
+} from "@/lib/supabase";
 import type { Category, CategoryCardTone } from "@/types/category";
 import type { Entry } from "@/types/entry";
 
@@ -7,7 +11,8 @@ type CategoryRow = {
   name: string;
   cover_photo: string | null;
   tone: string;
-  is_public: boolean;
+  is_shared: boolean;
+  share_id: string | null;
   created_at: string;
 };
 
@@ -44,7 +49,8 @@ type UpdateEntryPayload = Omit<
   "id" | "categoryId" | "createdAt" | "overallScore"
 >;
 
-const categoryColumns = "id,name,cover_photo,tone,is_public,created_at";
+const categoryColumns =
+  "id,name,cover_photo,tone,is_shared,share_id,created_at";
 const entryColumns =
   "id,category_id,place_name,city,notes,photo_url,created_at,taste,value,portion,vibe,overall_score";
 
@@ -73,7 +79,8 @@ function mapCategory(row: CategoryRow): Category {
     entryCount: 0,
     coverPhoto: row.cover_photo ?? undefined,
     tone: toCategoryTone(row.tone),
-    isPublic: row.is_public,
+    isPublic: row.is_shared,
+    shareId: row.share_id ?? undefined,
   };
 }
 
@@ -160,7 +167,8 @@ export async function insertCategory(
       name: category.name,
       tone: category.tone,
       cover_photo: category.coverPhoto ?? null,
-      is_public: false,
+      is_shared: false,
+      share_id: null,
     })
     .select(categoryColumns)
     .single()
@@ -176,10 +184,19 @@ export async function insertCategory(
 export async function updateCategoryVisibility(
   categoryId: string,
   isPublic: boolean,
+  shareId?: string,
 ): Promise<Category> {
+  const update: { is_shared: boolean; share_id?: string } = {
+    is_shared: isPublic,
+  };
+
+  if (shareId) {
+    update.share_id = shareId;
+  }
+
   const { data, error } = await getSupabaseClient()
     .from("categories")
-    .update({ is_public: isPublic })
+    .update(update)
     .eq("id", categoryId)
     .select(categoryColumns)
     .single()
@@ -227,14 +244,14 @@ export async function deleteCategory(categoryId: string): Promise<Category> {
   return mapCategory(data);
 }
 
-export async function getPublicCategory(
-  categoryId: string,
+export async function getPublicCategoryByShareId(
+  shareId: string,
 ): Promise<Category | null> {
-  const { data, error } = await supabase
+  const { data, error } = await getPublicSupabaseClient()
     .from("categories")
     .select(categoryColumns)
-    .eq("id", categoryId)
-    .eq("is_public", true)
+    .eq("share_id", shareId)
+    .eq("is_shared", true)
     .maybeSingle()
     .returns<CategoryRow | null>();
 
@@ -246,7 +263,7 @@ export async function getPublicCategory(
 }
 
 export async function getPublicEntries(categoryId: string): Promise<Entry[]> {
-  const { data, error } = await supabase
+  const { data, error } = await getPublicSupabaseClient()
     .from("entries")
     .select(entryColumns)
     .eq("category_id", categoryId)
@@ -261,9 +278,14 @@ export async function getPublicEntries(categoryId: string): Promise<Entry[]> {
 }
 
 export async function insertEntry(entry: InsertEntryPayload): Promise<Entry> {
-  const { data, error } = await getSupabaseClient()
+  const client = getSupabaseClient();
+  const entryWithPhoto = await resolveEntryPhotoInput(entry, {
+    client,
+    entryId: entry.id,
+  });
+  const { data, error } = await client
     .from("entries")
-    .insert(toInsertEntryPayload(entry))
+    .insert(toInsertEntryPayload(entryWithPhoto))
     .select(entryColumns)
     .single()
     .returns<EntryRow>();
@@ -279,9 +301,14 @@ export async function updateEntry(
   entryId: string,
   entry: UpdateEntryPayload,
 ): Promise<Entry> {
-  const { data, error } = await getSupabaseClient()
+  const client = getSupabaseClient();
+  const entryWithPhoto = await resolveEntryPhotoInput(entry, {
+    client,
+    entryId,
+  });
+  const { data, error } = await client
     .from("entries")
-    .update(toUpdateEntryPayload(entry))
+    .update(toUpdateEntryPayload(entryWithPhoto))
     .eq("id", entryId)
     .select(entryColumns)
     .single()

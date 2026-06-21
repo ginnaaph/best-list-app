@@ -8,4 +8,5 @@ export type Category = {
   coverPhoto?: string;
   tone: CategoryCardTone;
   isPublic: boolean;
+  shareId?: string;
 };

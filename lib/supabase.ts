@@ -27,7 +27,25 @@ export const supabase = createClient(supabaseUrl ?? "", supabaseAnonKey ?? "", {
   },
 });
 
+export const publicSupabase = createClient(
+  supabaseUrl ?? "",
+  supabaseAnonKey ?? "",
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+      detectSessionInUrl: false,
+      storageKey: "bestlist-public-share",
+    },
+  },
+);
+
 export function getSupabaseClient() {
   assertSupabaseConfigured();
   return supabase;
+}
+
+export function getPublicSupabaseClient() {
+  assertSupabaseConfigured();
+  return publicSupabase;
 }

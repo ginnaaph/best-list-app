@@ -7,7 +7,7 @@ You try a great dish, forget where it was, can't remember how it compared to the
 
 ## Core MVP 
 1. **Categories** — create a named list (e.g. "Breakfast Burrito", "Ramen")
-2. **Entries** — add a dish to a category with: place name, city, optional photo, weighted score, optional note
+2. **Entries** — add a dish to a category with: place name, city, optional photo, composite score, optional note
 3. **Ranking** — entries auto-sort by overall score. Re-sortable by individual dimension (taste / value / portion / vibe)
 4. **Shareable link** — toggle a category public, share a read-only link
 
@@ -44,7 +44,7 @@ You can find both values in your Supabase project settings under API configurati
 ## Screens (MVP)
 1. Home — category grid tiles
 2. Category / Ranked List — ranked entry cards, sortable
-3. Add Entry — photo + place + weighted score sliders + note
+3. Add Entry — photo + place + composite score sliders + note
 4. Entry Detail — full view with score breakdown
 5. Shareable List — read-only public view
 6. Profile - user stats and categories
