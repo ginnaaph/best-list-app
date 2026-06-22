@@ -1,8 +1,15 @@
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, ScrollView, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Image,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { images } from "@/constants/images";
 import {
   getPublicCategoryByShareId,
   getPublicEntries,
@@ -170,52 +177,69 @@ type SharedEntryCardProps = {
 
 function SharedEntryCard({ entry, rank }: SharedEntryCardProps) {
   const overallScore = calculateOverallScore(entry);
+  const rankingLabel = `#${rank} - ${entry.city.toUpperCase()}`;
+  const entryImageSource = entry.photoUrl
+    ? { uri: entry.photoUrl }
+    : images.noImages;
 
   return (
     <View className="rounded-bestlist-xl bg-white px-5 py-4 shadow-card">
-      <View className="flex-row items-start justify-between gap-4">
-        <View className="min-w-0 flex-1">
-          <Text className="font-mono-bestlist text-[11px] font-bold uppercase leading-5 tracking-[2px] text-secondary">
-            #{rank} - {entry.city.toUpperCase()}
-          </Text>
-          <Text
-            className="mt-1 font-display text-[24px] font-bold leading-7.5 text-primary"
-            numberOfLines={1}
-          >
-            {entry.placeName}
-          </Text>
-          <Text
-            className="mt-.75 font-body text-[12px] leading-5 text-secondary"
-            numberOfLines={1}
-          >
-            {entry.city}
-          </Text>
-        </View>
-
-        <View className="shrink-0 items-center">
-          <Text className="font-display text-[42px] font-extrabold leading-13.5 text-[#2D5016]">
-            {overallScore.toFixed(1)}
-          </Text>
-          <Text className="font-mono-bestlist text-[10px] font-bold uppercase leading-3.25 text-secondary">
-            Overall
-          </Text>
-        </View>
-      </View>
-
-      <View className="mt-4 flex-row flex-wrap gap-2">
-        {scoreDimensions.map((dimension) => (
-          <View
-            key={dimension.key}
-            className="min-w-[74px] flex-1 rounded-bestlist-sm border border-subtle bg-[#F5F0E8] px-3 py-2"
-          >
-            <Text className="font-mono-bestlist text-[10px] font-bold uppercase leading-3.25 text-secondary">
-              {dimension.label}
+      <View className="gap-3.5">
+        <View className="flex-row items-start justify-between gap-3">
+          <View className="flex-1 pr-2">
+            <Text className="font-mono-bestlist text-[11px] font-bold uppercase leading-5 mb-1.5 tracking-[2px] text-secondary">
+              {rankingLabel}
             </Text>
-            <Text className="mt-1 font-body text-[15px] font-bold leading-5 text-primary">
-              {entry[dimension.key].toFixed(1)}
+            <View className="mt-1 flex-row items-center gap-3">
+              <Image
+                className="h-16 w-16 rounded-lg"
+                source={entryImageSource}
+              />
+              <View className="min-w-0 flex-1 gap-1">
+                <Text
+                  className="font-display text-[24px] font-bold leading-7.5 text-primary"
+                  numberOfLines={1}
+                >
+                  {entry.placeName}
+                </Text>
+                <Text
+                  className="mt-.75 font-body text-[12px] leading-5 text-secondary"
+                  numberOfLines={1}
+                >
+                  {entry.city}
+                </Text>
+              </View>
+            </View>
+          </View>
+
+          <View className="shrink-0 items-center pt-4">
+            <Text className="font-display mt-1.5 text-[42px] font-extrabold leading-13.5 text-accent">
+              {overallScore.toFixed(1)}
             </Text>
           </View>
-        ))}
+        </View>
+
+        {entry.notes ? (
+          <Text className="font-body text-[14px] leading-6 text-primary">
+            {entry.notes}
+          </Text>
+        ) : null}
+
+        <View className="mt-4 flex-row flex-wrap gap-2">
+          {scoreDimensions.map((dimension) => (
+            <View
+              key={dimension.key}
+              className="min-w-[74px] flex-1 rounded-bestlist-sm border border-subtle bg-[#F5F0E8] px-3 py-2"
+            >
+              <Text className="font-mono-bestlist text-[10px] font-bold uppercase leading-3.25 text-secondary">
+                {dimension.label}
+              </Text>
+              <Text className="mt-1 font-body text-[15px] font-bold leading-5 text-primary">
+                {entry[dimension.key].toFixed(1)}
+              </Text>
+            </View>
+          ))}
+        </View>
       </View>
     </View>
   );
