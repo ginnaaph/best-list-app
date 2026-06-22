@@ -125,17 +125,6 @@ export function CategoryDetailScreen({
           </View>
         </View>
 
-        {category.isPublic && shareUrl ? (
-          <View className="items-end pb-2 pt-3">
-            <Text
-              selectable
-              className="max-w-full text-right font-mono-bestlist text-[10px] font-bold leading-4 text-secondary"
-            >
-              {shareUrl}
-            </Text>
-          </View>
-        ) : null}
-
         <View className="gap-2">
           <Text className="text-center font-display text-[38px] font-bold leading-10 text-primary">
             {category.name}
