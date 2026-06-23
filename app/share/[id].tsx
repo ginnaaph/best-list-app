@@ -1,6 +1,5 @@
 import { Link, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
 import {
   ActivityIndicator,
   Image,
@@ -11,13 +10,11 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 import { images } from "@/constants/images";
+import { getPublicCategoryByShareId, getPublicEntries } from "@/lib/api";
 import { getCategoryShareUrl } from "@/lib/category-sharing";
-import {
-  getPublicCategoryByShareId,
-  getPublicEntries,
-} from "@/lib/api";
 import { calculateOverallScore, sortEntries } from "@/lib/entry-score";
 import type { Category } from "@/types/category";
 import type { Entry } from "@/types/entry";
