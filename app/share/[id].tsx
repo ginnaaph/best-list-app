@@ -28,12 +28,6 @@ const scoreDimensions: { label: string; key: ScoreDimension }[] = [
   { label: "VIBE", key: "vibe" },
 ];
 
-function getPublicEntryImageSource(photoUrl?: string) {
-  return photoUrl
-    ? { uri: photoUrl }
-    : images.noImages;
-}
-
 type PublicCategoryOwner = Category & {
   displayName?: string;
   username?: string;
@@ -180,30 +174,30 @@ export default function ShareListScreen() {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#F5F0E8" }}>
-      <View className="flex-1 px-4 pb-8 pt-5">
+      <View className="flex-1 px-5 pb-5 pt-4">
         <View className="flex-row items-center justify-between">
-          <View className="h-16 w-16 items-center justify-center rounded-full bg-accent">
-            <Text className="font-body text-[18px] font-bold leading-5 text-white">
-              {ownerInitial}
-            </Text>
+          <View className="h-9 w-9 items-center justify-center rounded-full bg-white shadow-card">
+            <View className="h-9 w-9 items-center justify-center rounded-full bg-accent">
+              <Text className="text-label text-white">{ownerInitial}</Text>
+            </View>
           </View>
 
           <Pressable
             accessibilityLabel={`Share ${category.name}`}
             accessibilityRole="button"
-            className="h-12 w-12 items-center justify-center rounded-full border border-subtle bg-white shadow-card"
+            className="h-9 w-9 items-center justify-center rounded-full bg-white shadow-card"
             onPress={shareList}
           >
-            <FontAwesome name="share" size={18} color="#1A1A1A" />
+            <FontAwesome name="share" size={16} color="#000000" />
           </Pressable>
         </View>
 
-        <View className="mt-7 gap-2">
-          <Text className="text-center font-display text-[56px] font-bold leading-[62px] text-primary">
+        <View className="gap-2">
+          <Text className="text-center font-display text-[38px] font-bold leading-10 text-primary">
             {category.name}
           </Text>
-          <Text className="text-center font-mono-bestlist text-[13px] uppercase leading-5 tracking-[5px] text-secondary">
-            Ranked by {ownerHandle}
+          <Text className="text-center font-mono-bestlist text-[10px] font-bold uppercase leading-3.25 text-secondary">
+            RANKED BY {ownerHandle}
           </Text>
         </View>
 
@@ -211,7 +205,7 @@ export default function ShareListScreen() {
           className="mt-6 flex-1"
           showsVerticalScrollIndicator={false}
         >
-          <View className="gap-5 pb-20">
+          <View className="gap-4 pb-24">
             {sortedEntries.map((entry, index) => (
               <SharedEntryCard key={entry.id} entry={entry} rank={index + 1} />
             ))}
@@ -224,22 +218,14 @@ export default function ShareListScreen() {
               </View>
             ) : null}
 
-            <View className="items-center gap-4 px-3 pt-20">
+            <View className="items-center gap-4 pt-20">
               <View className="h-px w-14 bg-[#EDEBE6]" />
-              <Text className="font-display text-[18px] font-bold leading-6 text-primary">
+              <Text className="text-card-title text-primary">
                 Best<Text className="text-accent">List</Text>
               </Text>
-              {shareUrl ? (
-                <Text
-                  className="text-center font-mono-bestlist text-[11px] font-bold uppercase leading-4 tracking-[3px] text-secondary"
-                  numberOfLines={1}
-                >
-                  {shareUrl.replace("https://", "").toUpperCase()}
-                </Text>
-              ) : null}
               <Link href="/" asChild>
-                <Pressable className="mt-2 h-14 w-full items-center justify-center rounded-full bg-accent px-8 shadow-card">
-                  <Text className="font-body text-[16px] font-bold text-white">
+                <Pressable className="h-11 items-center justify-center rounded-full bg-accent px-6 shadow-card">
+                  <Text className="text-label uppercase text-white">
                     Start your own list
                   </Text>
                 </Pressable>
@@ -260,49 +246,49 @@ type SharedEntryCardProps = {
 function SharedEntryCard({ entry, rank }: SharedEntryCardProps) {
   const overallScore = calculateOverallScore(entry);
   const rankingLabel = `#${rank} - ${entry.city.toUpperCase()}`;
-  const entryImageSource = getPublicEntryImageSource(entry.photoUrl);
+  const entryImageSource = entry.photoUrl
+    ? { uri: entry.photoUrl }
+    : images.noImages;
 
   return (
-    <View className="rounded-bestlist-xl border border-subtle bg-white px-5 py-6 shadow-card">
-      <View className="gap-4">
-        <Text className="font-mono-bestlist text-[12px] uppercase leading-5 tracking-[4px] text-secondary">
-          {rankingLabel}
-        </Text>
-
-        <View className="flex-row items-center gap-3">
-          <Image
-            className="h-14 w-14 rounded-lg"
-            resizeMode="cover"
-            source={entryImageSource}
-          />
-
-          <View className="min-w-0 flex-1 gap-1">
-            <Text
-              className="font-display text-[24px] font-bold leading-7.5 text-primary"
-              numberOfLines={1}
-            >
-              {entry.placeName}
+    <View className="rounded-bestlist-xl bg-white px-5 py-4 shadow-card">
+      <View className="gap-3.5">
+        <View className="flex-row items-start justify-between gap-3">
+          <View className="flex-1 pr-2">
+            <Text className="font-mono-bestlist text-[11px] font-bold uppercase leading-5 mb-1.5 tracking-[2px] text-secondary">
+              {rankingLabel}
             </Text>
-            <Text
-              className="font-body text-[15px] leading-5 text-secondary"
-              numberOfLines={1}
-            >
-              {entry.city}
-            </Text>
+            <View className="mt-1 flex-row items-center gap-3">
+              <Image
+                className="h-16 w-16 rounded-lg"
+                source={entryImageSource}
+              />
+              <View className="min-w-0 flex-1 gap-1">
+                <Text
+                  className="font-display text-[24px] font-bold leading-7.5 text-primary"
+                  numberOfLines={1}
+                >
+                  {entry.placeName}
+                </Text>
+                <Text
+                  className="mt-.75 font-body text-[12px] leading-5 text-secondary"
+                  numberOfLines={1}
+                >
+                  {entry.city}
+                </Text>
+              </View>
+            </View>
           </View>
 
-          <View className="w-20 shrink-0 items-end">
-            <Text className="font-display text-[40px] font-extrabold leading-[44px] text-accent">
+          <View className="shrink-0 items-center pt-4">
+            <Text className="font-display mt-1.5 text-[42px] font-extrabold leading-13.5 text-accent">
               {overallScore.toFixed(1)}
-            </Text>
-            <Text className="font-mono-bestlist text-[10px] uppercase leading-3.25 tracking-[2px] text-secondary">
-              OVERALL
             </Text>
           </View>
         </View>
 
         {entry.notes ? (
-          <Text className="font-body text-[16px] leading-6 text-secondary">
+          <Text className="font-body text-[14px] leading-6 text-primary">
             {entry.notes}
           </Text>
         ) : null}
