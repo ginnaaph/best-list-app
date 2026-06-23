@@ -180,13 +180,8 @@ export default function ShareListScreen() {
           <Text className="text-center font-display text-[38px] font-bold leading-10 text-primary">
             {category.name}
           </Text>
-<<<<<<< HEAD
-          <Text className="text-center font-mono-bestlist text-[12px] font-bold uppercase leading-5 tracking-[3px] text-secondary">
-            Ranked by @Gina
-=======
           <Text className="text-center font-mono-bestlist text-[12px] font-bold uppercase leading-5 tracking-[4px] text-secondary">
             Shared on BestList
->>>>>>> a91c9e39136e8f7ddb70ea170576d3980f21336c
           </Text>
         </View>
 
