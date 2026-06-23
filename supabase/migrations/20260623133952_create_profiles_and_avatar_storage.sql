@@ -1,12 +1,36 @@
 create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
+  username text,
   full_name text,
+  city text,
+  bio text,
   avatar_url text,
-  created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  created_at timestamptz not null default now()
 );
 
+alter table public.profiles
+  add column if not exists username text;
+
+alter table public.profiles
+  add column if not exists full_name text;
+
+alter table public.profiles
+  add column if not exists city text;
+
+alter table public.profiles
+  add column if not exists bio text;
+
+alter table public.profiles
+  add column if not exists avatar_url text;
+
+alter table public.profiles
+  add column if not exists created_at timestamptz not null default now();
+
 alter table public.profiles enable row level security;
+
+create unique index if not exists profiles_username_key
+  on public.profiles (lower(username))
+  where username is not null;
 
 grant usage on schema public to authenticated;
 grant select, insert, update on public.profiles to authenticated;
@@ -34,26 +58,6 @@ create policy "Users can update their own profile"
   using ((select auth.uid()) = id)
   with check ((select auth.uid()) = id);
 
-create or replace function public.set_profile_updated_at()
-returns trigger
-language plpgsql
-set search_path = ''
-as $$
-begin
-  new.updated_at = now();
-  return new;
-end;
-$$;
-
-revoke execute on function public.set_profile_updated_at() from public;
-revoke execute on function public.set_profile_updated_at() from anon;
-revoke execute on function public.set_profile_updated_at() from authenticated;
-
-drop trigger if exists set_profile_updated_at on public.profiles;
-create trigger set_profile_updated_at
-  before update on public.profiles
-  for each row execute function public.set_profile_updated_at();
-
 create or replace function public.handle_new_user_profile()
 returns trigger
 language plpgsql
@@ -61,10 +65,13 @@ security definer
 set search_path = ''
 as $$
 begin
-  insert into public.profiles (id, full_name, avatar_url)
+  insert into public.profiles (id, username, full_name, city, bio, avatar_url)
   values (
     new.id,
+    new.raw_user_meta_data ->> 'username',
     new.raw_user_meta_data ->> 'full_name',
+    new.raw_user_meta_data ->> 'city',
+    new.raw_user_meta_data ->> 'bio',
     new.raw_user_meta_data ->> 'avatar_url'
   )
   on conflict (id) do nothing;
