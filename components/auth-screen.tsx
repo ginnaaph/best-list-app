@@ -159,6 +159,7 @@ export function AuthScreen({ mode }: AuthScreenProps) {
               </View>
 
               <SocialButton
+                alignIconLeft={mode === "sign-up"}
                 icon="google"
                 label="Continue with Google"
                 onPress={() => handleSocialPress("google")}
@@ -197,30 +198,56 @@ export function AuthScreen({ mode }: AuthScreenProps) {
 }
 
 type SocialButtonProps = {
+  alignIconLeft?: boolean;
   icon: "google" | "apple";
   label: string;
   onPress: () => void;
 };
 
-function SocialButton({ icon, label, onPress }: SocialButtonProps) {
+function SocialButton({
+  alignIconLeft = false,
+  icon,
+  label,
+  onPress,
+}: SocialButtonProps) {
   const isGoogle = icon === "google";
 
   return (
     <Pressable
-      className="h-15.25 flex-row items-center rounded-bestlist-md border border-subtle bg-card px-6"
+      className={
+        alignIconLeft
+          ? "relative h-15.25 flex-row items-center justify-center rounded-bestlist-md border border-subtle bg-card px-6"
+          : "h-15.25 flex-row items-center rounded-bestlist-md border border-subtle bg-card px-6"
+      }
       onPress={onPress}
     >
-      <View className="w-8 items-center">
+      <View
+        className={
+          alignIconLeft
+            ? "absolute left-6 h-8 w-8 items-center justify-center"
+            : "w-8 items-center"
+        }
+      >
         {isGoogle ? (
-          <Image source={images.googleLogo} className="size-7" />
+          <Image
+            source={images.googleLogo}
+            resizeMode="contain"
+            className={alignIconLeft ? "h-5.5 w-5.5" : "size-7"}
+          />
         ) : (
           <Ionicons name="logo-apple" size={31} color="#000000" />
         )}
       </View>
-      <Text className="flex-1 text-center font-body text-[18px] font-bold leading-5.5 text-primary">
+      <Text
+        className={
+          alignIconLeft
+            ? "text-center font-body text-[18px] font-bold leading-5.5 text-primary"
+            : "flex-1 text-center font-body text-[18px] font-bold leading-5.5 text-primary"
+        }
+      >
         {label}
       </Text>
-      <View className="w-8" />
+      {alignIconLeft ? null : <View className="w-8" />}
     </Pressable>
   );
 }
