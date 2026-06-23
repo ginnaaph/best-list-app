@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Image,
+  type ImageSourcePropType,
   Pressable,
   ScrollView,
   Share,
@@ -246,9 +247,12 @@ type SharedEntryCardProps = {
 function SharedEntryCard({ entry, rank }: SharedEntryCardProps) {
   const overallScore = calculateOverallScore(entry);
   const rankingLabel = `#${rank} - ${entry.city.toUpperCase()}`;
-  const entryImageSource = entry.photoUrl
+  const initialEntryImageSource: ImageSourcePropType = entry.photoUrl
     ? { uri: entry.photoUrl }
     : images.noImages;
+  const [entryImageSource, setEntryImageSource] = useState<ImageSourcePropType>(
+    initialEntryImageSource,
+  );
 
   return (
     <View className="rounded-bestlist-xl bg-white px-5 py-4 shadow-card">
@@ -260,7 +264,8 @@ function SharedEntryCard({ entry, rank }: SharedEntryCardProps) {
             </Text>
             <View className="mt-1 flex-row items-center gap-3">
               <Image
-                className="h-16 w-16 rounded-lg"
+                className="h-16 w-16 shrink-0 rounded-lg bg-subtle"
+                onError={() => setEntryImageSource(images.noImages)}
                 source={entryImageSource}
               />
               <View className="min-w-0 flex-1 gap-1">
@@ -280,7 +285,7 @@ function SharedEntryCard({ entry, rank }: SharedEntryCardProps) {
             </View>
           </View>
 
-          <View className="shrink-0 items-center pt-4">
+          <View className="w-20 shrink-0 items-center pt-4">
             <Text className="font-display mt-1.5 text-[42px] font-extrabold leading-13.5 text-accent">
               {overallScore.toFixed(1)}
             </Text>
