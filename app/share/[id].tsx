@@ -39,14 +39,21 @@ export default function ShareListScreen() {
   const sortedEntries = sortEntries(entries, "overall");
   const shareUrl = getCategoryShareUrl(id);
 
-  const shareList = () => {
+  const shareList = async () => {
     if (!category || !shareUrl) {
       return;
     }
 
-    void Share.share({
-      message: `My best ${category.name} list on BestList\n${shareUrl}`,
-    });
+    try {
+      await Share.share({
+        message: `My best ${category.name} list on BestList\n${shareUrl}`,
+      });
+    } catch (error: unknown) {
+      console.error(
+        "Failed to open share sheet:",
+        error instanceof Error ? error.message : String(error),
+      );
+    }
   };
 
   useEffect(() => {
