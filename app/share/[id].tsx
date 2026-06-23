@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Image,
-  type ImageSourcePropType,
   Pressable,
   ScrollView,
   Share,
@@ -247,12 +246,10 @@ type SharedEntryCardProps = {
 function SharedEntryCard({ entry, rank }: SharedEntryCardProps) {
   const overallScore = calculateOverallScore(entry);
   const rankingLabel = `#${rank} - ${entry.city.toUpperCase()}`;
-  const initialEntryImageSource: ImageSourcePropType = entry.photoUrl
+  const [hasImageError, setHasImageError] = useState(false);
+  const entryImageSource = entry.photoUrl && !hasImageError
     ? { uri: entry.photoUrl }
     : images.noImages;
-  const [entryImageSource, setEntryImageSource] = useState<ImageSourcePropType>(
-    initialEntryImageSource,
-  );
 
   return (
     <View className="rounded-bestlist-xl bg-white px-5 py-4 shadow-card">
@@ -263,11 +260,14 @@ function SharedEntryCard({ entry, rank }: SharedEntryCardProps) {
               {rankingLabel}
             </Text>
             <View className="mt-1 flex-row items-center gap-3">
-              <Image
-                className="h-16 w-16 shrink-0 rounded-lg bg-subtle"
-                onError={() => setEntryImageSource(images.noImages)}
-                source={entryImageSource}
-              />
+              <View className="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-subtle">
+                <Image
+                  className="h-full w-full"
+                  onError={() => setHasImageError(true)}
+                  resizeMode="cover"
+                  source={entryImageSource}
+                />
+              </View>
               <View className="min-w-0 flex-1 gap-1">
                 <Text
                   className="font-display text-[24px] font-bold leading-7.5 text-primary"
