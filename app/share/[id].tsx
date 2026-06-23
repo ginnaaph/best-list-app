@@ -183,6 +183,7 @@ export default function ShareListScreen() {
           <Text className="text-center font-display text-[38px] font-bold leading-10 text-primary">
             {category.name}
           </Text>
+<<<<<<< HEAD
           <Text className="text-center font-mono-bestlist text-[12px] font-bold uppercase leading-5 tracking-[3px] text-secondary">
             Ranked by @Gina
 =======
