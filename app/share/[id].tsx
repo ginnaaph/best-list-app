@@ -28,6 +28,12 @@ const scoreDimensions: { label: string; key: ScoreDimension }[] = [
   { label: "Vibe", key: "vibe" },
 ];
 
+function getPublicEntryImageSource(photoUrl?: string) {
+  return photoUrl?.startsWith("http://") || photoUrl?.startsWith("https://")
+    ? { uri: photoUrl }
+    : images.noImages;
+}
+
 export default function ShareListScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [category, setCategory] = useState<Category | null>(null);
@@ -170,12 +176,17 @@ export default function ShareListScreen() {
           </Pressable>
         </View>
 
-        <View className="mt-11 gap-2">
+        <View className="mt-6 gap-2">
           <Text className="text-center font-display text-[38px] font-bold leading-10 text-primary">
             {category.name}
           </Text>
+<<<<<<< HEAD
+          <Text className="text-center font-mono-bestlist text-[12px] font-bold uppercase leading-5 tracking-[3px] text-secondary">
+            Ranked by @Gina
+=======
           <Text className="text-center font-mono-bestlist text-[12px] font-bold uppercase leading-5 tracking-[4px] text-secondary">
             Shared on BestList
+>>>>>>> a91c9e39136e8f7ddb70ea170576d3980f21336c
           </Text>
         </View>
 
@@ -232,21 +243,20 @@ type SharedEntryCardProps = {
 function SharedEntryCard({ entry, rank }: SharedEntryCardProps) {
   const overallScore = calculateOverallScore(entry);
   const rankingLabel = `#${rank} - ${entry.city.toUpperCase()}`;
-  const entryImageSource = entry.photoUrl
-    ? { uri: entry.photoUrl }
-    : images.noImages;
+  const entryImageSource = getPublicEntryImageSource(entry.photoUrl);
 
   return (
-    <View className="rounded-bestlist-xl border border-subtle bg-white px-6 py-5 shadow-card">
+    <View className="rounded-bestlist-xl border border-subtle bg-white px-5 py-5 shadow-card">
       <View className="gap-3.5">
         <View className="flex-row items-start justify-between gap-3">
-          <View className="flex-1 pr-2">
+          <View className="min-w-0 flex-1 pr-1">
             <Text className="mb-1.5 font-mono-bestlist text-[11px] font-bold uppercase leading-5 tracking-[2px] text-secondary">
               {rankingLabel}
             </Text>
             <View className="mt-1 flex-row items-center gap-3">
               <Image
                 className="h-16 w-16 rounded-lg"
+                resizeMode="cover"
                 source={entryImageSource}
               />
               <View className="min-w-0 flex-1 gap-1">
@@ -266,7 +276,7 @@ function SharedEntryCard({ entry, rank }: SharedEntryCardProps) {
             </View>
           </View>
 
-          <View className="shrink-0 items-center pt-4">
+          <View className="w-20 shrink-0 items-center pt-4">
             <Text className="mt-1.5 font-display text-[42px] font-extrabold leading-13.5 text-accent">
               {overallScore.toFixed(1)}
             </Text>
