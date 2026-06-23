@@ -178,7 +178,7 @@ export default function ShareListScreen() {
             {category.name}
           </Text>
           <Text className="text-center font-mono-bestlist text-[12px] font-bold uppercase leading-5 tracking-[4px] text-secondary">
-            Ranked by @Gina
+            Shared on BestList
           </Text>
         </View>
 
