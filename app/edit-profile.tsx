@@ -33,8 +33,13 @@ type EditProfileRow = {
 };
 
 type SaveStatus = "idle" | "saving" | "saved";
+type HandleAvailability = "idle" | "checking" | "available" | "taken";
 
 const profileColumns = "id,username,city,bio,avatar_url";
+
+function normalizeHandleForAvailability(value: string) {
+  return value.trim().replace(/^@+/, "");
+}
 
 export default function EditProfileScreen() {
   const [existingUsername, setExistingUsername] = useState<string | null>(null);
@@ -48,6 +53,8 @@ export default function EditProfileScreen() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [handleAvailability, setHandleAvailability] =
+    useState<HandleAvailability>("idle");
   const successTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -131,6 +138,58 @@ export default function EditProfileScreen() {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (existingUsername) {
+      setHandleAvailability("idle");
+      return;
+    }
+
+    const normalizedHandle = normalizeHandleForAvailability(username);
+
+    if (normalizedHandle.length < 2) {
+      setHandleAvailability("idle");
+      return;
+    }
+
+    let isCurrent = true;
+    setHandleAvailability("checking");
+
+    const timeout = setTimeout(() => {
+      async function checkHandleAvailability() {
+        try {
+          const supabase = getSupabaseClient();
+          const { data, error } = await supabase
+            .from("profiles")
+            .select("id")
+            .ilike("username", normalizedHandle)
+            .limit(1)
+            .returns<{ id: string }[]>();
+
+          if (error) {
+            throw error;
+          }
+
+          if (isCurrent) {
+            setHandleAvailability(data.length > 0 ? "taken" : "available");
+          }
+        } catch (error: unknown) {
+          console.error("Failed to check handle availability:", error);
+
+          if (isCurrent) {
+            setHandleAvailability("idle");
+          }
+        }
+      }
+
+      void checkHandleAvailability();
+    }, 600);
+
+    return () => {
+      isCurrent = false;
+      clearTimeout(timeout);
+    };
+  }, [existingUsername, username]);
 
   async function handlePickAvatar() {
     if (isUploadingAvatar) {
@@ -299,8 +358,17 @@ export default function EditProfileScreen() {
       }, 2000);
     } catch (error: unknown) {
       console.error("Failed to save profile edits:", error);
+      const isUsernameTaken =
+        typeof error === "object" &&
+        error !== null &&
+        "code" in error &&
+        (error as { code: string }).code === "23505";
       setSaveStatus("idle");
-      setSaveError("Unable to save your profile. Try again.");
+      setSaveError(
+        isUsernameTaken
+          ? "That handle is already taken. Try a different one."
+          : "Unable to save your profile. Try again.",
+      );
     }
   }
 
@@ -428,6 +496,17 @@ export default function EditProfileScreen() {
                           onChangeText={setUsername}
                         />
                       )}
+                      {!existingUsername &&
+                      handleAvailability === "available" ? (
+                        <Text className="ml-3 font-body text-[13px] font-semibold leading-5 text-[#2D5016]">
+                          ✓ Available
+                        </Text>
+                      ) : null}
+                      {!existingUsername && handleAvailability === "taken" ? (
+                        <Text className="ml-3 font-body text-[13px] font-semibold leading-5 text-red-500">
+                          ✗ Taken
+                        </Text>
+                      ) : null}
                     </View>
                   </View>
 
