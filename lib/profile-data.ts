@@ -86,8 +86,10 @@ export function getProfileInitial(
 }
 
 export function prepareSetupHandleProfileUpdate(handle: string, city: string) {
+  const username = handle.trim().replace(/^@+/, "");
+
   return {
-    username: handle.trim().replace(/^@+/, ""),
+    username: username || undefined,
     city: city.trim(),
   };
 }

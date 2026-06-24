@@ -268,12 +268,18 @@ export default function EditProfileScreen() {
         city: city.trim(),
         bio: bio.trim(),
       };
+      const normalizedUsername = !existingUsername
+        ? prepareSetupHandleProfileUpdate(username, city).username
+        : undefined;
+
+      if (!existingUsername && !normalizedUsername) {
+        setSaveStatus("idle");
+        setSaveError("Choose a handle before saving.");
+        return;
+      }
 
       if (!existingUsername) {
-        updateFields.username = prepareSetupHandleProfileUpdate(
-          username,
-          city,
-        ).username;
+        updateFields.username = normalizedUsername;
       }
 
       const { error } = await supabase
