@@ -90,6 +90,7 @@ export function CurrentUserAvatar({ size = "small" }: CurrentUserAvatarProps) {
           }
         } catch (error) {
           console.error("Failed to load user avatar:", error);
+          setAvatarData({ profile: null });
         }
       }
 
