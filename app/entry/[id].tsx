@@ -3,6 +3,7 @@ import { Image, Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
+import { CurrentUserAvatar } from "@/components/current-user-avatar";
 import { images } from "@/constants/images";
 import { colors } from "@/constants/theme";
 import { calculateOverallScore } from "@/lib/entry-score";
@@ -47,9 +48,7 @@ function EntryNotFoundScreen() {
             className="h-7 w-7 items-center justify-center rounded-full bg-white shadow-card"
             onPress={() => router.push("/profile")}
           >
-            <View className="h-5 w-5 items-center justify-center rounded-full bg-accent">
-              <Text className="text-label text-white">g</Text>
-            </View>
+            <CurrentUserAvatar />
           </Pressable>
         </View>
 
