@@ -331,9 +331,9 @@ export default function EditProfileScreen() {
         ? prepareSetupHandleProfileUpdate(username, city).username
         : undefined;
 
-      if (!existingUsername && !normalizedUsername) {
+      if (!existingUsername && (!normalizedUsername || normalizedUsername.length < 2)) {
         setSaveStatus("idle");
-        setSaveError("Choose a handle before saving.");
+        setSaveError("Choose a handle with at least 2 characters.");
         return;
       }
 
