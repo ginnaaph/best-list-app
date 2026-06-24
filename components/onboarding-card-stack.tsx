@@ -1,9 +1,7 @@
-import { Image, Text, View } from "react-native";
-
-import { images } from "@/constants/images";
+import { Image, Text, View, type ImageSourcePropType } from "react-native";
 
 type CardConfig = {
-  image: number;
+  image: ImageSourcePropType;
   rotation: string;
   offsetX: number;
   zIndex: number;
@@ -11,19 +9,25 @@ type CardConfig = {
 
 const cards: CardConfig[] = [
   {
-    image: images.food.tacos,
+    image: {
+      uri: "https://images.unsplash.com/photo-1552332386-f8dd00dc2f85?auto=format&fit=crop&w=320&q=80",
+    },
     rotation: "-10deg",
     offsetX: -42,
     zIndex: 1,
   },
   {
-    image: images.food.ramen,
+    image: {
+      uri: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=320&q=80",
+    },
     rotation: "0deg",
     offsetX: 0,
     zIndex: 3,
   },
   {
-    image: images.food.breakfastBurrito,
+    image: {
+      uri: "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&w=320&q=80",
+    },
     rotation: "11deg",
     offsetX: 42,
     zIndex: 2,

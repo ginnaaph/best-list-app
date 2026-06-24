@@ -47,3 +47,4 @@ You can find both values in your Supabase project settings under API configurati
 3. Add Entry — photo + place + composite score sliders + note
 4. Entry Detail — full view with score breakdown
 5. Shareable List — read-only public view
+6. Profile - user stats and categories

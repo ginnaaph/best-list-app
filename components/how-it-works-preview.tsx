@@ -1,11 +1,22 @@
 import { Image, Text, View } from "react-native";
 
-import { images } from "@/constants/images";
-
 const dishCards = [
-  { image: images.food.breakfastBurrito, badge: "12" },
-  { image: images.food.tacos },
-  { image: images.food.ramen },
+  {
+    image: {
+      uri: "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&w=320&q=80",
+    },
+    badge: "12",
+  },
+  {
+    image: {
+      uri: "https://images.unsplash.com/photo-1552332386-f8dd00dc2f85?auto=format&fit=crop&w=320&q=80",
+    },
+  },
+  {
+    image: {
+      uri: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=320&q=80",
+    },
+  },
 ];
 
 const scoreRows = [
