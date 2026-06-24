@@ -85,6 +85,13 @@ export function getProfileInitial(
   return label.trim().charAt(0).toUpperCase() || "?";
 }
 
+export function prepareSetupHandleProfileUpdate(handle: string, city: string) {
+  return {
+    username: handle.trim().replace(/^@+/, ""),
+    city: city.trim(),
+  };
+}
+
 export function summarizeProfileCategories(
   categories: ProfileCategoryRow[],
   entries: ProfileEntryRow[],

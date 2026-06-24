@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { CurrentUserAvatar } from "@/components/current-user-avatar";
 import { EntryCard } from "@/components/entry-card";
 import { FloatingAddButton } from "@/components/floating-add-button";
 import { colors } from "@/constants/theme";
@@ -118,9 +119,7 @@ export function CategoryDetailScreen({
               className="h-7 w-7 items-center justify-center rounded-full bg-white shadow-card"
               onPress={() => router.push("/profile")}
             >
-              <View className="h-7 w-7 items-center justify-center rounded-full bg-accent">
-                <Text className="text-label text-white">G</Text>
-              </View>
+              <CurrentUserAvatar />
             </Pressable>
           </View>
         </View>
@@ -236,9 +235,7 @@ export function CategoryNotFoundScreen() {
             className="h-7 w-7 items-center justify-center rounded-full bg-white shadow-card"
             onPress={() => router.push("/profile")}
           >
-            <View className="h-7 w-7 items-center justify-center rounded-full bg-accent">
-              <Text className="text-label text-white">G</Text>
-            </View>
+            <CurrentUserAvatar />
           </Pressable>
         </View>
 

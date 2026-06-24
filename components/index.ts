@@ -4,6 +4,7 @@ export {
   CategoryDetailScreen,
   CategoryNotFoundScreen,
 } from "@/components/category-detail-screen";
+export { CurrentUserAvatar } from "@/components/current-user-avatar";
 export { EntryCard } from "@/components/entry-card";
 export { CategoryGrid } from "@/components/category-grid";
 export { FloatingAddButton } from "@/components/floating-add-button";

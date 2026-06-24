@@ -1,6 +1,7 @@
 import { Link, type Href } from "expo-router";
 import { Pressable, Text, View } from "react-native";
 
+import { CurrentUserAvatar } from "@/components/current-user-avatar";
 import { useStore } from "@/store";
 
 const profileRoute = "/profile" as Href;
@@ -28,9 +29,7 @@ export function HomeHeader() {
           accessibilityLabel="Open profile"
           className="h-7 w-7 items-center justify-center rounded-full bg-white shadow-card"
         >
-          <View className="h-7 w-7 items-center justify-center rounded-full bg-accent">
-            <Text className="text-label text-white">g</Text>
-          </View>
+          <CurrentUserAvatar />
         </Pressable>
       </Link>
     </View>

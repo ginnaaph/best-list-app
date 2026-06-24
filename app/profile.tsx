@@ -1,5 +1,5 @@
-import { Link, router } from "expo-router";
-import { useEffect, useState } from "react";
+import { Link, router, useFocusEffect } from "expo-router";
+import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
   Image,
@@ -11,14 +11,15 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { CurrentUserAvatar } from "@/components/current-user-avatar";
 import { images } from "@/constants/images";
 import {
-  getProfileInitial,
   mapProfileRow,
   type ProfileCategoryRow,
   type ProfileEntryRow,
   summarizeProfileCategories,
 } from "@/lib/profile-data";
+import { resolveAvatarDisplayUrl } from "@/lib/profile-avatar";
 import { getSupabaseClient } from "@/lib/supabase";
 import { useStore } from "@/store";
 import type { Category } from "@/types/category";
@@ -104,8 +105,15 @@ async function loadProfileScreenData(): Promise<ProfileScreenData> {
     throw entriesResult.error;
   }
 
+  const profile = mapProfileRow(profileResult.data);
+
   return {
-    profile: mapProfileRow(profileResult.data),
+    profile: profile?.avatarUrl
+      ? {
+          ...profile,
+          avatarUrl: await resolveAvatarDisplayUrl(profile.avatarUrl),
+        }
+      : profile,
     email: user.email,
     categories: summarizeProfileCategories(
       categoriesResult.data,
@@ -139,37 +147,39 @@ export default function Profile() {
     },
   ];
 
-  useEffect(() => {
-    let isMounted = true;
+  useFocusEffect(
+    useCallback(() => {
+      let isMounted = true;
 
-    async function loadProfile() {
-      try {
-        setIsLoadingProfile(true);
-        setProfileError(null);
-        const data = await loadProfileScreenData();
+      async function loadProfile() {
+        try {
+          setIsLoadingProfile(true);
+          setProfileError(null);
+          const data = await loadProfileScreenData();
 
-        if (isMounted) {
-          setProfileData(data);
-        }
-      } catch (error) {
-        console.error("Failed to load profile:", error);
+          if (isMounted) {
+            setProfileData(data);
+          }
+        } catch (error) {
+          console.error("Failed to load profile:", error);
 
-        if (isMounted) {
-          setProfileError("Unable to load profile right now.");
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoadingProfile(false);
+          if (isMounted) {
+            setProfileError("Unable to load profile right now.");
+          }
+        } finally {
+          if (isMounted) {
+            setIsLoadingProfile(false);
+          }
         }
       }
-    }
 
-    loadProfile();
+      loadProfile();
 
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+      return () => {
+        isMounted = false;
+      };
+    }, []),
+  );
 
   async function handleSignOut() {
     if (isSigningOut) {
@@ -239,19 +249,7 @@ export default function Profile() {
         {!isLoadingProfile && !profileError ? (
           <>
             <View className="items-center pt-3">
-              <View className="h-25 w-25 items-center justify-center overflow-hidden rounded-full bg-[#2D5016] shadow-card">
-                {profile?.avatarUrl ? (
-                  <Image
-                    source={{ uri: profile.avatarUrl }}
-                    resizeMode="cover"
-                    className="h-full w-full"
-                  />
-                ) : (
-                  <Text className="font-body text-[44px] font-bold leading-10 text-white">
-                    {getProfileInitial(profile, profileEmail)}
-                  </Text>
-                )}
-              </View>
+              <CurrentUserAvatar size="large" />
 
               <Text className="mt-1 font-display text-[33px] font-bold leading-9 text-primary">
                 {getDisplayName(profile, profileEmail)}
@@ -271,11 +269,16 @@ export default function Profile() {
                 </Text>
               ) : null}
 
-              <View className="mt-2 h-10 items-center justify-center rounded-full border border-subtle bg-white px-5">
+              <Pressable
+                className="mt-2 h-10 items-center justify-center rounded-full border border-subtle bg-white px-5"
+                onPress={() => {
+                  router.push("/edit-profile");
+                }}
+              >
                 <Text className="font-body text-[14px] font-semibold leading-5 text-primary">
                   Edit profile
                 </Text>
-              </View>
+              </Pressable>
             </View>
 
             <View className="mt-5 flex-row items-center rounded-bestlist-xl border border-subtle bg-white px-6 py-5 shadow-card">
