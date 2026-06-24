@@ -49,7 +49,7 @@ function getUsernameLabel(profile: DatabaseProfile | null) {
 }
 
 function getCityLabel(profile: DatabaseProfile | null) {
-  return profile?.city?.toUpperCase() ?? "No city yet";
+  return profile?.city?.toUpperCase() ?? null;
 }
 
 async function loadProfileScreenData(): Promise<ProfileScreenData> {
@@ -129,6 +129,7 @@ export default function Profile() {
   const [profileError, setProfileError] = useState<string | null>(null);
   const profile = profileData?.profile ?? null;
   const profileEmail = profileData?.email;
+  const cityLabel = getCityLabel(profile);
   const listCategories = profileData?.categories.slice(0, 4) ?? [];
   const stats = [
     { label: "Logged", value: String(profileData?.stats.loggedEntries ?? 0) },
@@ -257,15 +258,18 @@ export default function Profile() {
               </Text>
 
               <Text className="mt-1 text-center font-mono-bestlist text-[11px] uppercase leading-3.5 tracking-[3px] text-secondary">
-                {getUsernameLabel(profile)} · {getCityLabel(profile)}
+                {getUsernameLabel(profile)}
+                {cityLabel ? ` · ${cityLabel}` : null}
               </Text>
 
-              <Text
-                className="mt-2 max-w-77.5 text-center font-body text-[14px] leading-5.5 text-primary"
-                numberOfLines={2}
-              >
-                {profile?.bio ?? "No bio yet"}
-              </Text>
+              {profile?.bio ? (
+                <Text
+                  className="mt-2 max-w-77.5 text-center font-body text-[14px] leading-5.5 text-primary"
+                  numberOfLines={2}
+                >
+                  {profile.bio}
+                </Text>
+              ) : null}
 
               <View className="mt-2 h-10 items-center justify-center rounded-full border border-subtle bg-white px-5">
                 <Text className="font-body text-[14px] font-semibold leading-5 text-primary">
