@@ -127,6 +127,9 @@ export default function SetupHandleScreen() {
         error !== null &&
         "code" in error &&
         (error as { code: string }).code === "23505";
+      if (isUsernameTaken) {
+        setHandleAvailability("taken");
+      }
       Alert.alert(
         "Save failed",
         isUsernameTaken
