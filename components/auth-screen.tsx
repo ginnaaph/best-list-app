@@ -4,6 +4,7 @@ import { useState } from "react";
 import {
   Alert,
   Image,
+  Platform,
   Pressable,
   ScrollView,
   Text,
@@ -233,6 +234,14 @@ function SocialButton({
             source={images.googleLogo}
             resizeMode="contain"
             className={alignIconLeft ? "h-5.5 w-5.5" : "size-7"}
+            style={
+              Platform.OS === "web"
+                ? {
+                    height: alignIconLeft ? 22 : 28,
+                    width: alignIconLeft ? 22 : 28,
+                  }
+                : undefined
+            }
           />
         ) : (
           <Ionicons name="logo-apple" size={31} color="#000000" />
