@@ -20,6 +20,8 @@ const GOOGLE_PLACES_API_KEY =
   process.env.EXPO_PUBLIC_GOOGLE_PLACES_KEY;
 const AUTOCOMPLETE_DEBOUNCE_MS = 300;
 
+type PlacesAutocompleteType = "establishment" | "(cities)";
+
 type PlacePrediction = {
   description: string;
   place_id: string;
@@ -101,10 +103,10 @@ function TextField({
   );
 }
 
-function getAutocompleteUrl(input: string) {
+function getAutocompleteUrl(input: string, type: PlacesAutocompleteType) {
   const params = [
     `input=${encodeURIComponent(input)}`,
-    "types=establishment",
+    `types=${encodeURIComponent(type)}`,
     `key=${encodeURIComponent(GOOGLE_PLACES_API_KEY ?? "")}`,
   ];
 
@@ -155,6 +157,14 @@ function getCityFromAddressComponents(components: AddressComponent[]) {
   return [locality, state].filter(Boolean).join(", ");
 }
 
+function getCityFallbackFromPrediction(prediction: PlacePrediction) {
+  const mainText = getPredictionMainText(prediction);
+  const secondaryText = getPredictionSecondaryText(prediction);
+  const state = secondaryText.split(",")[0]?.trim();
+
+  return [mainText, state].filter(Boolean).join(", ");
+}
+
 export function EntryForm({
   initialValues,
   saveLabel,
@@ -175,9 +185,14 @@ export function EntryForm({
   const [placeSuggestions, setPlaceSuggestions] = useState<PlacePrediction[]>(
     [],
   );
+  const [citySuggestions, setCitySuggestions] = useState<PlacePrediction[]>([]);
   const [showPlaceSuggestions, setShowPlaceSuggestions] = useState(false);
+  const [showCitySuggestions, setShowCitySuggestions] = useState(false);
   const [isSelectingPlace, setIsSelectingPlace] = useState(false);
+  const [isSelectingCity, setIsSelectingCity] = useState(false);
   const autocompleteRequestIdRef = useRef(0);
+  const cityAutocompleteRequestIdRef = useRef(0);
+  const placeDetailsRequestIdRef = useRef(0);
 
   useEffect(() => {
     if (isSelectingPlace) {
@@ -198,7 +213,9 @@ export function EntryForm({
 
     const timeout = setTimeout(async () => {
       try {
-        const response = await fetch(getAutocompleteUrl(trimmedPlaceName));
+        const response = await fetch(
+          getAutocompleteUrl(trimmedPlaceName, "establishment"),
+        );
 
         if (!response.ok) {
           throw new Error("Place autocomplete request failed.");
@@ -233,12 +250,74 @@ export function EntryForm({
     };
   }, [isSelectingPlace, placeName]);
 
+  useEffect(() => {
+    if (isSelectingCity) {
+      return;
+    }
+
+    const requestId = cityAutocompleteRequestIdRef.current + 1;
+    cityAutocompleteRequestIdRef.current = requestId;
+    const trimmedCity = city.trim();
+
+    if (!GOOGLE_PLACES_API_KEY || trimmedCity.length < 2) {
+      setCitySuggestions([]);
+      setShowCitySuggestions(false);
+      return;
+    }
+
+    let isActive = true;
+
+    const timeout = setTimeout(async () => {
+      try {
+        const response = await fetch(getAutocompleteUrl(trimmedCity, "(cities)"));
+
+        if (!response.ok) {
+          throw new Error("City autocomplete request failed.");
+        }
+
+        const data = (await response.json()) as PlacesAutocompleteResponse;
+
+        if (!isActive || cityAutocompleteRequestIdRef.current !== requestId) {
+          return;
+        }
+
+        if (data.status !== "OK") {
+          setCitySuggestions([]);
+          setShowCitySuggestions(false);
+          return;
+        }
+
+        const predictions = data.predictions ?? [];
+        setCitySuggestions(predictions);
+        setShowCitySuggestions(predictions.length > 0);
+      } catch {
+        if (isActive && cityAutocompleteRequestIdRef.current === requestId) {
+          setCitySuggestions([]);
+          setShowCitySuggestions(false);
+        }
+      }
+    }, AUTOCOMPLETE_DEBOUNCE_MS);
+
+    return () => {
+      isActive = false;
+      clearTimeout(timeout);
+    };
+  }, [city, isSelectingCity]);
+
   const handlePlaceNameChange = (nextPlaceName: string) => {
+    placeDetailsRequestIdRef.current += 1;
     setIsSelectingPlace(false);
     setPlaceName(nextPlaceName);
   };
 
+  const handleCityChange = (nextCity: string) => {
+    setIsSelectingCity(false);
+    setCity(nextCity);
+  };
+
   const handleSelectPlace = async (prediction: PlacePrediction) => {
+    const placeDetailsRequestId = placeDetailsRequestIdRef.current + 1;
+    placeDetailsRequestIdRef.current = placeDetailsRequestId;
     const selectedPlaceName = getPredictionMainText(prediction);
 
     autocompleteRequestIdRef.current += 1;
@@ -256,6 +335,53 @@ export function EntryForm({
 
       if (!response.ok) {
         throw new Error("Place details request failed.");
+      }
+
+      const data = (await response.json()) as PlaceDetailsResponse;
+      const addressComponents = data.result?.address_components ?? [];
+      const selectedCity = getCityFromAddressComponents(addressComponents);
+
+      if (placeDetailsRequestIdRef.current !== placeDetailsRequestId) {
+        return;
+      }
+
+      cityAutocompleteRequestIdRef.current += 1;
+      setIsSelectingCity(true);
+      setCitySuggestions([]);
+      setShowCitySuggestions(false);
+      setCity(selectedCity || "");
+    } catch {
+      if (placeDetailsRequestIdRef.current !== placeDetailsRequestId) {
+        return;
+      }
+
+      cityAutocompleteRequestIdRef.current += 1;
+      setIsSelectingCity(true);
+      setCitySuggestions([]);
+      setShowCitySuggestions(false);
+      setCity("");
+      return;
+    }
+  };
+
+  const handleSelectCity = async (prediction: PlacePrediction) => {
+    const fallbackCity = getCityFallbackFromPrediction(prediction);
+
+    cityAutocompleteRequestIdRef.current += 1;
+    setIsSelectingCity(true);
+    setCity(fallbackCity);
+    setCitySuggestions([]);
+    setShowCitySuggestions(false);
+
+    if (!GOOGLE_PLACES_API_KEY) {
+      return;
+    }
+
+    try {
+      const response = await fetch(getPlaceDetailsUrl(prediction.place_id));
+
+      if (!response.ok) {
+        throw new Error("City details request failed.");
       }
 
       const data = (await response.json()) as PlaceDetailsResponse;
@@ -407,12 +533,56 @@ export function EntryForm({
             ) : null}
           </View>
 
-          <TextField
-            label="City"
-            placeholder="e.g. San Francisco, CA"
-            value={city}
-            onChange={setCity}
-          />
+          <View className="gap-1.5">
+            <Text className="font-mono-bestlist text-[10px] font-bold uppercase tracking-[1.5px] text-accent">
+              City
+            </Text>
+            <TextInput
+              className="mt-1 h-11 rounded-xl border border-subtle bg-white px-4 pt-2 pb-2 font-body text-[15px] text-primary"
+              placeholder="e.g. San Francisco, CA"
+              placeholderTextColor={colors.secondaryText}
+              value={city}
+              onChangeText={handleCityChange}
+              onFocus={() => {
+                if (citySuggestions.length > 0) {
+                  setShowCitySuggestions(true);
+                }
+              }}
+              returnKeyType="next"
+            />
+
+            {showCitySuggestions ? (
+              <View className="overflow-hidden rounded-xl border border-subtle bg-white">
+                {citySuggestions.map((suggestion, index) => {
+                  const mainText = getPredictionMainText(suggestion);
+                  const secondaryText = getPredictionSecondaryText(suggestion);
+                  const isLastSuggestion =
+                    index === citySuggestions.length - 1;
+
+                  return (
+                    <Pressable
+                      key={suggestion.place_id}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Select ${mainText}`}
+                      className={`px-4 py-3 ${
+                        isLastSuggestion ? "" : "border-b border-subtle"
+                      }`}
+                      onPress={() => handleSelectCity(suggestion)}
+                    >
+                      <Text className="font-body text-[15px] font-semibold text-primary">
+                        {mainText}
+                      </Text>
+                      {secondaryText ? (
+                        <Text className="mt-0.5 font-body text-[13px] text-secondary">
+                          {secondaryText}
+                        </Text>
+                      ) : null}
+                    </Pressable>
+                  );
+                })}
+              </View>
+            ) : null}
+          </View>
 
           <View className="rounded-2xl bg-white p-4 shadow-card">
             <Text className="mb-3 font-mono-bestlist text-[10px] font-bold uppercase tracking-[1.5px] text-accent">

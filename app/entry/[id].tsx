@@ -115,7 +115,7 @@ export default function EntryDetailScreen() {
 
             <View className="flex-row items-start justify-between gap-4">
               <View className="min-w-0 flex-1 gap-2 pt-2">
-                <Text className="font-display text-[29px] font-bold leading-5 text-primary">
+                <Text className="font-display text-[29px] font-bold leading-6 text-primary">
                   {entry.placeName}
                 </Text>
                 <Text className="font-mono-bestlist text-[10px] font-bold uppercase leading-3.25 tracking-[1.5px] text-secondary">
