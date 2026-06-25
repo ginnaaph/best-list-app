@@ -1,15 +1,8 @@
 import { router } from "expo-router";
 import { useState } from "react";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
-import {
-  Pressable,
-  ScrollView,
-  Share,
-  Switch,
-  Text,
-  View,
-} from "react-native";
+import { Pressable, ScrollView, Share, Switch, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 import { CurrentUserAvatar } from "@/components/current-user-avatar";
 import { EntryCard } from "@/components/entry-card";
@@ -57,7 +50,7 @@ export function CategoryDetailScreen({
     }
 
     void Share.share({
-      message: `My best ${category.name} list on BestList 🌮\n${shareUrl}`,
+      message: `My best ${category.name} list on BestList 📋\n${shareUrl}`,
     });
   };
 
@@ -88,9 +81,7 @@ export function CategoryDetailScreen({
               <View className="pt-0.5">
                 <Switch
                   accessibilityLabel={
-                    category.isPublic
-                      ? "Make list private"
-                      : "Make list public"
+                    category.isPublic ? "Make list private" : "Make list public"
                   }
                   disabled={toggleDisabled}
                   onValueChange={onPublicChange}
