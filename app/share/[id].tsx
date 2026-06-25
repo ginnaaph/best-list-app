@@ -37,7 +37,9 @@ type PublicCategoryOwner = Category & {
 function getOwnerLabel(category: Category) {
   const publicCategory = category as PublicCategoryOwner;
   const displayName =
-    publicCategory.displayName ?? publicCategory.username ?? publicCategory.handle;
+    publicCategory.displayName ??
+    publicCategory.username ??
+    publicCategory.handle;
   const normalizedName = displayName?.replace(/^@/, "").trim();
 
   return normalizedName || "BestList";
@@ -247,9 +249,10 @@ function SharedEntryCard({ entry, rank }: SharedEntryCardProps) {
   const overallScore = calculateOverallScore(entry);
   const rankingLabel = `#${rank} - ${entry.city.toUpperCase()}`;
   const [hasImageError, setHasImageError] = useState(false);
-  const entryImageSource = entry.photoUrl && !hasImageError
-    ? { uri: entry.photoUrl }
-    : images.noImages;
+  const entryImageSource =
+    entry.photoUrl && !hasImageError
+      ? { uri: entry.photoUrl }
+      : images.noImages;
 
   return (
     <View className="rounded-bestlist-xl bg-white px-5 py-4 shadow-card">
@@ -270,7 +273,7 @@ function SharedEntryCard({ entry, rank }: SharedEntryCardProps) {
               </View>
               <View className="min-w-0 flex-1 gap-1">
                 <Text
-                  className="font-display text-[24px] font-bold leading-7.5 text-primary"
+                  className="font-display text-[22px] font-bold leading-7.5 text-primary"
                   numberOfLines={1}
                 >
                   {entry.placeName}
@@ -286,7 +289,7 @@ function SharedEntryCard({ entry, rank }: SharedEntryCardProps) {
           </View>
 
           <View className="w-20 shrink-0 items-center pt-4">
-            <Text className="font-display mt-1.5 text-[42px] font-extrabold leading-13.5 text-accent">
+            <Text className="font-display mt-1.5 text-[36px] font-extrabold leading-13.5 text-accent">
               {overallScore.toFixed(1)}
             </Text>
           </View>
@@ -302,12 +305,12 @@ function SharedEntryCard({ entry, rank }: SharedEntryCardProps) {
           {scoreDimensions.map((dimension) => (
             <View
               key={dimension.key}
-              className="min-w-[64px] flex-1 items-center rounded-bestlist-sm border border-subtle bg-white px-2 py-3"
+              className="min-w-16px flex-1 items-center rounded-bestlist-sm  bg-white px-2 py-3"
             >
               <Text className="font-mono-bestlist text-[10px] uppercase leading-3.25 tracking-[2px] text-secondary">
                 {dimension.label}
               </Text>
-              <Text className="mt-1 font-body text-[18px] font-bold leading-5 text-primary">
+              <Text className="mt-1 font-body text-[18px] font-bold leading-5 text-accent">
                 {entry[dimension.key].toFixed(1)}
               </Text>
             </View>
