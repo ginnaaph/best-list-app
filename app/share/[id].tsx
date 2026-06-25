@@ -256,10 +256,10 @@ function SharedEntryCard({ entry, rank }: SharedEntryCardProps) {
 
   return (
     <View className="rounded-bestlist-xl bg-white px-5 py-4 shadow-card">
-      <View className="gap-3.5">
+      <View className="gap-3">
         <View className="flex-row items-start justify-between gap-3">
           <View className="flex-1 pr-2">
-            <Text className="font-mono-bestlist text-[11px] font-bold uppercase leading-5 mb-1.5 tracking-[2px] text-secondary">
+            <Text className="font-mono-bestlist text-[11px] font-semibold uppercase leading-5 mb-1.5 tracking-[2px] text-secondary">
               {rankingLabel}
             </Text>
             <View className="mt-1 flex-row items-center gap-3">
@@ -273,13 +273,13 @@ function SharedEntryCard({ entry, rank }: SharedEntryCardProps) {
               </View>
               <View className="min-w-0 flex-1 gap-1">
                 <Text
-                  className="font-display text-[20px] font-bold leading-5 text-primary"
+                  className="font-display text-[18px] font-semibold leading-2 text-primary"
                   numberOfLines={2}
                 >
                   {entry.placeName}
                 </Text>
                 <Text
-                  className="mt-.75 font-body text-[12px] leading-5 text-secondary"
+                  className="mt-.75 font-body text-[12px] leading-2 text-secondary"
                   numberOfLines={1}
                 >
                   {entry.city}
@@ -289,14 +289,14 @@ function SharedEntryCard({ entry, rank }: SharedEntryCardProps) {
           </View>
 
           <View className="w-20 shrink-0 items-center pt-4">
-            <Text className="font-display mt-1.5 text-[30px] font-extrabold leading-13.5 text-accent">
+            <Text className="font-display mt-1.5 text-[26px] font-extrabold leading-13.5 text-accent">
               {overallScore.toFixed(1)}
             </Text>
           </View>
         </View>
 
         {entry.notes ? (
-          <Text className="font-body text-[14px] leading-6 text-primary">
+          <Text className="font-body text-[12px] leading-4 text-primary">
             {entry.notes}
           </Text>
         ) : null}
