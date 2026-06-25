@@ -14,7 +14,7 @@
 
   --font-bestlist-display: RobotoSlab_700Bold, "Roboto Slab", Georgia;
   --font-bestlist-body: Roboto_400Regular, Roboto, system-ui, sans-serif;
-  --font-bestlist-mono: Menlo;
+  --font-bestlist-mono: Roboto_700Bold, Roboto, system-ui, sans-serif;
 
   --radius-bestlist-sm: 8px;
   --radius-bestlist-md: 12px;
@@ -88,6 +88,7 @@
 
 @utility font-mono-bestlist {
   font-family: var(--font-bestlist-mono);
+  text-transform: uppercase;
 }
 
 @utility text-brand {

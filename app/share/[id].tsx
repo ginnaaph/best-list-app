@@ -221,7 +221,7 @@ export default function ShareListScreen() {
             ) : null}
 
             <View className="items-center gap-4 pt-20">
-              <View className="h-px w-14 bg-[#EDEBE6]" />
+              <View className="h-px w-14 bg-secondary" />
               <Text className="text-card-title text-primary">
                 Best<Text className="text-accent">List</Text>
               </Text>
@@ -255,7 +255,7 @@ function SharedEntryCard({ entry, rank }: SharedEntryCardProps) {
       : images.noImages;
 
   return (
-    <View className="rounded-bestlist-xl bg-white px-5 py-4 shadow-card">
+    <View className="rounded-bestlist-xl bg-white px-4 py-4 shadow-card">
       <View className="gap-3">
         <View className="flex-row items-start justify-between gap-3">
           <View className="flex-1 pr-2">
@@ -263,7 +263,7 @@ function SharedEntryCard({ entry, rank }: SharedEntryCardProps) {
               {rankingLabel}
             </Text>
             <View className="mt-1 flex-row items-center gap-3">
-              <View className="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-subtle">
+              <View className="h-17 w-17 shrink-0 overflow-hidden rounded-lg bg-subtle">
                 <Image
                   className="h-full w-full"
                   onError={() => setHasImageError(true)}
@@ -289,7 +289,7 @@ function SharedEntryCard({ entry, rank }: SharedEntryCardProps) {
           </View>
 
           <View className="w-20 shrink-0 items-center pt-4">
-            <Text className="font-display mt-1.5 text-[26px] font-extrabold leading-13.5 text-accent">
+            <Text className="font-display mt-1.5 text-[29px] font-extrabold leading-13.5 text-accent">
               {overallScore.toFixed(1)}
             </Text>
           </View>
