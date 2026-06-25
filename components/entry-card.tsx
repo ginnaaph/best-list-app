@@ -31,7 +31,7 @@ export function EntryCard({ entry, rank }: EntryCardProps) {
               />
               <View className="min-w-0 flex-1 gap-1">
                 <Text
-                  className="font-display text-[24px] font-bold leading-7.5 text-primary"
+                  className="font-display text-[24px] font-bold leading-6 text-primary"
                   numberOfLines={1}
                 >
                   {entry.placeName}
