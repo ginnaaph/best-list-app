@@ -13,13 +13,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { CurrentUserAvatar } from "@/components/current-user-avatar";
 import { images } from "@/constants/images";
+import { resolveAvatarDisplayUrl } from "@/lib/profile-avatar";
 import {
   mapProfileRow,
   type ProfileCategoryRow,
   type ProfileEntryRow,
   summarizeProfileCategories,
 } from "@/lib/profile-data";
-import { resolveAvatarDisplayUrl } from "@/lib/profile-avatar";
 import { getSupabaseClient } from "@/lib/supabase";
 import { useStore } from "@/store";
 import type { Category } from "@/types/category";
@@ -255,7 +255,7 @@ export default function Profile() {
                 {getDisplayName(profile, profileEmail)}
               </Text>
 
-              <Text className="mt-1 text-center font-mono-bestlist text-[11px] uppercase leading-3.5 tracking-[3px] text-secondary">
+              <Text className="mt-1 text-center font-mono-bestlist text-[11px] uppercase leading-3.5 tracking-[3px] text-accent">
                 {getUsernameLabel(profile)}
                 {cityLabel ? ` · ${cityLabel}` : null}
               </Text>
@@ -288,7 +288,7 @@ export default function Profile() {
                     <Text className="font-display text-[31px] font-bold leading-8.5 text-primary">
                       {stat.value}
                     </Text>
-                    <Text className="mt-1 font-mono-bestlist text-[9px] uppercase leading-3 tracking-[3px] text-secondary">
+                    <Text className="mt-1 font-mono-bestlist text-[9px] uppercase leading-4 tracking-[3px] text-secondary">
                       {stat.label}
                     </Text>
                   </View>
@@ -305,9 +305,13 @@ export default function Profile() {
                 <Text className="font-mono-bestlist text-[13px] uppercase leading-4 tracking-[2px] text-secondary">
                   Your lists
                 </Text>
-                <Text className="font-body text-[13px] font-bold leading-5 text-[#2D5016] mb-2">
-                  See all
-                </Text>
+                <Link href="/home" asChild>
+                  <Pressable accessibilityRole="link" hitSlop={8}>
+                    <Text className="font-body text-[13px] font-bold leading-5 text-[#2D5016] mb-2">
+                      See all
+                    </Text>
+                  </Pressable>
+                </Link>
               </View>
 
               <View className="mt-1  gap-2">
