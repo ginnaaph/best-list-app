@@ -12,8 +12,8 @@
   --color-bestlist-text: #1a1a1a;
   --color-bestlist-green: #2d6a4f;
 
-  --font-bestlist-display: Georgia;
-  --font-bestlist-body: System;
+  --font-bestlist-display: RobotoSlab_700Bold, "Roboto Slab", Georgia;
+  --font-bestlist-body: Roboto_400Regular, Roboto, system-ui, sans-serif;
   --font-bestlist-mono: Menlo;
 
   --radius-bestlist-sm: 8px;
