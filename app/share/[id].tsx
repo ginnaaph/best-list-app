@@ -273,7 +273,7 @@ function SharedEntryCard({ entry, rank }: SharedEntryCardProps) {
               </View>
               <View className="min-w-0 flex-1 gap-1">
                 <Text
-                  className="font-display text-[22px] font-bold leading-7 text-primary"
+                  className="font-display text-[20px] font-bold leading-5 text-primary"
                   numberOfLines={2}
                 >
                   {entry.placeName}
@@ -289,7 +289,7 @@ function SharedEntryCard({ entry, rank }: SharedEntryCardProps) {
           </View>
 
           <View className="w-20 shrink-0 items-center pt-4">
-            <Text className="font-display mt-1.5 text-[36px] font-extrabold leading-13.5 text-accent">
+            <Text className="font-display mt-1.5 text-[30px] font-extrabold leading-13.5 text-accent">
               {overallScore.toFixed(1)}
             </Text>
           </View>
