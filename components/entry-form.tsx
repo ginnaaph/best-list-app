@@ -1,5 +1,5 @@
 import * as ImagePicker from "expo-image-picker";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Alert,
   Image,
@@ -14,6 +14,38 @@ import {
 
 import { ScoreSlider } from "@/components/score-slider";
 import { colors } from "@/constants/theme";
+
+const GOOGLE_PLACES_API_KEY =
+  process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY ??
+  process.env.EXPO_PUBLIC_GOOGLE_PLACES_KEY;
+const AUTOCOMPLETE_DEBOUNCE_MS = 300;
+
+type PlacePrediction = {
+  description: string;
+  place_id: string;
+  structured_formatting?: {
+    main_text?: string;
+    secondary_text?: string;
+  };
+};
+
+type PlacesAutocompleteResponse = {
+  predictions?: PlacePrediction[];
+  status: string;
+};
+
+type AddressComponent = {
+  long_name: string;
+  short_name: string;
+  types: string[];
+};
+
+type PlaceDetailsResponse = {
+  result?: {
+    address_components?: AddressComponent[];
+  };
+  status: string;
+};
 
 export type EntryFormValues = {
   placeName: string;
@@ -69,6 +101,60 @@ function TextField({
   );
 }
 
+function getAutocompleteUrl(input: string) {
+  const params = [
+    `input=${encodeURIComponent(input)}`,
+    "types=establishment",
+    `key=${encodeURIComponent(GOOGLE_PLACES_API_KEY ?? "")}`,
+  ];
+
+  return `https://maps.googleapis.com/maps/api/place/autocomplete/json?${params.join(
+    "&",
+  )}`;
+}
+
+function getPlaceDetailsUrl(placeId: string) {
+  const params = [
+    `place_id=${encodeURIComponent(placeId)}`,
+    "fields=address_components",
+    `key=${encodeURIComponent(GOOGLE_PLACES_API_KEY ?? "")}`,
+  ];
+
+  return `https://maps.googleapis.com/maps/api/place/details/json?${params.join(
+    "&",
+  )}`;
+}
+
+function getPredictionMainText(prediction: PlacePrediction) {
+  return prediction.structured_formatting?.main_text ?? prediction.description;
+}
+
+function getPredictionSecondaryText(prediction: PlacePrediction) {
+  return prediction.structured_formatting?.secondary_text ?? "";
+}
+
+function getAddressComponent(
+  components: AddressComponent[],
+  type: string,
+  name: "long_name" | "short_name" = "long_name",
+) {
+  return components.find((component) => component.types.includes(type))?.[name];
+}
+
+function getCityFromAddressComponents(components: AddressComponent[]) {
+  const locality =
+    getAddressComponent(components, "locality") ??
+    getAddressComponent(components, "postal_town") ??
+    getAddressComponent(components, "administrative_area_level_2");
+  const state = getAddressComponent(
+    components,
+    "administrative_area_level_1",
+    "short_name",
+  );
+
+  return [locality, state].filter(Boolean).join(", ");
+}
+
 export function EntryForm({
   initialValues,
   saveLabel,
@@ -86,6 +172,103 @@ export function EntryForm({
   const [photoUrl, setPhotoUrl] = useState<string | undefined>(
     initialValues.photoUrl,
   );
+  const [placeSuggestions, setPlaceSuggestions] = useState<PlacePrediction[]>(
+    [],
+  );
+  const [showPlaceSuggestions, setShowPlaceSuggestions] = useState(false);
+  const [isSelectingPlace, setIsSelectingPlace] = useState(false);
+  const autocompleteRequestIdRef = useRef(0);
+
+  useEffect(() => {
+    if (isSelectingPlace) {
+      return;
+    }
+
+    const requestId = autocompleteRequestIdRef.current + 1;
+    autocompleteRequestIdRef.current = requestId;
+    const trimmedPlaceName = placeName.trim();
+
+    if (!GOOGLE_PLACES_API_KEY || trimmedPlaceName.length < 2) {
+      setPlaceSuggestions([]);
+      setShowPlaceSuggestions(false);
+      return;
+    }
+
+    let isActive = true;
+
+    const timeout = setTimeout(async () => {
+      try {
+        const response = await fetch(getAutocompleteUrl(trimmedPlaceName));
+
+        if (!response.ok) {
+          throw new Error("Place autocomplete request failed.");
+        }
+
+        const data = (await response.json()) as PlacesAutocompleteResponse;
+
+        if (!isActive || autocompleteRequestIdRef.current !== requestId) {
+          return;
+        }
+
+        if (data.status !== "OK") {
+          setPlaceSuggestions([]);
+          setShowPlaceSuggestions(false);
+          return;
+        }
+
+        const predictions = data.predictions ?? [];
+        setPlaceSuggestions(predictions);
+        setShowPlaceSuggestions(predictions.length > 0);
+      } catch {
+        if (isActive && autocompleteRequestIdRef.current === requestId) {
+          setPlaceSuggestions([]);
+          setShowPlaceSuggestions(false);
+        }
+      }
+    }, AUTOCOMPLETE_DEBOUNCE_MS);
+
+    return () => {
+      isActive = false;
+      clearTimeout(timeout);
+    };
+  }, [isSelectingPlace, placeName]);
+
+  const handlePlaceNameChange = (nextPlaceName: string) => {
+    setIsSelectingPlace(false);
+    setPlaceName(nextPlaceName);
+  };
+
+  const handleSelectPlace = async (prediction: PlacePrediction) => {
+    const selectedPlaceName = getPredictionMainText(prediction);
+
+    autocompleteRequestIdRef.current += 1;
+    setIsSelectingPlace(true);
+    setPlaceName(selectedPlaceName);
+    setPlaceSuggestions([]);
+    setShowPlaceSuggestions(false);
+
+    if (!GOOGLE_PLACES_API_KEY) {
+      return;
+    }
+
+    try {
+      const response = await fetch(getPlaceDetailsUrl(prediction.place_id));
+
+      if (!response.ok) {
+        throw new Error("Place details request failed.");
+      }
+
+      const data = (await response.json()) as PlaceDetailsResponse;
+      const addressComponents = data.result?.address_components ?? [];
+      const selectedCity = getCityFromAddressComponents(addressComponents);
+
+      if (selectedCity) {
+        setCity(selectedCity);
+      }
+    } catch {
+      return;
+    }
+  };
 
   const handlePickPhoto = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -173,12 +356,56 @@ export function EntryForm({
             ) : null}
           </View>
 
-          <TextField
-            label="Place Name"
-            placeholder="e.g. Nopalito"
-            value={placeName}
-            onChange={setPlaceName}
-          />
+          <View className="gap-1.5">
+            <Text className="font-mono-bestlist text-[10px] font-bold uppercase tracking-[1.5px] text-accent">
+              Place Name
+            </Text>
+            <TextInput
+              className="mt-1 h-11 rounded-xl border border-subtle bg-white px-4 pt-2 pb-2 font-body text-[15px] text-primary"
+              placeholder="e.g. Nopalito"
+              placeholderTextColor={colors.secondaryText}
+              value={placeName}
+              onChangeText={handlePlaceNameChange}
+              onFocus={() => {
+                if (placeSuggestions.length > 0) {
+                  setShowPlaceSuggestions(true);
+                }
+              }}
+              returnKeyType="next"
+            />
+
+            {showPlaceSuggestions ? (
+              <View className="overflow-hidden rounded-xl border border-subtle bg-white">
+                {placeSuggestions.map((suggestion, index) => {
+                  const mainText = getPredictionMainText(suggestion);
+                  const secondaryText = getPredictionSecondaryText(suggestion);
+                  const isLastSuggestion =
+                    index === placeSuggestions.length - 1;
+
+                  return (
+                    <Pressable
+                      key={suggestion.place_id}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Select ${mainText}`}
+                      className={`px-4 py-3 ${
+                        isLastSuggestion ? "" : "border-b border-subtle"
+                      }`}
+                      onPress={() => handleSelectPlace(suggestion)}
+                    >
+                      <Text className="font-body text-[15px] font-semibold text-primary">
+                        {mainText}
+                      </Text>
+                      {secondaryText ? (
+                        <Text className="mt-0.5 font-body text-[13px] text-secondary">
+                          {secondaryText}
+                        </Text>
+                      ) : null}
+                    </Pressable>
+                  );
+                })}
+              </View>
+            ) : null}
+          </View>
 
           <TextField
             label="City"

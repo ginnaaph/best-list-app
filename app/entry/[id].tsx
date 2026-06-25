@@ -114,8 +114,8 @@ export default function EntryDetailScreen() {
             />
 
             <View className="flex-row items-start justify-between gap-4">
-              <View className="min-w-0 flex-1 gap-2">
-                <Text className="font-display text-[32px] font-bold leading-9 text-primary">
+              <View className="min-w-0 flex-1 gap-2 pt-2">
+                <Text className="font-display text-[29px] font-bold leading-5 text-primary">
                   {entry.placeName}
                 </Text>
                 <Text className="font-mono-bestlist text-[10px] font-bold uppercase leading-3.25 tracking-[1.5px] text-secondary">
@@ -127,7 +127,7 @@ export default function EntryDetailScreen() {
               </View>
 
               <View className="shrink-0 items-center ">
-                <Text className="font-mono-bestlist text-[10px] font-bold pt-9.5 uppercase leading-1 tracking-[1.5px] text-secondary">
+                <Text className="font-mono-bestlist text-[10px] font-bold pt-3 uppercase leading-1 tracking-[1.5px] text-secondary">
                   Overall
                 </Text>
                 <Text className="font-display text-[52px] font-extrabold leading-7 text-accent">
