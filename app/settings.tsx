@@ -1,7 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { useState } from "react";
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+import { DeleteAccountSheet } from "@/components/delete-account-sheet";
 
 const aboutRows = [
   { label: "Privacy policy", showsChevron: true },
@@ -61,6 +64,8 @@ function SettingsSection({
 }
 
 export default function SettingsScreen() {
+  const [isDeleteSheetVisible, setIsDeleteSheetVisible] = useState(false);
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FAFAFA" }}>
       <ScrollView
@@ -87,13 +92,27 @@ export default function SettingsScreen() {
           <SettingsSection label="About" rows={aboutRows} />
           <SettingsSection label="Support" rows={supportRows} />
 
-          <View className="mt-1 h-14 items-center justify-center rounded-full border border-[#FFC7CC] bg-[#FFF4F5]">
+          <Pressable
+            accessibilityLabel="Delete account"
+            accessibilityRole="button"
+            className="mt-1 h-14 items-center justify-center rounded-full border border-[#FFC7CC] bg-[#FFF4F5]"
+            onPress={() => setIsDeleteSheetVisible(true)}
+          >
             <Text className="font-body text-[17px] font-semibold text-[#E52D35]">
               Delete account
             </Text>
-          </View>
+          </Pressable>
         </View>
       </ScrollView>
+
+      <DeleteAccountSheet
+        onBackToSignIn={() => {
+          setIsDeleteSheetVisible(false);
+          router.replace("/sign-in");
+        }}
+        onClose={() => setIsDeleteSheetVisible(false)}
+        visible={isDeleteSheetVisible}
+      />
     </SafeAreaView>
   );
 }
