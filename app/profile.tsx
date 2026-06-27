@@ -220,13 +220,18 @@ export default function Profile() {
             </Text>
           </Pressable>
 
-          <View className="h-11 w-11 items-center justify-center rounded-full border border-subtle bg-white">
+          <Pressable
+            accessibilityLabel="Open settings"
+            accessibilityRole="button"
+            className="h-11 w-11 items-center justify-center rounded-full border border-subtle bg-white"
+            onPress={() => router.push("/settings")}
+          >
             <Image
               source={images.setting}
               resizeMode="contain"
               className="h-5 w-5"
             />
-          </View>
+          </Pressable>
         </View>
 
         {isLoadingProfile ? (
