@@ -5,7 +5,7 @@ import test from "node:test";
 const componentSource = await readFile(
   new URL("./delete-account-sheet.tsx", import.meta.url),
   "utf8",
-).catch(() => "");
+);
 const settingsSource = await readFile(
   new URL("../app/settings.tsx", import.meta.url),
   "utf8",
