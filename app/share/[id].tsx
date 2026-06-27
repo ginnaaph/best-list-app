@@ -207,7 +207,7 @@ export default function ShareListScreen() {
           className="mt-6 flex-1"
           showsVerticalScrollIndicator={false}
         >
-          <View className="gap-4 pb-24">
+          <View className="gap-4 pb-20">
             {sortedEntries.map((entry, index) => (
               <SharedEntryCard key={entry.id} entry={entry} rank={index + 1} />
             ))}
