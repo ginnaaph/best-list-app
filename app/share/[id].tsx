@@ -255,14 +255,14 @@ function SharedEntryCard({ entry, rank }: SharedEntryCardProps) {
       : images.noImages;
 
   return (
-    <View className="rounded-bestlist-xl bg-white px-4 py-4 shadow-card">
-      <View className="gap-3">
+    <View className="rounded-bestlist-xl bg-white px-4 py-3 shadow-card">
+      <View className="gap-2">
         <View className="flex-row items-start justify-between gap-3">
-          <View className="flex-1 pr-2">
+          <View className="flex-1 pr-1">
             <Text className="font-mono-bestlist text-[11px] font-semibold uppercase leading-5 mb-1.5 tracking-[2px] text-secondary">
               {rankingLabel}
             </Text>
-            <View className="mt-1 flex-row items-center gap-3">
+            <View className="mt-1 flex-row items-center gap-1.5">
               <View className="h-17 w-17 shrink-0 overflow-hidden rounded-lg bg-subtle">
                 <Image
                   className="h-full w-full"
@@ -288,7 +288,7 @@ function SharedEntryCard({ entry, rank }: SharedEntryCardProps) {
             </View>
           </View>
 
-          <View className="w-20 shrink-0 items-center pt-4">
+          <View className="w-20 shrink-0 items-center pt-3">
             <Text className="font-display mt-1.5 text-[29px] font-extrabold leading-13.5 text-accent">
               {overallScore.toFixed(1)}
             </Text>
