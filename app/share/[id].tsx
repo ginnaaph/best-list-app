@@ -175,7 +175,7 @@ export default function ShareListScreen() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#F5F0E8" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#f8f8f7" }}>
       <View className="flex-1 px-5 pb-5 pt-4">
         <View className="flex-row items-center justify-between">
           <View className="h-9 w-9 items-center justify-center rounded-full bg-white shadow-card">
@@ -255,11 +255,11 @@ function SharedEntryCard({ entry, rank }: SharedEntryCardProps) {
       : images.noImages;
 
   return (
-    <View className="rounded-bestlist-xl bg-white px-4 py-3 shadow-card">
+    <View className="rounded-bestlist-xl bg-white px-4.5 py-4 shadow-card">
       <View className="gap-2">
         <View className="flex-row items-start justify-between gap-3">
           <View className="flex-1 pr-1">
-            <Text className="font-mono-bestlist text-[11px] font-semibold uppercase leading-5 mb-1.5 tracking-[2px] text-secondary">
+            <Text className="font-mono-bestlist text-[11px] font-medium uppercase leading-5 mb-1.5 mt-1.5 tracking-[2px] text-accent">
               {rankingLabel}
             </Text>
             <View className="mt-1 flex-row items-center gap-1.5">
@@ -273,7 +273,7 @@ function SharedEntryCard({ entry, rank }: SharedEntryCardProps) {
               </View>
               <View className="min-w-0 flex-1 gap-1">
                 <Text
-                  className="font-display text-[18px] font-semibold leading-6 text-primary"
+                  className="font-display text-[18px] font-medium leading-6 text-primary"
                   numberOfLines={2}
                 >
                   {entry.placeName}
