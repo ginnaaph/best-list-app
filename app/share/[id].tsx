@@ -259,7 +259,7 @@ function SharedEntryCard({ entry, rank }: SharedEntryCardProps) {
       <View className="gap-2">
         <View className="flex-row items-start justify-between gap-3">
           <View className="flex-1 pr-1">
-            <Text className="font-mono-bestlist text-[11px] font-medium uppercase leading-5 mb-1.5 mt-1.5 tracking-[2px] text-accent">
+            <Text className="font-mono-bestlist text-[11px] font-medium uppercase leading-5 mb-1.5 mt-2 tracking-[2px] text-accent">
               {rankingLabel}
             </Text>
             <View className="mt-1 flex-row items-center gap-1.5">
@@ -289,7 +289,7 @@ function SharedEntryCard({ entry, rank }: SharedEntryCardProps) {
           </View>
 
           <View className="w-20 shrink-0 items-center pt-3">
-            <Text className="font-display mt-1.5 text-[29px] font-extrabold leading-13.5 text-accent">
+            <Text className="font-display mt-2 text-[29px] font-extrabold leading-13.5 text-accent">
               {overallScore.toFixed(1)}
             </Text>
           </View>
@@ -304,14 +304,14 @@ function SharedEntryCard({ entry, rank }: SharedEntryCardProps) {
               <Text className="font-mono-bestlist text-[10px] uppercase leading-3.25 tracking-[2px] text-secondary">
                 {dimension.label}
               </Text>
-              <Text className="mt-1 font-body text-[18px] font-bold leading-5 text-accent">
+              <Text className="mt-1 font-body text-[20px] font-bold leading-5 text-accent">
                 {entry[dimension.key].toFixed(1)}
               </Text>
             </View>
           ))}
         </View>
         {entry.notes ? (
-          <Text className="font-body text-[12px] leading-4 pl-2 text-primary">
+          <Text className="font-body text-[12px] leading-4 ml-3 text-primary">
             {entry.notes}
           </Text>
         ) : null}
