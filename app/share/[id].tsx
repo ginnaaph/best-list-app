@@ -295,12 +295,6 @@ function SharedEntryCard({ entry, rank }: SharedEntryCardProps) {
           </View>
         </View>
 
-        {entry.notes ? (
-          <Text className="font-body text-[12px] leading-4 text-primary">
-            {entry.notes}
-          </Text>
-        ) : null}
-
         <View className="flex-row gap-3">
           {scoreDimensions.map((dimension) => (
             <View
@@ -316,6 +310,11 @@ function SharedEntryCard({ entry, rank }: SharedEntryCardProps) {
             </View>
           ))}
         </View>
+        {entry.notes ? (
+          <Text className="font-body text-[12px] leading-4 text-primary">
+            {entry.notes}
+          </Text>
+        ) : null}
       </View>
     </View>
   );
