@@ -311,7 +311,7 @@ function SharedEntryCard({ entry, rank }: SharedEntryCardProps) {
           ))}
         </View>
         {entry.notes ? (
-          <Text className="font-body text-[12px] leading-4 text-primary">
+          <Text className="font-body text-[12px] leading-4 pl-2 text-primary">
             {entry.notes}
           </Text>
         ) : null}
