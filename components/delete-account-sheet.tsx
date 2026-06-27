@@ -15,20 +15,26 @@ type DeleteAccountSheetProps = {
   visible: boolean;
   onClose: () => void;
   onBackToSignIn: () => void;
+  onDelete: () => Promise<void>;
 };
 
 export function DeleteAccountSheet({
   visible,
   onClose,
   onBackToSignIn,
+  onDelete,
 }: DeleteAccountSheetProps) {
   const [step, setStep] = useState<DeleteAccountStep>("warning");
   const [confirmation, setConfirmation] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const isConfirmed = confirmation === "DELETE";
 
   function resetFlow() {
     setStep("warning");
     setConfirmation("");
+    setIsDeleting(false);
+    setDeleteError(null);
   }
 
   function closeSheet() {
@@ -38,7 +44,35 @@ export function DeleteAccountSheet({
 
   function returnToWarning() {
     setConfirmation("");
+    setDeleteError(null);
     setStep("warning");
+  }
+
+  function updateConfirmation(value: string) {
+    setConfirmation(value);
+    setDeleteError(null);
+  }
+
+  async function deleteAccount() {
+    if (!isConfirmed || isDeleting) {
+      return;
+    }
+
+    setIsDeleting(true);
+    setDeleteError(null);
+
+    try {
+      await onDelete();
+      setStep("success");
+    } catch (error: unknown) {
+      setDeleteError(
+        error instanceof Error
+          ? error.message
+          : "Unable to delete your account. Please try again.",
+      );
+    } finally {
+      setIsDeleting(false);
+    }
   }
 
   function returnToSignIn() {
@@ -126,7 +160,8 @@ export function DeleteAccountSheet({
                 className={`mt-6 h-13 rounded-[13px] border bg-[#FAFAFA] px-4 font-mono-bestlist text-[16px] font-bold tracking-[3px] text-[#2D5016] ${
                   isConfirmed ? "border-[#2D7D5B]" : "border-[#E5E5E5]"
                 }`}
-                onChangeText={setConfirmation}
+                editable={!isDeleting}
+                onChangeText={updateConfirmation}
                 placeholder="Type DELETE to confirm"
                 placeholderTextColor="#8E8E93"
                 returnKeyType="done"
@@ -137,25 +172,39 @@ export function DeleteAccountSheet({
                 <Pressable
                   accessibilityLabel="Delete my account"
                   accessibilityRole="button"
+                  accessibilityState={{
+                    busy: isDeleting,
+                    disabled: !isConfirmed || isDeleting,
+                  }}
                   className={`h-13 items-center justify-center rounded-[14px] ${
                     isConfirmed ? "bg-[#DC2626]" : "bg-[#E7E7E7]"
                   }`}
                   disabled={!isConfirmed}
-                  onPress={() => setStep("success")}
+                  onPress={deleteAccount}
                 >
                   <Text
                     className={`font-body text-[17px] font-bold ${
                       isConfirmed ? "text-white" : "text-[#9A9A9A]"
                     }`}
                   >
-                    Delete my account
+                    {isDeleting ? "Deleting..." : "Delete my account"}
                   </Text>
                 </Pressable>
+
+                {deleteError ? (
+                  <Text
+                    accessibilityRole="alert"
+                    className="text-center font-body text-[14px] leading-5 text-[#DC2626]"
+                  >
+                    {deleteError}
+                  </Text>
+                ) : null}
 
                 <Pressable
                   accessibilityLabel="Back to delete account warning"
                   accessibilityRole="button"
                   className="h-13 items-center justify-center rounded-[14px] border border-[#E5E5E5] bg-[#FAFAFA]"
+                  disabled={isDeleting}
                   onPress={returnToWarning}
                 >
                   <Text className="font-body text-[17px] font-semibold text-[#8E8E93]">

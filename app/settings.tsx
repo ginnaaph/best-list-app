@@ -5,6 +5,13 @@ import { Linking, Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { DeleteAccountSheet } from "@/components/delete-account-sheet";
+import { getSupabaseClient } from "@/lib/supabase";
+import { useStore } from "@/store";
+
+type DeleteAccountResponse = {
+  success: boolean;
+  error?: string;
+};
 
 const aboutRows = [
   {
@@ -92,6 +99,35 @@ function SettingsSection({
 export default function SettingsScreen() {
   const [isDeleteSheetVisible, setIsDeleteSheetVisible] = useState(false);
 
+  async function handleDeleteAccount() {
+    const supabase = getSupabaseClient();
+    const { data, error } =
+      await supabase.functions.invoke<DeleteAccountResponse>("delete-account");
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    if (!data?.success) {
+      throw new Error(
+        data?.error ?? "Unable to delete your account. Please try again.",
+      );
+    }
+
+    try {
+      await useStore.getState().clearStore();
+      const { error: signOutError } = await supabase.auth.signOut({
+        scope: "local",
+      });
+
+      if (signOutError) {
+        console.warn("Unable to clear the deleted account session.", signOutError);
+      }
+    } catch (cleanupError: unknown) {
+      console.warn("Unable to clear deleted account data locally.", cleanupError);
+    }
+  }
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FAFAFA" }}>
       <ScrollView
@@ -137,6 +173,7 @@ export default function SettingsScreen() {
           router.replace("/sign-in");
         }}
         onClose={() => setIsDeleteSheetVisible(false)}
+        onDelete={handleDeleteAccount}
         visible={isDeleteSheetVisible}
       />
     </SafeAreaView>
