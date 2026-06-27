@@ -1,14 +1,22 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
-import { Pressable, ScrollView, Text, View } from "react-native";
+import { Linking, Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { DeleteAccountSheet } from "@/components/delete-account-sheet";
 
 const aboutRows = [
-  { label: "Privacy policy", showsChevron: true },
-  { label: "Terms of service", showsChevron: true },
+  {
+    label: "Privacy policy",
+    showsChevron: true,
+    url: "https://docs.google.com/document/d/1ajcu8poYGEjaV1qFvriZV4Sa1v6-JAtUIGnp7RwdtMw/edit?usp=sharing",
+  },
+  {
+    label: "Terms of service",
+    showsChevron: true,
+    url: "https://docs.google.com/document/d/1BNlqGjMY2Ls9v4s8AksbBkvHv2LN0HGVzYN5hHv6-Rs/edit?usp=sharing",
+  },
   { label: "App version", value: "1.0.0", showsChevron: false },
 ];
 
@@ -21,6 +29,7 @@ type SettingsRow = {
   label: string;
   value?: string;
   showsChevron: boolean;
+  url?: string;
 };
 
 function SettingsSection({
@@ -37,27 +46,44 @@ function SettingsSection({
       </Text>
 
       <View className="overflow-hidden rounded-[18px] border border-[#E5E5E5] bg-white">
-        {rows.map((row, index) => (
-          <View key={row.label}>
+        {rows.map((row, index) => {
+          const url = row.url;
+          const content = (
             <View className="h-15.5 flex-row items-center justify-between px-5">
               <Text className="font-body text-[17px] font-medium text-[#1C1C1E]">
                 {row.label}
               </Text>
 
               {row.showsChevron ? (
-                <Ionicons name="chevron-forward" size={22} color="#C7C7CC" />
+                <Ionicons
+                  name="chevron-forward"
+                  size={22}
+                  color="#C7C7CC"
+                />
               ) : (
                 <Text className="font-body text-[17px] text-[#8E8E93]">
                   {row.value}
                 </Text>
               )}
             </View>
+          );
 
-            {index < rows.length - 1 ? (
-              <View className="h-px bg-[#E5E5E5]" />
-            ) : null}
-          </View>
-        ))}
+          return (
+            <View key={row.label}>
+              {url ? (
+                <Pressable onPress={() => Linking.openURL(url)}>
+                  {content}
+                </Pressable>
+              ) : (
+                content
+              )}
+
+              {index < rows.length - 1 ? (
+                <View className="h-px bg-[#E5E5E5]" />
+              ) : null}
+            </View>
+          );
+        })}
       </View>
     </View>
   );
