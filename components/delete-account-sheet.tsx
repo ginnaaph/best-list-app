@@ -83,7 +83,7 @@ export function DeleteAccountSheet({
   return (
     <Modal
       animationType="slide"
-      onRequestClose={() => undefined}
+      onRequestClose={step === "confirmation" ? returnToWarning : closeSheet}
       presentationStyle="overFullScreen"
       statusBarTranslucent
       transparent
