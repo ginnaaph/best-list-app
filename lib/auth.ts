@@ -48,9 +48,10 @@ export async function signUpWithPassword(email: string, password: string) {
   }
 
   if (!data.session) {
-    throw new Error(
-      "Confirm your email before signing in, or disable email confirmation for demo accounts in Supabase.",
-    );
+    return { needsEmailConfirmation: true, session: null } as const;
+  }
+
+  return { needsEmailConfirmation: false, session: data.session } as const;
   }
 
   return data.session;
