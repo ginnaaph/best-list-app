@@ -53,19 +53,16 @@ export default function SetupHandleScreen() {
       async function checkHandleAvailability() {
         try {
           const supabase = getSupabaseClient();
-          const { data, error } = await supabase
-            .from("profiles")
-            .select("id")
-            .ilike("username", normalizedHandle)
-            .limit(1)
-            .returns<{ id: string }[]>();
+          const { data, error } = await supabase.rpc("is_username_taken", {
+            handle: normalizedHandle,
+          });
 
           if (error) {
             throw error;
           }
 
           if (isCurrent) {
-            setHandleAvailability(data.length > 0 ? "taken" : "available");
+            setHandleAvailability(data === true ? "taken" : "available");
           }
         } catch (error: unknown) {
           console.error("Failed to check handle availability:", error);
