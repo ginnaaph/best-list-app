@@ -1,11 +1,15 @@
 import { Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
   Pressable,
+  ScrollView,
   Text,
   TextInput,
   View,
@@ -14,6 +18,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { colors } from "@/constants/theme";
 import { prepareSetupHandleProfileUpdate } from "@/lib/profile-data";
+import { avatarsBucket, resolveAvatarDisplayUrl } from "@/lib/profile-avatar";
 import { getSupabaseClient } from "@/lib/supabase";
 
 type HandleAvailability = "idle" | "checking" | "available" | "taken";
@@ -25,6 +30,10 @@ function normalizeHandleForAvailability(value: string) {
 export default function SetupHandleScreen() {
   const [handle, setHandle] = useState("");
   const [city, setCity] = useState("");
+  const [bio, setBio] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [avatarPreviewUrl, setAvatarPreviewUrl] = useState<string | null>(null);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [handleAvailability, setHandleAvailability] =
     useState<HandleAvailability>("idle");
@@ -44,19 +53,16 @@ export default function SetupHandleScreen() {
       async function checkHandleAvailability() {
         try {
           const supabase = getSupabaseClient();
-          const { data, error } = await supabase
-            .from("profiles")
-            .select("id")
-            .ilike("username", normalizedHandle)
-            .limit(1)
-            .returns<{ id: string }[]>();
+          const { data, error } = await supabase.rpc("is_username_taken", {
+            handle: normalizedHandle,
+          });
 
           if (error) {
             throw error;
           }
 
           if (isCurrent) {
-            setHandleAvailability(data.length > 0 ? "taken" : "available");
+            setHandleAvailability(data === true ? "taken" : "available");
           }
         } catch (error: unknown) {
           console.error("Failed to check handle availability:", error);
@@ -76,12 +82,105 @@ export default function SetupHandleScreen() {
     };
   }, [handle]);
 
-  const handleSave = async () => {
-    if (isSaving) {
+  const handlePickAvatar = async () => {
+    if (isUploadingAvatar || isSaving) {
       return;
     }
 
-    const profileUpdate = prepareSetupHandleProfileUpdate(handle, city);
+    try {
+      const permission =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+      if (!permission.granted) {
+        Alert.alert(
+          "Photo access required",
+          "Allow photo access to choose a profile picture.",
+        );
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        allowsEditing: true,
+        aspect: [1, 1],
+        mediaTypes: ["images"],
+        quality: 0.8,
+        shape: "oval",
+      });
+
+      if (result.canceled) {
+        return;
+      }
+
+      const selectedUri = result.assets[0]?.uri;
+
+      if (!selectedUri) {
+        Alert.alert(
+          "Photo unavailable",
+          "Choose a different photo and try again.",
+        );
+        return;
+      }
+
+      setIsUploadingAvatar(true);
+
+      const supabase = getSupabaseClient();
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError) {
+        throw userError;
+      }
+
+      if (!user) {
+        Alert.alert("Sign in required", "Please sign in to finish setup.");
+        return;
+      }
+
+      const response = await fetch(selectedUri);
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch avatar: ${response.status} ${response.statusText}`,
+        );
+      }
+
+      const imageBytes = await response.arrayBuffer();
+      const contentType = response.headers.get("Content-Type") ?? "image/jpeg";
+      const path = `${user.id}/avatar.jpg`;
+      const bucket = supabase.storage.from(avatarsBucket);
+      const { error: uploadError } = await bucket.upload(path, imageBytes, {
+        contentType,
+        upsert: true,
+      });
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const storageUrl = bucket.getPublicUrl(path).data.publicUrl;
+      setAvatarUrl(storageUrl);
+      setAvatarPreviewUrl(await resolveAvatarDisplayUrl(storageUrl));
+    } catch (error: unknown) {
+      console.error("Failed to upload setup avatar:", error);
+      Alert.alert("Upload failed", "Unable to upload your photo. Try again.");
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
+
+  const handleSave = async () => {
+    if (isSaving || isUploadingAvatar) {
+      return;
+    }
+
+    const profileUpdate = prepareSetupHandleProfileUpdate(
+      handle,
+      city,
+      bio,
+      avatarUrl,
+    );
 
     if (!profileUpdate.username || !profileUpdate.city) {
       Alert.alert("Missing details", "Please enter a handle and home city.");
@@ -111,6 +210,8 @@ export default function SetupHandleScreen() {
           id: user.id,
           username: profileUpdate.username,
           city: profileUpdate.city,
+          bio: profileUpdate.bio,
+          avatar_url: profileUpdate.avatar_url,
         },
         { onConflict: "id" },
       );
@@ -147,11 +248,15 @@ export default function SetupHandleScreen() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
-        <View className="flex-1 px-5 pb-5 pt-4">
+        <ScrollView
+          contentContainerClassName="grow px-5 pb-5 pt-4"
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
           <View className="flex-1 justify-between">
             <View>
               <Text className="font-mono-bestlist text-[11px] font-bold uppercase leading-4 tracking-[2px] text-secondary">
-                Step 2 of 2
+                Step 3 of 3
               </Text>
 
               <Text className="mt-4 font-display text-[34px] font-bold leading-9.5 text-primary">
@@ -162,7 +267,45 @@ export default function SetupHandleScreen() {
                 Shown on shared lists — bestlist.app/[handle]
               </Text>
 
-              <View className="mt-9 gap-5">
+              <View className="mt-7 gap-5">
+                <View className="items-center pb-1">
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityLabel="Choose profile photo"
+                    className="h-24 w-24 items-center justify-center"
+                    disabled={isUploadingAvatar || isSaving}
+                    onPress={() => {
+                      void handlePickAvatar();
+                    }}
+                  >
+                    <View className="h-full w-full items-center justify-center overflow-hidden rounded-full bg-[#2D5016] shadow-card">
+                      {avatarPreviewUrl ? (
+                        <Image
+                          source={{ uri: avatarPreviewUrl }}
+                          resizeMode="cover"
+                          className="h-full w-full"
+                        />
+                      ) : (
+                        <Text className="font-body text-[40px] font-bold leading-10 text-white">
+                          {normalizeHandleForAvailability(handle)
+                            .charAt(0)
+                            .toUpperCase() || "?"}
+                        </Text>
+                      )}
+
+                      {isUploadingAvatar ? (
+                        <View className="absolute inset-0 items-center justify-center bg-black/20">
+                          <ActivityIndicator color="#FFFFFF" />
+                        </View>
+                      ) : null}
+                    </View>
+
+                    <View className="absolute bottom-0 right-0 h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[#F3A23A]">
+                      <Ionicons name="camera" size={16} color="#FFFFFF" />
+                    </View>
+                  </Pressable>
+                </View>
+
                 <View className="gap-2">
                   <Text className="font-mono-bestlist text-[10px] font-bold uppercase tracking-[1.5px] text-secondary">
                     Handle
@@ -209,17 +352,33 @@ export default function SetupHandleScreen() {
                       className="ml-2 h-full min-w-0 flex-1 py-0 font-body text-[17px] leading-6 text-primary"
                       placeholder="San Francisco, CA"
                       placeholderTextColor={colors.secondaryText}
-                      returnKeyType="done"
+                      returnKeyType="next"
                       value={city}
                       onChangeText={setCity}
-                      onSubmitEditing={() => {
-                        void handleSave();
-                      }}
                     />
                   </View>
                   <Text className="font-body text-[13px] leading-5 text-secondary">
                     {"We'll tag new entries with that city — change this anytime."}
                   </Text>
+                </View>
+
+                <View className="gap-2">
+                  <Text className="font-mono-bestlist text-[10px] font-bold uppercase tracking-[1.5px] text-secondary">
+                    Bio
+                  </Text>
+                  <TextInput
+                    autoCapitalize="sentences"
+                    className="h-13 rounded-xl border border-subtle bg-white px-4 py-0 font-body text-[17px] leading-6 text-primary"
+                    maxLength={100}
+                    placeholder="Taco enthusiast. SF local."
+                    placeholderTextColor={colors.secondaryText}
+                    returnKeyType="done"
+                    value={bio}
+                    onChangeText={setBio}
+                    onSubmitEditing={() => {
+                      void handleSave();
+                    }}
+                  />
                 </View>
               </View>
             </View>
@@ -228,9 +387,9 @@ export default function SetupHandleScreen() {
               accessibilityRole="button"
               accessibilityLabel="Start logging"
               className={`h-14 items-center justify-center rounded-full bg-[#2D5016] shadow-card ${
-                isSaving ? "opacity-60" : "opacity-100"
+                isSaving || isUploadingAvatar ? "opacity-60" : "opacity-100"
               }`}
-              disabled={isSaving}
+              disabled={isSaving || isUploadingAvatar}
               onPress={() => {
                 void handleSave();
               }}
@@ -240,7 +399,7 @@ export default function SetupHandleScreen() {
               </Text>
             </Pressable>
           </View>
-        </View>
+        </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

@@ -85,12 +85,25 @@ export function getProfileInitial(
   return label.trim().charAt(0).toUpperCase() || "?";
 }
 
-export function prepareSetupHandleProfileUpdate(handle: string, city: string) {
+export function getPostAuthDestination(
+  profile: { username: string | null } | null | undefined,
+) {
+  return profile?.username ? ("/home" as const) : ("/setup-handle" as const);
+}
+
+export function prepareSetupHandleProfileUpdate(
+  handle: string,
+  city: string,
+  bio = "",
+  avatarUrl: string | null = null,
+) {
   const username = handle.trim().replace(/^@+/, "");
 
   return {
     username: username || undefined,
     city: city.trim(),
+    bio: bio.trim(),
+    avatar_url: avatarUrl,
   };
 }
 

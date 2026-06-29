@@ -36,6 +36,42 @@ export async function sendEmailOtp(email: string, mode: EmailAuthMode) {
   return normalizedEmail;
 }
 
+export async function signUpWithPassword(email: string, password: string) {
+  assertSupabaseConfigured();
+
+  const credentials = getPasswordCredentials(email, password);
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase.auth.signUp(credentials);
+
+  if (error) {
+    throw new Error(getAuthErrorMessage(error.message, "sign-up"));
+  }
+
+  if (!data.session) {
+    return { needsEmailConfirmation: true, session: null } as const;
+  }
+
+  return { needsEmailConfirmation: false, session: data.session } as const;
+}
+
+export async function signInWithPassword(email: string, password: string) {
+  assertSupabaseConfigured();
+
+  const credentials = getPasswordCredentials(email, password);
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase.auth.signInWithPassword(credentials);
+
+  if (error) {
+    throw error;
+  }
+
+  if (!data.session) {
+    throw new Error("Sign in did not return a session. Try again.");
+  }
+
+  return data.session;
+}
+
 export async function verifyEmailOtp(email: string, code: string) {
   const supabase = getSupabaseClient();
 
@@ -198,6 +234,20 @@ function getAuthErrorMessage(message: string, mode: EmailAuthMode) {
   }
 
   return message;
+}
+
+function getPasswordCredentials(email: string, password: string) {
+  const normalizedEmail = email.trim().toLowerCase();
+
+  if (!normalizedEmail) {
+    throw new Error("Enter an email address.");
+  }
+
+  if (!password) {
+    throw new Error("Enter a password.");
+  }
+
+  return { email: normalizedEmail, password };
 }
 
 function getProviderLabel(provider?: SocialAuthProvider | null) {
