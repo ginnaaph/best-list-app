@@ -57,8 +57,7 @@ export function AuthScreen({ mode }: AuthScreenProps) {
   const copy = authCopy[mode];
   const [email, setEmail] = useState<string>(copy.email);
   const [password, setPassword] = useState("");
-  const [isPasswordSignInVisible, setIsPasswordSignInVisible] =
-    useState(false);
+  const [isPasswordSignInVisible, setIsPasswordSignInVisible] = useState(false);
   const [isVerificationVisible, setIsVerificationVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [verifiedEmail, setVerifiedEmail] = useState<string>(copy.email);
@@ -187,7 +186,11 @@ export function AuthScreen({ mode }: AuthScreenProps) {
             <Pressable
               className="mt-4 h-15.25 items-center justify-center rounded-bestlist-lg bg-accent"
               disabled={isSubmitting}
-              onPress={handlePrimaryPress}
+              onPress={
+                isPasswordSignInVisible
+                  ? handlePasswordSignInPress
+                  : handlePrimaryPress
+              }
             >
               <Text className="font-body text-[18px] font-bold leading-5.5 text-white">
                 {copy.button}
@@ -246,9 +249,7 @@ export function AuthScreen({ mode }: AuthScreenProps) {
           <Pressable className="py-2">
             <Text className="font-body text-[16px] leading-5 text-secondary">
               {copy.footerLead}{" "}
-              <Text className="font-bold text-accent">
-                {copy.footerAction}
-              </Text>
+              <Text className="font-bold text-accent">{copy.footerAction}</Text>
             </Text>
           </Pressable>
         </Link>
