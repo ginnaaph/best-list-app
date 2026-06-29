@@ -52,9 +52,6 @@ export async function signUpWithPassword(email: string, password: string) {
   }
 
   return { needsEmailConfirmation: false, session: data.session } as const;
-  }
-
-  return data.session;
 }
 
 export async function signInWithPassword(email: string, password: string) {
