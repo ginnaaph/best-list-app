@@ -67,6 +67,10 @@ export async function signInWithPassword(email: string, password: string) {
     throw error;
   }
 
+  if (!data.session) {
+    throw new Error("Sign in did not return a session. Try again.");
+  }
+
   return data.session;
 }
 
