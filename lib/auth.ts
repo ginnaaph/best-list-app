@@ -96,6 +96,7 @@ export async function signInWithSocialProvider(provider: SocialAuthProvider) {
     options: {
       redirectTo: authRedirectTo,
       skipBrowserRedirect: true,
+      queryParams: provider === "google" ? { prompt: "select_account" } : {},
     },
   });
 
