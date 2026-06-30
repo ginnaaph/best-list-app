@@ -5,6 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import {
   CategoryGrid,
   FloatingAddButton,
+  HomeEmptyState,
   HomeHeader,
   SearchPill,
 } from "@/components";
@@ -41,13 +42,19 @@ export function HomeScreen() {
           className="mt-5 flex-1"
           showsVerticalScrollIndicator={false}
         >
-          <View className="gap-5 pb-24">
-            <SearchPill />
-            <CategoryGrid categories={categoriesWithStats} />
-          </View>
+          {categories.length === 0 ? (
+            <HomeEmptyState />
+          ) : (
+            <View className="gap-5 pb-24">
+              <SearchPill />
+              <CategoryGrid categories={categoriesWithStats} />
+            </View>
+          )}
         </ScrollView>
 
-        <FloatingAddButton onPress={() => router.push(addCategoryRoute)} />
+        {categories.length > 0 && (
+          <FloatingAddButton onPress={() => router.push(addCategoryRoute)} />
+        )}
       </View>
     </SafeAreaView>
   );
