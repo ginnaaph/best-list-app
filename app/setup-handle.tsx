@@ -17,8 +17,8 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { colors } from "@/constants/theme";
-import { prepareSetupHandleProfileUpdate } from "@/lib/profile-data";
 import { avatarsBucket, resolveAvatarDisplayUrl } from "@/lib/profile-avatar";
+import { prepareSetupHandleProfileUpdate } from "@/lib/profile-data";
 import { getSupabaseClient } from "@/lib/supabase";
 
 type HandleAvailability = "idle" | "checking" | "available" | "taken";
@@ -286,7 +286,7 @@ export default function SetupHandleScreen() {
                           className="h-full w-full"
                         />
                       ) : (
-                        <Text className="font-body text-[40px] font-bold leading-10 text-white">
+                        <Text className="font-body text-[40px] font-bold leading-8 text-white">
                           {normalizeHandleForAvailability(handle)
                             .charAt(0)
                             .toUpperCase() || "?"}
@@ -317,7 +317,7 @@ export default function SetupHandleScreen() {
                     <TextInput
                       autoCapitalize="none"
                       autoCorrect={false}
-                      className="h-full min-w-0 flex-1 py-0 font-body text-[17px] leading-6 text-primary"
+                      className="h-full min-w-0 flex-1 py-0 font-body text-[16px] leading-6 mb-1 text-primary"
                       placeholder="yourname"
                       placeholderTextColor={colors.secondaryText}
                       returnKeyType="next"
@@ -325,12 +325,12 @@ export default function SetupHandleScreen() {
                       onChangeText={setHandle}
                     />
                     {handleAvailability === "available" ? (
-                      <Text className="ml-3 font-body text-[13px] font-semibold leading-5 text-[#2D5016]">
+                      <Text className="ml-3 font-body text-[11px] font-semibold leading-5 text-[#2D5016]">
                         ✓ Available
                       </Text>
                     ) : null}
                     {handleAvailability === "taken" ? (
-                      <Text className="ml-3 font-body text-[13px] font-semibold leading-5 text-red-500">
+                      <Text className="ml-3 font-body text-[11px] font-semibold leading-5 text-red-500">
                         ✗ Taken
                       </Text>
                     ) : null}
@@ -349,7 +349,7 @@ export default function SetupHandleScreen() {
                     />
                     <TextInput
                       autoCapitalize="words"
-                      className="ml-2 h-full min-w-0 flex-1 py-0 font-body text-[17px] leading-6 text-primary"
+                      className="ml-2 h-full min-w-0 flex-1 py-0 font-body text-[16px] leading-6 mb-1 text-primary"
                       placeholder="San Francisco, CA"
                       placeholderTextColor={colors.secondaryText}
                       returnKeyType="next"
@@ -357,9 +357,6 @@ export default function SetupHandleScreen() {
                       onChangeText={setCity}
                     />
                   </View>
-                  <Text className="font-body text-[13px] leading-5 text-secondary">
-                    {"We'll tag new entries with that city — change this anytime."}
-                  </Text>
                 </View>
 
                 <View className="gap-2">
@@ -368,7 +365,7 @@ export default function SetupHandleScreen() {
                   </Text>
                   <TextInput
                     autoCapitalize="sentences"
-                    className="h-13 rounded-xl border border-subtle bg-white px-4 py-0 font-body text-[17px] leading-6 text-primary"
+                    className="h-13 rounded-xl border border-subtle bg-white px-4 py-0 font-body text-[16px] leading-6 mb-1 text-primary"
                     maxLength={100}
                     placeholder="Taco enthusiast. SF local."
                     placeholderTextColor={colors.secondaryText}
@@ -386,7 +383,7 @@ export default function SetupHandleScreen() {
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Start logging"
-              className={`h-14 items-center justify-center rounded-full bg-[#2D5016] shadow-card ${
+              className={`h-14 items-center justify-center rounded-full mt-10 bg-[#2D5016] shadow-card ${
                 isSaving || isUploadingAvatar ? "opacity-60" : "opacity-100"
               }`}
               disabled={isSaving || isUploadingAvatar}
