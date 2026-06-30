@@ -4,6 +4,7 @@ import { useState } from "react";
 import {
   Alert,
   Image,
+  Linking,
   Platform,
   Pressable,
   ScrollView,
@@ -94,10 +95,14 @@ export function AuthScreen({ mode }: AuthScreenProps) {
         showsVerticalScrollIndicator={false}
       >
         <View>
-          <Text className="text-center font-display text-[41px] font-bold leading-11.75 text-primary">
-            BestList
-            <Text className="text-accent">.</Text>
-          </Text>
+          <View className="flex-row items-center justify-center">
+            <Text className="font-display text-[44px] font-bold leading-[44px] text-primary">
+              Best
+            </Text>
+            <Text className="font-display text-[44px] font-bold leading-[44px] text-bestlist-green">
+              List
+            </Text>
+          </View>
 
           <View className="mt-18.5 gap-4">
             <View className="gap-3">
@@ -145,8 +150,28 @@ export function AuthScreen({ mode }: AuthScreenProps) {
             {copy.legal ? (
               <Text className="text-center font-body text-[14px] leading-4.75 text-secondary">
                 By signing up you agree to our{" "}
-                <Text className="text-primary underline">Terms</Text> and{" "}
-                <Text className="text-primary underline">Privacy</Text>.
+                <Text
+                  className="text-primary underline"
+                  onPress={() =>
+                    Linking.openURL(
+                      "https://docs.google.com/document/d/1BNlqGjMY2Ls9v4s8AksbBkvHv2LN0HGVzYN5hHv6-Rs/edit?usp=sharing"
+                    )
+                  }
+                >
+                  Terms
+                </Text>{" "}
+                and{" "}
+                <Text
+                  className="text-primary underline"
+                  onPress={() =>
+                    Linking.openURL(
+                      "https://docs.google.com/document/d/1ajcu8poYGEjaV1qFvriZV4Sa1v6-JAtUIGnp7RwdtMw/edit?usp=sharing"
+                    )
+                  }
+                >
+                  Privacy
+                </Text>
+                .
               </Text>
             ) : null}
 
