@@ -8,6 +8,7 @@ export { CurrentUserAvatar } from "@/components/current-user-avatar";
 export { EntryCard } from "@/components/entry-card";
 export { CategoryGrid } from "@/components/category-grid";
 export { FloatingAddButton } from "@/components/floating-add-button";
+export { HomeEmptyState } from "@/components/home-empty-state";
 export { HomeHeader } from "@/components/home-header";
 export { HomeScreen } from "@/components/home-screen";
 export { DishCardPreview, RankingPreview, ScorePreview } from "@/components/how-it-works-preview";
