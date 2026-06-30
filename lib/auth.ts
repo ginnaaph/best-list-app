@@ -24,7 +24,6 @@ export async function sendEmailOtp(email: string, mode: EmailAuthMode) {
   const { error } = await supabase.auth.signInWithOtp({
     email: normalizedEmail,
     options: {
-      emailRedirectTo: authRedirectTo,
       shouldCreateUser: true,
     },
   });
