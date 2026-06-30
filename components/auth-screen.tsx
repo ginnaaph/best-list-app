@@ -18,9 +18,7 @@ import { images } from "@/constants/images";
 import { colors } from "@/constants/theme";
 import {
   sendEmailOtp,
-  signInWithPassword,
   signInWithSocialProvider,
-  signUpWithPassword,
   type SocialAuthProvider,
 } from "@/lib/auth";
 
@@ -56,8 +54,6 @@ const authCopy = {
 export function AuthScreen({ mode }: AuthScreenProps) {
   const copy = authCopy[mode];
   const [email, setEmail] = useState<string>(copy.email);
-  const [password, setPassword] = useState("");
-  const [isPasswordSignInVisible, setIsPasswordSignInVisible] = useState(false);
   const [isVerificationVisible, setIsVerificationVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [verifiedEmail, setVerifiedEmail] = useState<string>(copy.email);
@@ -66,33 +62,9 @@ export function AuthScreen({ mode }: AuthScreenProps) {
     setIsSubmitting(true);
 
     try {
-      if (mode === "sign-up") {
-        await signUpWithPassword(email, password);
-        router.replace("/");
-        return;
-      }
-
       const normalizedEmail = await sendEmailOtp(email, mode);
       setVerifiedEmail(normalizedEmail);
       setIsVerificationVisible(true);
-    } catch (error) {
-      Alert.alert("Authentication error", getErrorMessage(error));
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handlePasswordSignInPress = async () => {
-    if (!isPasswordSignInVisible) {
-      setIsPasswordSignInVisible(true);
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      await signInWithPassword(email, password);
-      router.replace("/");
     } catch (error) {
       Alert.alert("Authentication error", getErrorMessage(error));
     } finally {
@@ -143,75 +115,32 @@ export function AuthScreen({ mode }: AuthScreenProps) {
             </View>
 
             <View className="mt-5 gap-2">
-              <View className="gap-2">
-                <Text className="font-mono-bestlist text-[13px] font-bold uppercase leading-4 tracking-[4px] text-secondary">
-                  Email
-                </Text>
-                <TextInput
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  className="h-15.5 rounded-bestlist-md border border-subtle bg-card px-5 font-body text-[21px] leading-6.25 text-primary"
-                  inputMode="email"
-                  keyboardType="email-address"
-                  onChangeText={setEmail}
-                  placeholder={copy.email}
-                  placeholderTextColor={colors.primaryText}
-                  textContentType="emailAddress"
-                  value={email}
-                />
-              </View>
-
-              {mode === "sign-up" || isPasswordSignInVisible ? (
-                <View className="mt-3 gap-2">
-                  <Text className="font-mono-bestlist text-[13px] font-bold uppercase leading-4 tracking-[4px] text-secondary">
-                    Password
-                  </Text>
-                  <TextInput
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    className="h-15.5 rounded-bestlist-md border border-subtle bg-card px-5 font-body text-[21px] leading-6.25 text-primary"
-                    onChangeText={setPassword}
-                    placeholder="Enter your password"
-                    placeholderTextColor={colors.secondaryText}
-                    secureTextEntry
-                    textContentType={
-                      mode === "sign-up" ? "newPassword" : "password"
-                    }
-                    value={password}
-                  />
-                </View>
-              ) : null}
+              <Text className="font-mono-bestlist text-[13px] font-bold uppercase leading-4 tracking-[4px] text-secondary">
+                Email
+              </Text>
+              <TextInput
+                autoCapitalize="none"
+                autoCorrect={false}
+                className="h-15.5 rounded-bestlist-md border border-subtle bg-card px-5 font-body text-[21px] leading-6.25 text-primary"
+                inputMode="email"
+                keyboardType="email-address"
+                onChangeText={setEmail}
+                placeholder={copy.email}
+                placeholderTextColor={colors.primaryText}
+                textContentType="emailAddress"
+                value={email}
+              />
             </View>
 
             <Pressable
               className="mt-4 h-15.25 items-center justify-center rounded-bestlist-lg bg-accent"
               disabled={isSubmitting}
-              onPress={
-                isPasswordSignInVisible
-                  ? handlePasswordSignInPress
-                  : handlePrimaryPress
-              }
+              onPress={handlePrimaryPress}
             >
               <Text className="font-body text-[18px] font-bold leading-5.5 text-white">
                 {copy.button}
               </Text>
             </Pressable>
-
-            {mode === "sign-in" ? (
-              <Pressable
-                className={
-                  isPasswordSignInVisible
-                    ? "h-15.25 items-center justify-center rounded-bestlist-lg border border-accent bg-surface"
-                    : "items-center py-2"
-                }
-                disabled={isSubmitting}
-                onPress={handlePasswordSignInPress}
-              >
-                <Text className="font-body text-[16px] font-bold leading-5 text-accent">
-                  Sign in with password
-                </Text>
-              </Pressable>
-            ) : null}
 
             {copy.legal ? (
               <Text className="text-center font-body text-[14px] leading-4.75 text-secondary">
