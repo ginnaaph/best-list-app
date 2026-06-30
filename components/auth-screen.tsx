@@ -4,6 +4,7 @@ import { useState } from "react";
 import {
   Alert,
   Image,
+  Linking,
   Platform,
   Pressable,
   ScrollView,
@@ -18,9 +19,7 @@ import { images } from "@/constants/images";
 import { colors } from "@/constants/theme";
 import {
   sendEmailOtp,
-  signInWithPassword,
   signInWithSocialProvider,
-  signUpWithPassword,
   type SocialAuthProvider,
 } from "@/lib/auth";
 
@@ -56,8 +55,6 @@ const authCopy = {
 export function AuthScreen({ mode }: AuthScreenProps) {
   const copy = authCopy[mode];
   const [email, setEmail] = useState<string>(copy.email);
-  const [password, setPassword] = useState("");
-  const [isPasswordSignInVisible, setIsPasswordSignInVisible] = useState(false);
   const [isVerificationVisible, setIsVerificationVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [verifiedEmail, setVerifiedEmail] = useState<string>(copy.email);
@@ -66,33 +63,9 @@ export function AuthScreen({ mode }: AuthScreenProps) {
     setIsSubmitting(true);
 
     try {
-      if (mode === "sign-up") {
-        await signUpWithPassword(email, password);
-        router.replace("/");
-        return;
-      }
-
       const normalizedEmail = await sendEmailOtp(email, mode);
       setVerifiedEmail(normalizedEmail);
       setIsVerificationVisible(true);
-    } catch (error) {
-      Alert.alert("Authentication error", getErrorMessage(error));
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handlePasswordSignInPress = async () => {
-    if (!isPasswordSignInVisible) {
-      setIsPasswordSignInVisible(true);
-      return;
-    }
-
-    setIsSubmitting(true);
-
-    try {
-      await signInWithPassword(email, password);
-      router.replace("/");
     } catch (error) {
       Alert.alert("Authentication error", getErrorMessage(error));
     } finally {
@@ -122,10 +95,14 @@ export function AuthScreen({ mode }: AuthScreenProps) {
         showsVerticalScrollIndicator={false}
       >
         <View>
-          <Text className="text-center font-display text-[41px] font-bold leading-11.75 text-primary">
-            BestList
-            <Text className="text-accent">.</Text>
-          </Text>
+          <View className="flex-row items-center justify-center">
+            <Text className="font-display text-[44px] font-bold leading-[44px] text-primary">
+              Best
+            </Text>
+            <Text className="font-display text-[44px] font-bold leading-[44px] text-bestlist-green">
+              List
+            </Text>
+          </View>
 
           <View className="mt-18.5 gap-4">
             <View className="gap-3">
@@ -143,81 +120,58 @@ export function AuthScreen({ mode }: AuthScreenProps) {
             </View>
 
             <View className="mt-5 gap-2">
-              <View className="gap-2">
-                <Text className="font-mono-bestlist text-[13px] font-bold uppercase leading-4 tracking-[4px] text-secondary">
-                  Email
-                </Text>
-                <TextInput
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  className="h-15.5 rounded-bestlist-md border border-subtle bg-card px-5 font-body text-[21px] leading-6.25 text-primary"
-                  inputMode="email"
-                  keyboardType="email-address"
-                  onChangeText={setEmail}
-                  placeholder={copy.email}
-                  placeholderTextColor={colors.primaryText}
-                  textContentType="emailAddress"
-                  value={email}
-                />
-              </View>
-
-              {mode === "sign-up" || isPasswordSignInVisible ? (
-                <View className="mt-3 gap-2">
-                  <Text className="font-mono-bestlist text-[13px] font-bold uppercase leading-4 tracking-[4px] text-secondary">
-                    Password
-                  </Text>
-                  <TextInput
-                    autoCapitalize="none"
-                    autoCorrect={false}
-                    className="h-15.5 rounded-bestlist-md border border-subtle bg-card px-5 font-body text-[21px] leading-6.25 text-primary"
-                    onChangeText={setPassword}
-                    placeholder="Enter your password"
-                    placeholderTextColor={colors.secondaryText}
-                    secureTextEntry
-                    textContentType={
-                      mode === "sign-up" ? "newPassword" : "password"
-                    }
-                    value={password}
-                  />
-                </View>
-              ) : null}
+              <Text className="font-mono-bestlist text-[13px] font-bold uppercase leading-4 tracking-[4px] text-secondary">
+                Email
+              </Text>
+              <TextInput
+                autoCapitalize="none"
+                autoCorrect={false}
+                className="h-15.5 rounded-bestlist-md border border-subtle bg-card px-5 font-body text-[21px] leading-6.25 text-primary"
+                inputMode="email"
+                keyboardType="email-address"
+                onChangeText={setEmail}
+                placeholder={copy.email}
+                placeholderTextColor={colors.primaryText}
+                textContentType="emailAddress"
+                value={email}
+              />
             </View>
 
             <Pressable
               className="mt-4 h-15.25 items-center justify-center rounded-bestlist-lg bg-accent"
               disabled={isSubmitting}
-              onPress={
-                isPasswordSignInVisible
-                  ? handlePasswordSignInPress
-                  : handlePrimaryPress
-              }
+              onPress={handlePrimaryPress}
             >
               <Text className="font-body text-[18px] font-bold leading-5.5 text-white">
                 {copy.button}
               </Text>
             </Pressable>
 
-            {mode === "sign-in" ? (
-              <Pressable
-                className={
-                  isPasswordSignInVisible
-                    ? "h-15.25 items-center justify-center rounded-bestlist-lg border border-accent bg-surface"
-                    : "items-center py-2"
-                }
-                disabled={isSubmitting}
-                onPress={handlePasswordSignInPress}
-              >
-                <Text className="font-body text-[16px] font-bold leading-5 text-accent">
-                  Sign in with password
-                </Text>
-              </Pressable>
-            ) : null}
-
             {copy.legal ? (
               <Text className="text-center font-body text-[14px] leading-4.75 text-secondary">
                 By signing up you agree to our{" "}
-                <Text className="text-primary underline">Terms</Text> and{" "}
-                <Text className="text-primary underline">Privacy</Text>.
+                <Text
+                  className="text-primary underline"
+                  onPress={() =>
+                    Linking.openURL(
+                      "https://docs.google.com/document/d/1BNlqGjMY2Ls9v4s8AksbBkvHv2LN0HGVzYN5hHv6-Rs/edit?usp=sharing"
+                    )
+                  }
+                >
+                  Terms
+                </Text>{" "}
+                and{" "}
+                <Text
+                  className="text-primary underline"
+                  onPress={() =>
+                    Linking.openURL(
+                      "https://docs.google.com/document/d/1ajcu8poYGEjaV1qFvriZV4Sa1v6-JAtUIGnp7RwdtMw/edit?usp=sharing"
+                    )
+                  }
+                >
+                  Privacy
+                </Text>
+                .
               </Text>
             ) : null}
 

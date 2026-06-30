@@ -22,6 +22,7 @@ type VerificationModalProps = {
 };
 
 const CODE_LENGTH = 6;
+const RESEND_DELAY_SECONDS = 60;
 
 export function VerificationModal({
   email,
@@ -33,6 +34,9 @@ export function VerificationModal({
   const [code, setCode] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
   const [isResending, setIsResending] = useState(false);
+  const [secondsRemaining, setSecondsRemaining] = useState(
+    RESEND_DELAY_SECONDS,
+  );
 
   useEffect(() => {
     if (!visible) {
@@ -40,9 +44,24 @@ export function VerificationModal({
       return;
     }
 
+    setSecondsRemaining(RESEND_DELAY_SECONDS);
     const focusTimer = setTimeout(() => inputRef.current?.focus(), 250);
     return () => clearTimeout(focusTimer);
   }, [visible]);
+
+  useEffect(() => {
+    if (!visible || secondsRemaining === 0) {
+      return;
+    }
+
+    const countdownTimer = setInterval(() => {
+      setSecondsRemaining((currentSeconds) =>
+        Math.max(currentSeconds - 1, 0),
+      );
+    }, 1000);
+
+    return () => clearInterval(countdownTimer);
+  }, [secondsRemaining, visible]);
 
   const handleCodeChange = async (value: string) => {
     const nextCode = value.replace(/\D/g, "").slice(0, CODE_LENGTH);
@@ -65,11 +84,16 @@ export function VerificationModal({
   };
 
   const handleResendPress = async () => {
+    if (secondsRemaining > 0 || isResending) {
+      return;
+    }
+
     setIsResending(true);
 
     try {
       await sendEmailOtp(email, mode);
       setCode("");
+      setSecondsRemaining(RESEND_DELAY_SECONDS);
       inputRef.current?.focus();
     } catch (error) {
       Alert.alert("Authentication error", getErrorMessage(error));
@@ -138,17 +162,31 @@ export function VerificationModal({
           </Pressable>
 
           <View className="mt-6 flex-row items-center justify-between">
-            <Text className="font-body text-[15px] leading-4.75 text-secondary">
-              Didn&apos;t get it?{" "}
-              <Text
-                className="font-bold text-accent"
+            <View className="flex-row items-center">
+              <Text className="font-body text-[15px] leading-4.75 text-secondary">
+                Didn&apos;t get it?{" "}
+              </Text>
+              <Pressable
+                disabled={secondsRemaining > 0 || isResending}
                 onPress={handleResendPress}
               >
-                Resend
-              </Text>
-            </Text>
+                <Text
+                  className={`font-body text-[15px] font-bold leading-4.75 ${
+                    secondsRemaining > 0 || isResending
+                      ? "text-secondary"
+                      : "text-accent"
+                  }`}
+                >
+                  Resend
+                </Text>
+              </Pressable>
+            </View>
             <Text className="font-mono-bestlist text-[16px] leading-5 text-secondary">
-              00:42
+              {`${Math.floor(secondsRemaining / 60)
+                .toString()
+                .padStart(2, "0")}:${(secondsRemaining % 60)
+                .toString()
+                .padStart(2, "0")}`}
             </Text>
           </View>
 
