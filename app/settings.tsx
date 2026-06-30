@@ -33,7 +33,6 @@ const supportRows = [
     showsChevron: true,
     onPress: () => router.push("/contact-us"),
   },
-  { label: "Rate BestList", showsChevron: true },
 ];
 
 type SettingsRow = {
