@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 const screenSource = await readFile(
-  new URL("./contact-us.tsx", import.meta.url),
+  new URL("../app/contact-us.tsx", import.meta.url),
   "utf8",
 );
 
