@@ -262,6 +262,21 @@ export async function getPublicCategoryByShareId(
   return data ? mapCategory(data) : null;
 }
 
+export async function getPublicCategoryOwnerUsername(
+  shareId: string,
+): Promise<string | null> {
+  const { data, error } = await getPublicSupabaseClient().rpc(
+    "get_shared_category_owner_username",
+    { category_share_id: shareId },
+  );
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+}
+
 export async function getPublicEntries(categoryId: string): Promise<Entry[]> {
   const { data, error } = await getPublicSupabaseClient()
     .from("entries")

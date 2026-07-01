@@ -14,6 +14,10 @@ const homeHeaderSource = await readFile(
   new URL("./home-header.tsx", import.meta.url),
   "utf8",
 );
+const globalCssSource = await readFile(
+  new URL("../global.css", import.meta.url),
+  "utf8",
+);
 const componentIndexSource = await readFile(
   new URL("./index.ts", import.meta.url),
   "utf8",
@@ -48,8 +52,12 @@ test("exports the empty state and personalizes the welcome for users with no log
     homeHeaderSource,
     /loggedCount === 0[\s\S]*`Welcome \$\{username\}`[\s\S]*loggedCount/,
   );
-  assert.match(homeHeaderSource, /RobotoSlab_700Bold/);
-  assert.match(homeHeaderSource, /Roboto_400Regular/);
+  assert.match(homeHeaderSource, /font-display/);
+  assert.match(
+    globalCssSource,
+    /--font-bestlist-display: RobotoSlab_700Bold;/,
+  );
+  assert.match(globalCssSource, /--font-bestlist-body: Roboto_400Regular;/);
   assert.match(
     homeHeaderSource,
     /loggedCount === 0 \? "uppercase tracking-\[1\.5px\]"/,
