@@ -19,6 +19,7 @@ import { images } from "@/constants/images";
 import { colors } from "@/constants/theme";
 import {
   sendEmailOtp,
+  signInWithApple,
   signInWithSocialProvider,
   type SocialAuthProvider,
 } from "@/lib/auth";
@@ -78,6 +79,19 @@ export function AuthScreen({ mode }: AuthScreenProps) {
 
     try {
       await signInWithSocialProvider(provider);
+      router.replace("/");
+    } catch (error) {
+      Alert.alert("Authentication error", getErrorMessage(error));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleApplePress = async () => {
+    setIsSubmitting(true);
+
+    try {
+      await signInWithApple();
       router.replace("/");
     } catch (error) {
       Alert.alert("Authentication error", getErrorMessage(error));
@@ -192,7 +206,7 @@ export function AuthScreen({ mode }: AuthScreenProps) {
             <SocialButton
               icon="apple"
               label="Continue with Apple"
-              onPress={() => handleSocialPress("apple")}
+              onPress={handleApplePress}
             />
           </View>
         </View>

@@ -1,6 +1,9 @@
+import * as AppleAuthentication from "expo-apple-authentication";
 import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
+import { Platform } from "react-native";
 
+import { prepareAppleNameProfileUpdate } from "@/lib/profile-data";
 import { getSupabaseClient, assertSupabaseConfigured } from "@/lib/supabase";
 
 WebBrowser.maybeCompleteAuthSession();
@@ -135,6 +138,67 @@ export async function signInWithSocialProvider(provider: SocialAuthProvider) {
   throw new Error(`${getProviderLabel(provider)} sign in did not complete.`);
 }
 
+export async function signInWithApple() {
+  if (Platform.OS !== "ios") {
+    return signInWithSocialProvider("apple");
+  }
+
+  let credential: AppleAuthentication.AppleAuthenticationCredential;
+
+  try {
+    credential = await AppleAuthentication.signInAsync({
+      requestedScopes: [
+        AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+        AppleAuthentication.AppleAuthenticationScope.EMAIL,
+      ],
+    });
+  } catch (error: unknown) {
+    if (isAppleCancellationError(error)) {
+      throw new Error("Apple sign in was canceled.");
+    }
+
+    throw error;
+  }
+
+  if (!credential.identityToken) {
+    throw new Error("Apple sign in did not return an identity token.");
+  }
+
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase.auth.signInWithIdToken({
+    provider: "apple",
+    token: credential.identityToken,
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  if (!data.user) {
+    throw new Error("Apple sign in did not return a user.");
+  }
+
+  if (credential.fullName) {
+    const profileUpdate = prepareAppleNameProfileUpdate(
+      AppleAuthentication.formatFullName(credential.fullName),
+    );
+
+    if (profileUpdate) {
+      const { error: profileError } = await supabase.from("profiles").upsert(
+        {
+          id: data.user.id,
+          ...profileUpdate,
+        },
+        { onConflict: "id" },
+      );
+
+      if (profileError) {
+        throw profileError;
+      }
+    }
+  }
+}
+
 export async function createSessionFromUrl(url: string) {
   const supabase = getSupabaseClient();
 
@@ -211,6 +275,15 @@ function isOAuthErrorBody(body: unknown): body is { msg: string } {
     body !== null &&
     "msg" in body &&
     typeof body.msg === "string"
+  );
+}
+
+function isAppleCancellationError(error: unknown) {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    error.code === "ERR_REQUEST_CANCELED"
   );
 }
 

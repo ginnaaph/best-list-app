@@ -28,14 +28,18 @@ const aboutRows = [
 ];
 
 const supportRows = [
-  { label: "Contact us", showsChevron: true },
-  { label: "Rate BestList", showsChevron: true },
+  {
+    label: "Contact us",
+    showsChevron: true,
+    onPress: () => router.push("/contact-us"),
+  },
 ];
 
 type SettingsRow = {
   label: string;
   value?: string;
   showsChevron: boolean;
+  onPress?: () => void;
   url?: string;
 };
 
@@ -77,7 +81,11 @@ function SettingsSection({
 
           return (
             <View key={row.label}>
-              {url ? (
+              {row.onPress ? (
+                <Pressable onPress={row.onPress}>
+                  {content}
+                </Pressable>
+              ) : url ? (
                 <Pressable onPress={() => Linking.openURL(url)}>
                   {content}
                 </Pressable>
