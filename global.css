@@ -88,6 +88,7 @@
 
 @utility font-mono-bestlist {
   font-family: var(--font-bestlist-mono);
+  text-transform: uppercase;
 }
 
 @utility text-brand {

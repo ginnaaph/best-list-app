@@ -179,7 +179,7 @@ export default function ShareListScreen() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#F5F0E8" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#f8f8f7" }}>
       <View className="flex-1 px-5 pb-5 pt-4">
         <View className="flex-row items-center justify-between">
           <View className="items-center gap-1">
@@ -219,7 +219,7 @@ export default function ShareListScreen() {
           className="mt-6 flex-1"
           showsVerticalScrollIndicator={false}
         >
-          <View className="gap-4 pb-24">
+          <View className="gap-4 pb-20">
             {sortedEntries.map((entry, index) => (
               <SharedEntryCard key={entry.id} entry={entry} rank={index + 1} />
             ))}
@@ -233,7 +233,7 @@ export default function ShareListScreen() {
             ) : null}
 
             <View className="items-center gap-4 pt-20">
-              <View className="h-px w-14 bg-[#EDEBE6]" />
+              <View className="h-px w-14 bg-secondary" />
               <Text className="text-card-title text-primary">
                 Best<Text className="text-accent">List</Text>
               </Text>
@@ -261,20 +261,21 @@ function SharedEntryCard({ entry, rank }: SharedEntryCardProps) {
   const overallScore = calculateOverallScore(entry);
   const rankingLabel = `#${rank} - ${entry.city.toUpperCase()}`;
   const [hasImageError, setHasImageError] = useState(false);
-  const entryImageSource = entry.photoUrl && !hasImageError
-    ? { uri: entry.photoUrl }
-    : images.noImages;
+  const entryImageSource =
+    entry.photoUrl && !hasImageError
+      ? { uri: entry.photoUrl }
+      : images.noImages;
 
   return (
-    <View className="rounded-bestlist-xl bg-white px-5 py-4 shadow-card">
-      <View className="gap-3.5">
+    <View className="rounded-bestlist-xl bg-white px-4.5 py-4 shadow-card">
+      <View className="gap-2">
         <View className="flex-row items-start justify-between gap-3">
-          <View className="flex-1 pr-2">
-            <Text className="font-mono-bestlist text-[11px] font-bold uppercase leading-5 mb-1.5 tracking-[2px] text-secondary">
+          <View className="flex-1 pr-1">
+            <Text className="font-mono-bestlist text-[11px] font-medium uppercase leading-5 mb-1.5 mt-2 tracking-[2px] text-accent">
               {rankingLabel}
             </Text>
-            <View className="mt-1 flex-row items-center gap-3">
-              <View className="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-subtle">
+            <View className="mt-1 flex-row items-center gap-1.5">
+              <View className="h-17 w-17 shrink-0 overflow-hidden rounded-lg bg-subtle">
                 <Image
                   className="h-full w-full"
                   onError={() => setHasImageError(true)}
@@ -284,8 +285,8 @@ function SharedEntryCard({ entry, rank }: SharedEntryCardProps) {
               </View>
               <View className="min-w-0 flex-1 gap-1">
                 <Text
-                  className="font-display text-[24px] font-bold leading-7.5 text-primary"
-                  numberOfLines={1}
+                  className="font-display text-[18px] font-medium leading-6 text-primary"
+                  numberOfLines={2}
                 >
                   {entry.placeName}
                 </Text>
@@ -299,34 +300,33 @@ function SharedEntryCard({ entry, rank }: SharedEntryCardProps) {
             </View>
           </View>
 
-          <View className="w-20 shrink-0 items-center pt-4">
-            <Text className="font-display mt-1.5 text-[42px] font-extrabold leading-13.5 text-accent">
+          <View className="w-20 shrink-0 items-center pt-3">
+            <Text className="font-display mt-2 text-[29px] font-extrabold leading-13.5 text-accent">
               {overallScore.toFixed(1)}
             </Text>
           </View>
         </View>
 
-        {entry.notes ? (
-          <Text className="font-body text-[14px] leading-6 text-primary">
-            {entry.notes}
-          </Text>
-        ) : null}
-
         <View className="flex-row gap-3">
           {scoreDimensions.map((dimension) => (
             <View
               key={dimension.key}
-              className="min-w-[64px] flex-1 items-center rounded-bestlist-sm border border-subtle bg-white px-2 py-3"
+              className="min-w-16px flex-1 items-center rounded-bestlist-sm  bg-white px-2 py-3"
             >
               <Text className="font-mono-bestlist text-[10px] uppercase leading-3.25 tracking-[2px] text-secondary">
                 {dimension.label}
               </Text>
-              <Text className="mt-1 font-body text-[18px] font-bold leading-5 text-primary">
+              <Text className="mt-1 font-body text-[20px] font-bold leading-5 text-accent">
                 {entry[dimension.key].toFixed(1)}
               </Text>
             </View>
           ))}
         </View>
+        {entry.notes ? (
+          <Text className="font-body text-[12px] leading-4 ml-3 text-primary">
+            {entry.notes}
+          </Text>
+        ) : null}
       </View>
     </View>
   );
