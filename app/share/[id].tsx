@@ -13,7 +13,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 import { images } from "@/constants/images";
-import { getPublicCategoryByShareId, getPublicEntries } from "@/lib/api";
+import {
+  getPublicCategoryByShareId,
+  getPublicCategoryOwnerUsername,
+  getPublicEntries,
+} from "@/lib/api";
 import { getCategoryShareUrl } from "@/lib/category-sharing";
 import { calculateOverallScore, sortEntries } from "@/lib/entry-score";
 import type { Category } from "@/types/category";
@@ -28,21 +32,6 @@ const scoreDimensions: { label: string; key: ScoreDimension }[] = [
   { label: "VIBE", key: "vibe" },
 ];
 
-type PublicCategoryOwner = Category & {
-  displayName?: string;
-  username?: string;
-  handle?: string;
-};
-
-function getOwnerLabel(category: Category) {
-  const publicCategory = category as PublicCategoryOwner;
-  const displayName =
-    publicCategory.displayName ?? publicCategory.username ?? publicCategory.handle;
-  const normalizedName = displayName?.replace(/^@/, "").trim();
-
-  return normalizedName || "BestList";
-}
-
 function getAvatarInitial(ownerLabel: string) {
   return ownerLabel.charAt(0).toUpperCase();
 }
@@ -51,11 +40,14 @@ export default function ShareListScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [category, setCategory] = useState<Category | null>(null);
   const [entries, setEntries] = useState<Entry[]>([]);
+  const [ownerUsername, setOwnerUsername] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const sortedEntries = sortEntries(entries, "overall");
   const shareUrl = getCategoryShareUrl(id);
-  const ownerLabel = category ? getOwnerLabel(category) : "BestList";
-  const ownerHandle = `@${ownerLabel.replace(/^@/, "")}`;
+  const ownerLabel = ownerUsername ?? "BestList";
+  const ownerHandle = ownerUsername
+    ? `@${ownerUsername.replace(/^@/, "")}`
+    : null;
   const ownerInitial = getAvatarInitial(ownerLabel);
 
   const shareList = async () => {
@@ -87,7 +79,10 @@ export default function ShareListScreen() {
       setIsLoading(true);
 
       try {
-        const publicCategory = await getPublicCategoryByShareId(id);
+        const [publicCategory, publicOwnerUsername] = await Promise.all([
+          getPublicCategoryByShareId(id),
+          getPublicCategoryOwnerUsername(id),
+        ]);
 
         if (!isMounted) {
           return;
@@ -96,6 +91,7 @@ export default function ShareListScreen() {
         if (!publicCategory) {
           setCategory(null);
           setEntries([]);
+          setOwnerUsername(null);
           return;
         }
 
@@ -107,6 +103,7 @@ export default function ShareListScreen() {
 
         setCategory(publicCategory);
         setEntries(publicEntries);
+        setOwnerUsername(publicOwnerUsername);
       } catch (error: unknown) {
         console.error(
           "Failed to load shared list:",
@@ -116,6 +113,7 @@ export default function ShareListScreen() {
         if (isMounted) {
           setCategory(null);
           setEntries([]);
+          setOwnerUsername(null);
         }
       } finally {
         if (isMounted) {
@@ -176,10 +174,18 @@ export default function ShareListScreen() {
     <SafeAreaView style={{ flex: 1, backgroundColor: "#F5F0E8" }}>
       <View className="flex-1 px-5 pb-5 pt-4">
         <View className="flex-row items-center justify-between">
-          <View className="h-9 w-9 items-center justify-center rounded-full bg-white shadow-card">
-            <View className="h-9 w-9 items-center justify-center rounded-full bg-accent">
-              <Text className="text-label text-white">{ownerInitial}</Text>
+          <View className="items-center gap-1">
+            <View className="h-9 w-9 items-center justify-center rounded-full bg-white shadow-card">
+              <View className="h-9 w-9 items-center justify-center rounded-full bg-accent">
+                <Text className="text-label text-white">{ownerInitial}</Text>
+              </View>
             </View>
+
+            {ownerHandle ? (
+              <Text className="font-mono-bestlist text-[10px] font-bold leading-4 text-secondary">
+                {ownerHandle}
+              </Text>
+            ) : null}
           </View>
 
           <Pressable
