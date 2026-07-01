@@ -91,6 +91,12 @@ export function getPostAuthDestination(
   return profile?.username ? ("/home" as const) : ("/setup-handle" as const);
 }
 
+export function prepareAppleNameProfileUpdate(fullName: string) {
+  const normalizedFullName = fullName.trim().replace(/\s+/g, " ");
+
+  return normalizedFullName ? { full_name: normalizedFullName } : null;
+}
+
 export function prepareSetupHandleProfileUpdate(
   handle: string,
   city: string,
