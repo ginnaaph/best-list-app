@@ -81,7 +81,13 @@ export default function ShareListScreen() {
       try {
         const [publicCategory, publicOwnerUsername] = await Promise.all([
           getPublicCategoryByShareId(id),
-          getPublicCategoryOwnerUsername(id),
+          getPublicCategoryOwnerUsername(id).catch((error: unknown) => {
+            console.error(
+              "Failed to load shared list owner:",
+              error instanceof Error ? error.message : String(error),
+            );
+            return null;
+          }),
         ]);
 
         if (!isMounted) {
