@@ -44,9 +44,11 @@ export default function ShareListScreen() {
   const [isLoading, setIsLoading] = useState(true);
   const sortedEntries = sortEntries(entries, "overall");
   const shareUrl = getCategoryShareUrl(id);
-  const ownerLabel = ownerUsername ?? "BestList";
-  const ownerHandle = ownerUsername
-    ? `@${ownerUsername.replace(/^@/, "")}`
+  const normalizedOwnerUsername =
+    ownerUsername?.replace(/^@+/, "").trim() || null;
+  const ownerLabel = normalizedOwnerUsername ?? "BestList";
+  const ownerHandle = normalizedOwnerUsername
+    ? `@${normalizedOwnerUsername}`
     : null;
   const ownerInitial = getAvatarInitial(ownerLabel);
 
