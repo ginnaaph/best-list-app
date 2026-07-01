@@ -15,7 +15,10 @@ test("uses the existing slide-up transparent modal pattern without implicit dism
   assert.match(componentSource, /<Modal/);
   assert.match(componentSource, /animationType="slide"/);
   assert.match(componentSource, /transparent/);
-  assert.match(componentSource, /onRequestClose=\{\(\) => undefined\}/);
+  assert.match(
+    componentSource,
+    /onRequestClose=\{step === "confirmation" \? returnToWarning : closeSheet\}/,
+  );
   assert.doesNotMatch(componentSource, /<Pressable className="flex-1"/);
 });
 
