@@ -16,12 +16,12 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { colors } from "@/constants/theme";
+import { avatarsBucket, resolveAvatarDisplayUrl } from "@/lib/profile-avatar";
 import {
   getProfileInitial,
   mapProfileRow,
   prepareSetupHandleProfileUpdate,
 } from "@/lib/profile-data";
-import { avatarsBucket, resolveAvatarDisplayUrl } from "@/lib/profile-avatar";
 import { getSupabaseClient } from "@/lib/supabase";
 
 type EditProfileRow = {
@@ -331,7 +331,10 @@ export default function EditProfileScreen() {
         ? prepareSetupHandleProfileUpdate(username, city).username
         : undefined;
 
-      if (!existingUsername && (!normalizedUsername || normalizedUsername.length < 2)) {
+      if (
+        !existingUsername &&
+        (!normalizedUsername || normalizedUsername.length < 2)
+      ) {
         setSaveStatus("idle");
         setSaveError("Choose a handle with at least 2 characters.");
         return;
@@ -382,7 +385,7 @@ export default function EditProfileScreen() {
         style={{ flex: 1 }}
       >
         <ScrollView
-          contentContainerClassName="grow px-5 pb-5 pt-4"
+          contentContainerClassName="grow px-5 pb-5 pt-2"
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
@@ -399,14 +402,9 @@ export default function EditProfileScreen() {
                 </Text>
               </Pressable>
 
-              <Text className="mt-6 font-display text-[34px] font-bold leading-9.5 text-primary">
+              <Text className="text-center font-display text-[34px] font-bold leading-4 text-primary">
                 Edit your profile.
               </Text>
-
-              <Text className="mt-3 font-body text-[16px] leading-6 text-secondary">
-                Keep your public list details current.
-              </Text>
-
               {isLoadingProfile ? (
                 <View className="items-center justify-center py-20">
                   <ActivityIndicator color="#2D5016" />
@@ -515,7 +513,7 @@ export default function EditProfileScreen() {
                       Bio
                     </Text>
                     <TextInput
-                      className="min-h-28 rounded-xl border border-subtle bg-white px-4 py-3 font-body text-[17px] leading-6 text-primary"
+                      className="min-h-28 rounded-xl border border-subtle bg-white px-4 py-3 font-body text-[15px] leading-6 text-primary"
                       multiline
                       placeholder="What are you always hunting for?"
                       placeholderTextColor={colors.secondaryText}
@@ -537,10 +535,11 @@ export default function EditProfileScreen() {
                       />
                       <TextInput
                         autoCapitalize="words"
-                        className="ml-2 h-full min-w-0 flex-1 py-0 font-body text-[17px] leading-6 text-primary"
+                        className="ml-2 h-full min-w-0 flex-1 font-body text-[15px] leading-5 text-primary"
                         placeholder="San Francisco, CA"
                         placeholderTextColor={colors.secondaryText}
                         returnKeyType="done"
+                        textAlign="left"
                         value={city}
                         onChangeText={setCity}
                         onSubmitEditing={() => {
