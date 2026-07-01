@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "BestList.",
-    "slug": "BestList.",
+    "slug": "best-list",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/BestList1.png",
@@ -39,6 +39,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "08d14eb2-8d28-4702-9ddc-ce7a5f89cc6a"
+      }
     }
   }
 }
