@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
+  Alert,
   Linking,
   Pressable,
   ScrollView,
@@ -19,13 +20,30 @@ export default function ContactUsScreen() {
 
   const canSend = Boolean(name.trim() && email.trim() && message.trim());
 
-  function handleSend() {
+  async function handleSend() {
     const body = `Name: ${name.trim()}\nEmail (reply-to): ${email.trim()}\n\nMessage:\n${message.trim()}`;
     const mailtoUrl = `mailto:bestlist.app@gmail.com?subject=${encodeURIComponent(
       subject.trim(),
     )}&body=${encodeURIComponent(body)}`;
 
-    void Linking.openURL(mailtoUrl);
+    try {
+      const canOpenEmail = await Linking.canOpenURL(mailtoUrl);
+
+      if (!canOpenEmail) {
+        Alert.alert(
+          "Unable to open email",
+          "No email app found. Please email bestlist.app@gmail.com directly.",
+        );
+        return;
+      }
+
+      await Linking.openURL(mailtoUrl);
+    } catch {
+      Alert.alert(
+        "Unable to open email",
+        "No email app found. Please email bestlist.app@gmail.com directly.",
+      );
+    }
   }
 
   return (
