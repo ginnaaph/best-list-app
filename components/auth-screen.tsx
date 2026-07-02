@@ -44,7 +44,7 @@ const authCopy = {
     eyebrow: "Welcome back",
     title: "Sign in to your lists.",
     subtitle: "",
-    email: "gina@best-list.vercel.app",
+    email: "youremail@email.com",
     button: "Sign in",
     footerLead: "New to BestList?",
     footerAction: "Create an account",
@@ -168,7 +168,7 @@ export function AuthScreen({ mode }: AuthScreenProps) {
                   className="text-primary underline"
                   onPress={() =>
                     Linking.openURL(
-                      "https://docs.google.com/document/d/1BNlqGjMY2Ls9v4s8AksbBkvHv2LN0HGVzYN5hHv6-Rs/edit?usp=sharing"
+                      "https://docs.google.com/document/d/1BNlqGjMY2Ls9v4s8AksbBkvHv2LN0HGVzYN5hHv6-Rs/edit?usp=sharing",
                     )
                   }
                 >
@@ -179,7 +179,7 @@ export function AuthScreen({ mode }: AuthScreenProps) {
                   className="text-primary underline"
                   onPress={() =>
                     Linking.openURL(
-                      "https://docs.google.com/document/d/1ajcu8poYGEjaV1qFvriZV4Sa1v6-JAtUIGnp7RwdtMw/edit?usp=sharing"
+                      "https://docs.google.com/document/d/1ajcu8poYGEjaV1qFvriZV4Sa1v6-JAtUIGnp7RwdtMw/edit?usp=sharing",
                     )
                   }
                 >

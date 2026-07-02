@@ -11,7 +11,10 @@ WebBrowser.maybeCompleteAuthSession();
 export type EmailAuthMode = "sign-up" | "sign-in";
 export type SocialAuthProvider = "google" | "apple";
 
-export const authRedirectTo = Linking.createURL("auth/callback");
+export const authRedirectTo =
+  Platform.OS === "web"
+    ? Linking.createURL("auth/callback")
+    : "bestlist://auth/callback";
 
 export async function sendEmailOtp(email: string, mode: EmailAuthMode) {
   assertSupabaseConfigured();
