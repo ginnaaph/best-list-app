@@ -1,4 +1,4 @@
-import { Link, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -7,6 +7,7 @@ import {
   ScrollView,
   Share,
   Text,
+  TextInput,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -17,6 +18,7 @@ import {
   getPublicCategoryByShareId,
   getPublicCategoryOwnerUsername,
   getPublicEntries,
+  joinWaitlist,
 } from "@/lib/api";
 import { getCategoryShareUrl } from "@/lib/category-sharing";
 import { calculateOverallScore, sortEntries } from "@/lib/entry-score";
@@ -165,13 +167,10 @@ export default function ShareListScreen() {
               This shared BestList is not available.
             </Text>
 
-            <Link href="/" asChild>
-              <Pressable className="mt-4 h-12 items-center justify-center rounded-full bg-accent px-6 shadow-card">
-                <Text className="font-body text-[16px] font-bold text-white">
-                  Start your own list
-                </Text>
-              </Pressable>
-            </Link>
+            <WaitlistCapture
+              buttonClassName="mt-4 h-12 items-center justify-center rounded-full bg-accent px-6 shadow-card"
+              labelClassName="font-body text-[16px] font-bold text-white"
+            />
           </View>
         </View>
       </SafeAreaView>
@@ -237,18 +236,121 @@ export default function ShareListScreen() {
               <Text className="text-card-title text-primary">
                 Best<Text className="text-accent">List</Text>
               </Text>
-              <Link href="/" asChild>
-                <Pressable className="h-11 items-center justify-center rounded-full bg-accent px-6 shadow-card">
-                  <Text className="text-label uppercase text-white">
-                    Start your own list
-                  </Text>
-                </Pressable>
-              </Link>
+              <WaitlistCapture
+                buttonClassName="h-11 items-center justify-center rounded-full bg-accent px-6 shadow-card"
+                labelClassName="text-label uppercase text-white"
+              />
             </View>
           </View>
         </ScrollView>
       </View>
     </SafeAreaView>
+  );
+}
+
+type WaitlistCaptureProps = {
+  buttonClassName: string;
+  labelClassName: string;
+};
+
+type WaitlistState = "idle" | "form" | "joined" | "already_joined";
+
+function WaitlistCapture({
+  buttonClassName,
+  labelClassName,
+}: WaitlistCaptureProps) {
+  const [email, setEmail] = useState("");
+  const [state, setState] = useState<WaitlistState>("idle");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  async function submitWaitlist() {
+    const normalizedEmail = email.trim().toLowerCase();
+    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail);
+
+    if (!isValidEmail) {
+      setErrorMessage("Enter a valid email address.");
+      return;
+    }
+
+    setErrorMessage(null);
+    setIsSubmitting(true);
+
+    try {
+      const result = await joinWaitlist(email);
+      setState(result);
+    } catch (error: unknown) {
+      console.error(
+        "Failed to join waitlist:",
+        error instanceof Error ? error.message : String(error),
+      );
+      setErrorMessage("We couldn't save your email. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  if (state === "joined") {
+    return (
+      <Text className="max-w-sm text-center font-body text-[14px] leading-5 text-accent">
+        {"You're on the list — we'll email you when BestList is live."}
+      </Text>
+    );
+  }
+
+  if (state === "already_joined") {
+    return (
+      <Text className="max-w-sm text-center font-body text-[14px] leading-5 text-accent">
+        {"You're already on the list — we'll email you when BestList is live."}
+      </Text>
+    );
+  }
+
+  if (state === "idle") {
+    return (
+      <Pressable
+        accessibilityRole="button"
+        className={buttonClassName}
+        onPress={() => setState("form")}
+      >
+        <Text className={labelClassName}>Join the App Store waitlist</Text>
+      </Pressable>
+    );
+  }
+
+  return (
+    <View className="w-full max-w-sm gap-2">
+      <TextInput
+        autoCapitalize="none"
+        autoComplete="email"
+        className="h-12 rounded-full border border-subtle bg-white px-5 font-body text-[16px] text-primary"
+        editable={!isSubmitting}
+        inputMode="email"
+        keyboardType="email-address"
+        onChangeText={setEmail}
+        onSubmitEditing={() => void submitWaitlist()}
+        placeholder="you@example.com"
+        placeholderTextColor="#78716C"
+        returnKeyType="done"
+        textContentType="emailAddress"
+        value={email}
+      />
+      {errorMessage ? (
+        <Text className="text-center font-body text-[13px] leading-5 text-red-700">
+          {errorMessage}
+        </Text>
+      ) : null}
+      <Pressable
+        accessibilityRole="button"
+        className="h-11 items-center justify-center rounded-full bg-accent px-6 shadow-card disabled:opacity-60"
+        disabled={isSubmitting}
+        onPress={() => void submitWaitlist()}
+      >
+        <Text className="text-label uppercase text-white">
+          {isSubmitting ? "Joining…" : "Join waitlist"}
+        </Text>
+      </Pressable>
+    </View>
   );
 }
 
