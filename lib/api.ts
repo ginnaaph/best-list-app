@@ -49,6 +49,8 @@ type UpdateEntryPayload = Omit<
   "id" | "categoryId" | "createdAt" | "overallScore"
 >;
 
+type WaitlistJoinResult = "joined" | "already_joined";
+
 const categoryColumns =
   "id,name,cover_photo,tone,is_shared,share_id,created_at";
 const entryColumns =
@@ -275,6 +277,28 @@ export async function getPublicCategoryOwnerUsername(
   }
 
   return data;
+}
+
+export async function joinWaitlist(
+  email: string,
+): Promise<WaitlistJoinResult> {
+  const normalizedEmail = email.trim().toLowerCase();
+  const { error } = await getPublicSupabaseClient()
+    .from("waitlist_signups")
+    .insert({
+      email: normalizedEmail,
+      source: "public_share",
+    });
+
+  if (error?.code === "23505") {
+    return "already_joined";
+  }
+
+  if (error) {
+    throw error;
+  }
+
+  return "joined";
 }
 
 export async function getPublicEntries(categoryId: string): Promise<Entry[]> {
