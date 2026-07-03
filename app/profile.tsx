@@ -227,7 +227,7 @@ export default function Profile() {
             className="h-11 w-11 items-center justify-center rounded-full border border-subtle bg-white"
             onPress={() => router.push("/settings")}
           >
-            <FontAwesome name="gear" size={20} color="#000000" />
+            <FontAwesome name="cog" size={20} color="#000000" />
           </Pressable>
         </View>
 
