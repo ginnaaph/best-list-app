@@ -46,7 +46,7 @@ export function EntryCard({ entry, rank }: EntryCardProps) {
             </View>
           </View>
 
-          <View className="shrink-0 items-center pt-4">
+          <View className="shrink-0 items-center pt-4 pb-4">
             <Text className="font-display mt-1.5 text-[42px] font-extrabold leading-13.5 text-accent">
               {overallScore.toFixed(1)}
             </Text>

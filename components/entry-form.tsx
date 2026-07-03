@@ -190,12 +190,14 @@ export function EntryForm({
   const [showCitySuggestions, setShowCitySuggestions] = useState(false);
   const [isSelectingPlace, setIsSelectingPlace] = useState(false);
   const [isSelectingCity, setIsSelectingCity] = useState(false);
+  const [hasEditedPlace, setHasEditedPlace] = useState(false);
+  const [hasEditedCity, setHasEditedCity] = useState(false);
   const autocompleteRequestIdRef = useRef(0);
   const cityAutocompleteRequestIdRef = useRef(0);
   const placeDetailsRequestIdRef = useRef(0);
 
   useEffect(() => {
-    if (isSelectingPlace) {
+    if (!hasEditedPlace || isSelectingPlace) {
       return;
     }
 
@@ -248,10 +250,10 @@ export function EntryForm({
       isActive = false;
       clearTimeout(timeout);
     };
-  }, [isSelectingPlace, placeName]);
+  }, [hasEditedPlace, isSelectingPlace, placeName]);
 
   useEffect(() => {
-    if (isSelectingCity) {
+    if (!hasEditedCity || isSelectingCity) {
       return;
     }
 
@@ -302,15 +304,17 @@ export function EntryForm({
       isActive = false;
       clearTimeout(timeout);
     };
-  }, [city, isSelectingCity]);
+  }, [city, hasEditedCity, isSelectingCity]);
 
   const handlePlaceNameChange = (nextPlaceName: string) => {
     placeDetailsRequestIdRef.current += 1;
+    setHasEditedPlace(true);
     setIsSelectingPlace(false);
     setPlaceName(nextPlaceName);
   };
 
   const handleCityChange = (nextCity: string) => {
+    setHasEditedCity(true);
     setIsSelectingCity(false);
     setCity(nextCity);
   };
