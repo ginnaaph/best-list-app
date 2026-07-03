@@ -24,6 +24,11 @@ const aboutRows = [
     showsChevron: true,
     url: "https://docs.google.com/document/d/1BNlqGjMY2Ls9v4s8AksbBkvHv2LN0HGVzYN5hHv6-Rs/edit?usp=sharing",
   },
+  {
+    label: "Credits",
+    showsChevron: true,
+    onPress: () => router.push("/credits"),
+  },
   { label: "App version", value: "1.0.0", showsChevron: false },
 ];
 
