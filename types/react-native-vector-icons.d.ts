@@ -2,7 +2,7 @@ declare module "react-native-vector-icons/FontAwesome" {
   import type { ComponentType } from "react";
   import type { TextProps } from "react-native";
 
-  type FontAwesomeName = "edit" | "lock" | "share" | "users";
+  type FontAwesomeName = "edit" | "lock" | "share" | "sliders" | "users";
 
   type FontAwesomeProps = TextProps & {
     name: FontAwesomeName;
