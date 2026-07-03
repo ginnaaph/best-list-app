@@ -1,5 +1,6 @@
 import { Link, router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 import {
   ActivityIndicator,
   Image,
@@ -226,11 +227,7 @@ export default function Profile() {
             className="h-11 w-11 items-center justify-center rounded-full border border-subtle bg-white"
             onPress={() => router.push("/settings")}
           >
-            <Image
-              source={images.setting}
-              resizeMode="contain"
-              className="h-5 w-5"
-            />
+            <FontAwesome name="gear" size={20} color="#000000" />
           </Pressable>
         </View>
 
