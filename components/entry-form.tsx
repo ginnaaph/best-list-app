@@ -455,11 +455,11 @@ export function EntryForm({
             >
               {photoUrl ? (
                 <Image
-                  className="h-44 w-full rounded-xl bg-white"
+                  className="aspect-square w-full rounded-bestlist-xl bg-white"
                   source={{ uri: photoUrl }}
                 />
               ) : (
-                <View className="h-44 items-center justify-center rounded-xl border border-dashed border-subtle bg-white gap-2">
+                <View className="aspect-square w-full items-center justify-center rounded-bestlist-xl border border-dashed border-subtle bg-white gap-2">
                   <Text className="text-3xl">📷</Text>
                   <Text className="font-body text-[14px] text-secondary">
                     Tap to add a photo
