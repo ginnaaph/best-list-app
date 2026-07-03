@@ -16,6 +16,14 @@ const photoCredits = [
 ];
 
 export default function CreditsScreen() {
+  async function handleMagnificPress() {
+    try {
+      await Linking.openURL(MAGNIFIC_URL);
+    } catch (error: unknown) {
+      console.warn("Unable to open the Magnific website.", error);
+    }
+  }
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FAFAFA" }}>
       <ScrollView
@@ -50,7 +58,7 @@ export default function CreditsScreen() {
                   accessibilityHint="Opens the Magnific website"
                   accessibilityRole="link"
                   className="min-h-15.5 flex-row items-center justify-between px-5 py-3"
-                  onPress={() => Linking.openURL(MAGNIFIC_URL)}
+                  onPress={handleMagnificPress}
                 >
                   <View className="flex-1 gap-0.5 pr-3">
                     <Text className="font-body text-[17px] font-medium text-[#1C1C1E]">

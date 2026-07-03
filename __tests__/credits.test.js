@@ -33,5 +33,9 @@ test("lists every required Magnific photo credit and link", () => {
 
   assert.match(creditsSource, /Designed by Magnific/);
   assert.match(creditsSource, /https:\/\/www\.magnific\.com/);
-  assert.match(creditsSource, /Linking\.openURL\(MAGNIFIC_URL\)/);
+  assert.match(
+    creditsSource,
+    /async function handleMagnificPress\(\)[\s\S]*try \{[\s\S]*await Linking\.openURL\(MAGNIFIC_URL\);[\s\S]*\} catch \(error: unknown\) \{[\s\S]*console\.warn\("Unable to open the Magnific website\.", error\);/,
+  );
+  assert.match(creditsSource, /onPress=\{handleMagnificPress\}/);
 });
