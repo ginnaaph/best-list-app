@@ -400,7 +400,30 @@ export function EntryForm({
     }
   };
 
-  const handlePickPhoto = async () => {
+  const handleTakePhoto = async () => {
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+
+    if (!permission.granted) {
+      Alert.alert(
+        "Camera access needed",
+        "Please allow camera access to take an entry photo.",
+      );
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+      mediaTypes: ["images"],
+      quality: 0.8,
+    });
+
+    if (!result.canceled) {
+      setPhotoUrl(result.assets[0]?.uri);
+    }
+  };
+
+  const handleChooseFromLibrary = async () => {
     const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (!permission.granted) {
@@ -421,6 +444,17 @@ export function EntryForm({
     if (!result.canceled) {
       setPhotoUrl(result.assets[0]?.uri);
     }
+  };
+
+  const handlePickPhoto = () => {
+    Alert.alert("Add Photo", undefined, [
+      { text: "Take Photo", onPress: () => void handleTakePhoto() },
+      {
+        text: "Choose from Library",
+        onPress: () => void handleChooseFromLibrary(),
+      },
+      { text: "Cancel", style: "cancel" },
+    ]);
   };
 
   const handleSave = () => {
