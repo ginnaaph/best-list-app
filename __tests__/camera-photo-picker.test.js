@@ -10,6 +10,10 @@ const editProfileSource = await readFile(
   new URL("../app/edit-profile.tsx", import.meta.url),
   "utf8",
 );
+const setupHandleSource = await readFile(
+  new URL("../app/setup-handle.tsx", import.meta.url),
+  "utf8",
+);
 const appConfig = JSON.parse(
   await readFile(new URL("../app.json", import.meta.url), "utf8"),
 );
@@ -29,6 +33,18 @@ test("profile avatars offer camera and photo library choices", () => {
   assert.match(editProfileSource, /requestCameraPermissionsAsync\(\)/);
   assert.match(editProfileSource, /launchCameraAsync\(\{[\s\S]*?aspect: \[1, 1\]/);
   assert.match(editProfileSource, /"Camera access needed"/);
+});
+
+test("setup avatars offer camera and photo library choices", () => {
+  assert.match(setupHandleSource, /Alert\.alert\("Add Photo", undefined, \[/);
+  assert.match(setupHandleSource, /text: "Take Photo"/);
+  assert.match(setupHandleSource, /text: "Choose from Library"/);
+  assert.match(setupHandleSource, /requestCameraPermissionsAsync\(\)/);
+  assert.match(
+    setupHandleSource,
+    /launchCameraAsync\(\{[\s\S]*?aspect: \[1, 1\]/,
+  );
+  assert.match(setupHandleSource, /"Camera access needed"/);
 });
 
 test("iOS and expo-image-picker declare matching photo permissions", () => {
