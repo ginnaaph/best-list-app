@@ -4,6 +4,7 @@ import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -191,29 +192,65 @@ export default function EditProfileScreen() {
     };
   }, [existingUsername, username]);
 
-  async function handlePickAvatar() {
+  function handlePickAvatar() {
     if (isUploadingAvatar) {
       return;
     }
 
     setSaveError(null);
 
+    Alert.alert("Change Photo", undefined, [
+      {
+        text: "Take Photo",
+        onPress: () => void handleSelectAvatar("camera"),
+      },
+      {
+        text: "Choose from Library",
+        onPress: () => void handleSelectAvatar("library"),
+      },
+      { text: "Cancel", style: "cancel" },
+    ]);
+  }
+
+  async function handleSelectAvatar(source: "camera" | "library") {
+    if (isUploadingAvatar) {
+      return;
+    }
+
     try {
       const permission =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
+        source === "camera"
+          ? await ImagePicker.requestCameraPermissionsAsync()
+          : await ImagePicker.requestMediaLibraryPermissionsAsync();
 
       if (!permission.granted) {
-        setSaveError("Photo access is needed to update your avatar.");
+        if (source === "camera") {
+          Alert.alert(
+            "Camera access needed",
+            "Please allow camera access to update your avatar.",
+          );
+        } else {
+          setSaveError("Photo access is needed to update your avatar.");
+        }
         return;
       }
 
-      const result = await ImagePicker.launchImageLibraryAsync({
-        allowsEditing: true,
-        aspect: [1, 1],
-        mediaTypes: ["images"],
-        quality: 0.8,
-        shape: "oval",
-      });
+      const result =
+        source === "camera"
+          ? await ImagePicker.launchCameraAsync({
+              allowsEditing: true,
+              aspect: [1, 1],
+              mediaTypes: ["images"],
+              quality: 0.8,
+              shape: "oval",
+            })
+          : await ImagePicker.launchImageLibraryAsync({
+              allowsEditing: true,
+              aspect: [1, 1],
+              mediaTypes: ["images"],
+              quality: 0.8,
+              shape: "oval",
+            });
 
       if (result.canceled) {
         return;

@@ -13,7 +13,9 @@
       "bundleIdentifier": "com.gina.bestlist",
       "usesAppleSignIn": true,
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSCameraUsageDescription": "Allow BestList to use your camera to take photos.",
+        "NSPhotoLibraryUsageDescription": "Allow BestList to access your photo library to choose photos."
       }
     },
     "android": {
@@ -32,6 +34,13 @@
     "plugins": [
       "expo-router",
       "expo-apple-authentication",
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "Allow BestList to use your camera to take photos.",
+          "photosPermission": "Allow BestList to access your photo library to choose photos."
+        }
+      ],
       [
         "expo-splash-screen",
         {
