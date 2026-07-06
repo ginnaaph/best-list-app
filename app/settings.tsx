@@ -17,12 +17,12 @@ const aboutRows = [
   {
     label: "Privacy policy",
     showsChevron: true,
-    url: "https://docs.google.com/document/d/1ajcu8poYGEjaV1qFvriZV4Sa1v6-JAtUIGnp7RwdtMw/edit?usp=sharing",
+    url: "https://sites.google.com/view/bestlist-app/private-policy?authuser=0",
   },
   {
     label: "Terms of service",
     showsChevron: true,
-    url: "https://docs.google.com/document/d/1BNlqGjMY2Ls9v4s8AksbBkvHv2LN0HGVzYN5hHv6-Rs/edit?usp=sharing",
+    url: "https://sites.google.com/view/bestlist-app/terms-of-service?authuser=0",
   },
   {
     label: "Credits",
@@ -71,11 +71,7 @@ function SettingsSection({
               </Text>
 
               {row.showsChevron ? (
-                <Ionicons
-                  name="chevron-forward"
-                  size={22}
-                  color="#C7C7CC"
-                />
+                <Ionicons name="chevron-forward" size={22} color="#C7C7CC" />
               ) : (
                 <Text className="font-body text-[17px] text-[#8E8E93]">
                   {row.value}
@@ -87,9 +83,7 @@ function SettingsSection({
           return (
             <View key={row.label}>
               {row.onPress ? (
-                <Pressable onPress={row.onPress}>
-                  {content}
-                </Pressable>
+                <Pressable onPress={row.onPress}>{content}</Pressable>
               ) : url ? (
                 <Pressable onPress={() => Linking.openURL(url)}>
                   {content}
@@ -134,10 +128,16 @@ export default function SettingsScreen() {
       });
 
       if (signOutError) {
-        console.warn("Unable to clear the deleted account session.", signOutError);
+        console.warn(
+          "Unable to clear the deleted account session.",
+          signOutError,
+        );
       }
     } catch (cleanupError: unknown) {
-      console.warn("Unable to clear deleted account data locally.", cleanupError);
+      console.warn(
+        "Unable to clear deleted account data locally.",
+        cleanupError,
+      );
     }
   }
 
