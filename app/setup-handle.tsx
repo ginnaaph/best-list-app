@@ -82,30 +82,66 @@ export default function SetupHandleScreen() {
     };
   }, [handle]);
 
-  const handlePickAvatar = async () => {
+  const handlePickAvatar = () => {
+    if (isUploadingAvatar || isSaving) {
+      return;
+    }
+
+    Alert.alert("Add Photo", undefined, [
+      {
+        text: "Take Photo",
+        onPress: () => void handleSelectAvatar("camera"),
+      },
+      {
+        text: "Choose from Library",
+        onPress: () => void handleSelectAvatar("library"),
+      },
+      { text: "Cancel", style: "cancel" },
+    ]);
+  };
+
+  const handleSelectAvatar = async (source: "camera" | "library") => {
     if (isUploadingAvatar || isSaving) {
       return;
     }
 
     try {
       const permission =
-        await ImagePicker.requestMediaLibraryPermissionsAsync();
+        source === "camera"
+          ? await ImagePicker.requestCameraPermissionsAsync()
+          : await ImagePicker.requestMediaLibraryPermissionsAsync();
 
       if (!permission.granted) {
-        Alert.alert(
-          "Photo access required",
-          "Allow photo access to choose a profile picture.",
-        );
+        if (source === "camera") {
+          Alert.alert(
+            "Camera access needed",
+            "Please allow camera access to take a profile picture.",
+          );
+        } else {
+          Alert.alert(
+            "Photo access required",
+            "Allow photo access to choose a profile picture.",
+          );
+        }
         return;
       }
 
-      const result = await ImagePicker.launchImageLibraryAsync({
-        allowsEditing: true,
-        aspect: [1, 1],
-        mediaTypes: ["images"],
-        quality: 0.8,
-        shape: "oval",
-      });
+      const result =
+        source === "camera"
+          ? await ImagePicker.launchCameraAsync({
+              allowsEditing: true,
+              aspect: [1, 1],
+              mediaTypes: ["images"],
+              quality: 0.8,
+              shape: "oval",
+            })
+          : await ImagePicker.launchImageLibraryAsync({
+              allowsEditing: true,
+              aspect: [1, 1],
+              mediaTypes: ["images"],
+              quality: 0.8,
+              shape: "oval",
+            });
 
       if (result.canceled) {
         return;
