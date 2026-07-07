@@ -1,4 +1,8 @@
 import * as AppleAuthentication from "expo-apple-authentication";
+import {
+  GoogleSignin,
+  isCancelledResponse,
+} from "@react-native-google-signin/google-signin";
 import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
 import { Platform } from "react-native";
@@ -7,6 +11,14 @@ import { prepareAppleNameProfileUpdate } from "@/lib/profile-data";
 import { getSupabaseClient, assertSupabaseConfigured } from "@/lib/supabase";
 
 WebBrowser.maybeCompleteAuthSession();
+
+const googleWebClientId = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID;
+const googleIosClientId = process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID;
+
+GoogleSignin.configure({
+  webClientId: googleWebClientId,
+  iosClientId: googleIosClientId,
+});
 
 export type EmailAuthMode = "sign-up" | "sign-in";
 export type SocialAuthProvider = "google" | "apple";
@@ -139,6 +151,38 @@ export async function signInWithSocialProvider(provider: SocialAuthProvider) {
   }
 
   throw new Error(`${getProviderLabel(provider)} sign in did not complete.`);
+}
+
+export async function signInWithGoogle() {
+  if (!googleWebClientId || !googleIosClientId) {
+    throw new Error(
+      "Google sign in is not configured. Add the Google web and iOS client IDs.",
+    );
+  }
+
+  const response = await GoogleSignin.signIn();
+
+  if (isCancelledResponse(response)) {
+    throw new Error("Google sign in was canceled.");
+  }
+
+  if (!response.data.idToken) {
+    throw new Error("Google sign in did not return an ID token.");
+  }
+
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase.auth.signInWithIdToken({
+    provider: "google",
+    token: response.data.idToken,
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  if (!data.user) {
+    throw new Error("Google sign in did not return a user.");
+  }
 }
 
 export async function signInWithApple() {
