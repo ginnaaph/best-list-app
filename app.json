@@ -47,6 +47,14 @@
           "backgroundColor": "#F5F0E8"
         }
       ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ],
       "expo-font"
     ],
     "experiments": {
