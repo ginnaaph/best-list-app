@@ -17,12 +17,12 @@ const aboutRows = [
   {
     label: "Privacy policy",
     showsChevron: true,
-    url: "https://sites.google.com/view/bestlist-app/private-policy?authuser=0",
+    onPress: () => router.push("/privacy"),
   },
   {
     label: "Terms of service",
     showsChevron: true,
-    url: "https://sites.google.com/view/bestlist-app/terms-of-service?authuser=0",
+    onPress: () => router.push("/terms"),
   },
   {
     label: "Credits",

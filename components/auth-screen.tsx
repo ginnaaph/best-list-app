@@ -4,7 +4,6 @@ import { useState } from "react";
 import {
   Alert,
   Image,
-  Linking,
   Platform,
   Pressable,
   ScrollView,
@@ -166,22 +165,14 @@ export function AuthScreen({ mode }: AuthScreenProps) {
                 By signing up you agree to our{" "}
                 <Text
                   className="text-primary underline"
-                  onPress={() =>
-                    Linking.openURL(
-                      "https://docs.google.com/document/d/1BNlqGjMY2Ls9v4s8AksbBkvHv2LN0HGVzYN5hHv6-Rs/edit?usp=sharing",
-                    )
-                  }
+                  onPress={() => router.push("/terms")}
                 >
                   Terms
                 </Text>{" "}
                 and{" "}
                 <Text
                   className="text-primary underline"
-                  onPress={() =>
-                    Linking.openURL(
-                      "https://docs.google.com/document/d/1ajcu8poYGEjaV1qFvriZV4Sa1v6-JAtUIGnp7RwdtMw/edit?usp=sharing",
-                    )
-                  }
+                  onPress={() => router.push("/privacy")}
                 >
                   Privacy
                 </Text>
