@@ -7,18 +7,18 @@ const screenSource = await readFile(
   "utf8",
 );
 
-test("shows feedback when no email app can open the contact message", () => {
-  assert.match(screenSource, /Alert/);
-  assert.match(screenSource, /await Linking\.canOpenURL\(mailtoUrl\)/);
+test("shows feedback when the contact form submission fails", () => {
+  assert.match(screenSource, /const FORMSPREE_URL =/);
+  assert.match(screenSource, /await fetch\(FORMSPREE_URL,/);
   assert.match(
     screenSource,
-    /No email app found\. Please email bestlist\.app@gmail\.com directly\./,
+    /if \(response\.ok\)[\s\S]*else \{[\s\S]*setSubmitError\(getFormspreeError\(payload\) \?\? GENERIC_ERROR_MESSAGE\);/,
   );
 });
 
-test("shows the same feedback if opening the email app rejects", () => {
+test("shows the same feedback if the contact form submission rejects", () => {
   assert.match(
     screenSource,
-    /try \{[\s\S]*await Linking\.openURL\(mailtoUrl\);[\s\S]*\} catch/,
+    /try \{[\s\S]*await fetch\(FORMSPREE_URL,[\s\S]*\} catch \{[\s\S]*setSubmitError\(GENERIC_ERROR_MESSAGE\);/,
   );
 });
