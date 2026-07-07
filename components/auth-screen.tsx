@@ -171,6 +171,7 @@ export function AuthScreen({ mode }: AuthScreenProps) {
                       "https://docs.google.com/document/d/1BNlqGjMY2Ls9v4s8AksbBkvHv2LN0HGVzYN5hHv6-Rs/edit?usp=sharing",
                     )
                   }
+                  onPress={() => router.push("/terms")}
                 >
                   Terms
                 </Text>{" "}
@@ -182,6 +183,7 @@ export function AuthScreen({ mode }: AuthScreenProps) {
                       "https://docs.google.com/document/d/1ajcu8poYGEjaV1qFvriZV4Sa1v6-JAtUIGnp7RwdtMw/edit?usp=sharing",
                     )
                   }
+                  onPress={() => router.push("/privacy")}
                 >
                   Privacy
                 </Text>
