@@ -19,8 +19,7 @@ import { colors } from "@/constants/theme";
 import {
   sendEmailOtp,
   signInWithApple,
-  signInWithSocialProvider,
-  type SocialAuthProvider,
+  signInWithGoogle,
 } from "@/lib/auth";
 
 type AuthScreenProps = {
@@ -73,11 +72,11 @@ export function AuthScreen({ mode }: AuthScreenProps) {
     }
   };
 
-  const handleSocialPress = async (provider: SocialAuthProvider) => {
+  const handleGooglePress = async () => {
     setIsSubmitting(true);
 
     try {
-      await signInWithSocialProvider(provider);
+      await signInWithGoogle();
       router.replace("/");
     } catch (error) {
       Alert.alert("Authentication error", getErrorMessage(error));
@@ -192,7 +191,7 @@ export function AuthScreen({ mode }: AuthScreenProps) {
               alignIconLeft={mode === "sign-up"}
               icon="google"
               label="Continue with Google"
-              onPress={() => handleSocialPress("google")}
+              onPress={handleGooglePress}
             />
             <SocialButton
               icon="apple"
