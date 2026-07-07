@@ -115,7 +115,7 @@ export default function ContactUsScreen() {
         </View>
 
         {isSubmitted ? (
-          <View className="gap-3 pt-8">
+          <View accessibilityLiveRegion="polite" className="gap-3 pt-8">
             <Text className="font-body text-[19px] font-bold text-[#1C1C1E]">
               Message sent
             </Text>

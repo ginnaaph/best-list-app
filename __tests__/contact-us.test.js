@@ -22,3 +22,10 @@ test("shows the same feedback if the contact form submission rejects", () => {
     /try \{[\s\S]*await fetch\(FORMSPREE_URL,[\s\S]*\} catch \{[\s\S]*setSubmitError\(GENERIC_ERROR_MESSAGE\);/,
   );
 });
+
+test("announces when the contact form submission succeeds", () => {
+  assert.match(
+    screenSource,
+    /isSubmitted \? \([\s\S]*<View accessibilityLiveRegion="polite" className="gap-3 pt-8">/,
+  );
+});
