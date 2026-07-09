@@ -6,14 +6,18 @@ const baseConfig = appJson.expo as ExpoConfig;
 
 export default function configureExpo({ config }: ConfigContext): ExpoConfig {
   const googleIosClientId = process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID;
-  assertGoogleIosClientIdConfigured(googleIosClientId);
+  const isEasBuild = process.env.EAS_BUILD === "true";
 
-  const googlePlugin: NonNullable<ExpoConfig["plugins"]> = [
-    [
-      "@react-native-google-signin/google-signin",
-      { iosUrlScheme: getGoogleIosUrlScheme(googleIosClientId) },
-    ],
-  ];
+  assertGoogleIosClientIdConfigured(googleIosClientId, isEasBuild);
+
+  const googlePlugin: NonNullable<ExpoConfig["plugins"]> = googleIosClientId
+    ? [
+        [
+          "@react-native-google-signin/google-signin",
+          { iosUrlScheme: getGoogleIosUrlScheme(googleIosClientId) },
+        ],
+      ]
+    : [];
 
   return {
     ...config,
@@ -24,7 +28,12 @@ export default function configureExpo({ config }: ConfigContext): ExpoConfig {
 
 function assertGoogleIosClientIdConfigured(
   clientId: string | undefined,
+  isEasBuild: boolean,
 ): asserts clientId is string {
+  if (!isEasBuild) {
+    return;
+  }
+
   if (!clientId) {
     throw new Error("Missing EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID.");
   }
