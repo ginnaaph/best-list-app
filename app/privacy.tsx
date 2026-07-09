@@ -10,7 +10,8 @@ const collectedInformation = [
   "Photos you upload — images you attach to your dishes, lists, or profile, either captured with your device's camera or selected from your photo library.",
   'Place and city search terms — when you type a restaurant, dish location, or city name while adding an entry, that text is sent to Google Places API to return autocomplete suggestions and address details (see "Third-Party Services" below).',
   "Shared links — when you share a list via link, we store that link so others can view it.",
-  "Crash and diagnostic data — if the app crashes or hits an error, our crash-reporting tool (Sentry) automatically receives a report with your device model, OS version, app version, your device's IP address, a stack trace of the code that was running, and diagnostic console logs. For a small sample of sessions, and for any session where a crash happens, it also captures a screen recording of what was on screen — text and images in these recordings are masked by default, so the actual content of your lists or photos isn't exposed. These reports do not include your name, email, or account ID (see \"Third-Party Services\" below).",
+  "Crash and diagnostic data — if the app crashes or hits an error, our crash-reporting tool (Sentry) automatically receives a report with your device model, OS version, app version, your device's IP address, a stack trace of the code that was running, and diagnostic console logs. For a small sample of sessions, and for any session where a crash happens, it also captures a screen recording of what was on screen — text and images in these recordings are masked by default, so the actual content of your lists or photos isn't exposed. These automatic crash reports do not include your name, email, or account ID (bug reports you choose to submit are covered below; see \"Third-Party Services\" below).",
+  "Bug reports you submit — if you use the \"Report a bug\" option in Settings, the name, email, and description you type there are sent directly to Sentry as part of your report. This is separate from the automatic crash data above, and only happens when you choose to submit a report.",
 ];
 
 const informationNotCollected = [
@@ -19,7 +20,7 @@ const informationNotCollected = [
   "Any payment or financial information (the app is free)",
   "Any data from other apps on your device",
   "Advertising data or cross-app tracking — we don't use ad networks and don't track you across other apps or websites",
-  "Your cookies or logged-in account information (name, email, user ID) through our crash-reporting tool — we've turned this off in our Sentry configuration",
+  "Your cookies or logged-in account information (name, email, user ID) through automatic crash reports — we've turned this off in our Sentry configuration. This does not include the separate \"Report a bug\" form, where you choose what name, email, and message to submit.",
 ];
 
 const dataUses = [
@@ -28,6 +29,7 @@ const dataUses = [
   "To let you search for and autofill restaurant names, addresses, and cities when adding an entry",
   "To enable link sharing so others can view lists you choose to share",
   "To detect, diagnose, and fix crashes and bugs",
+  "To let you submit a bug report with your name, email, and description, if you choose to",
   "To allow you to delete your account and all associated data",
 ];
 
@@ -174,10 +176,12 @@ export default function PrivacyScreen() {
               receives the IP address of the device sending the report, as it
               does for any network request. We&apos;ve turned off the setting
               that would otherwise send cookies or your logged-in account
-              information (name, email, user ID) with each report — your
-              crash reports aren&apos;t linked to your account. Sentry&apos;s
-              privacy policy applies to this data and can be found at
-              sentry.io/privacy.
+              information (name, email, user ID) with each automatic crash
+              report — your crash reports aren&apos;t linked to your account.
+              If you use the &quot;Report a bug&quot; option in Settings, the name,
+              email, and message you provide are sent to Sentry as part of
+              that report. Sentry&apos;s privacy policy applies to this data and
+              can be found at sentry.io/privacy.
             </Text>
             <Text className="font-body text-[16px] leading-6 text-[#1C1C1E]">
               These are the only third-party services with access to your data.

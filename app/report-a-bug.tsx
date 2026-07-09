@@ -21,7 +21,10 @@ export default function ReportABugScreen() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const canSend = Boolean(name.trim() && email.trim() && message.trim());
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const canSend = Boolean(
+    name.trim() && emailRegex.test(email.trim()) && message.trim(),
+  );
 
   async function handleSend() {
     if (!canSend || isSubmitting) {
