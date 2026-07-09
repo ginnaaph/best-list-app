@@ -10,6 +10,7 @@ const collectedInformation = [
   "Photos you upload — images you attach to your dishes, lists, or profile, either captured with your device's camera or selected from your photo library.",
   'Place and city search terms — when you type a restaurant, dish location, or city name while adding an entry, that text is sent to Google Places API to return autocomplete suggestions and address details (see "Third-Party Services" below).',
   "Shared links — when you share a list via link, we store that link so others can view it.",
+  "Crash and diagnostic data — if the app crashes or hits an error, our crash-reporting tool (Sentry) automatically receives a report with your device model, OS version, app version, your device's IP address, a stack trace of the code that was running, and diagnostic console logs. For a small sample of sessions, and for any session where a crash happens, it also captures a screen recording of what was on screen — text and images in these recordings are masked by default, so the actual content of your lists or photos isn't exposed. These reports do not include your name, email, or account ID (see \"Third-Party Services\" below).",
 ];
 
 const informationNotCollected = [
@@ -17,7 +18,8 @@ const informationNotCollected = [
   "Your contacts or address book",
   "Any payment or financial information (the app is free)",
   "Any data from other apps on your device",
-  "Analytics or behavioral tracking beyond what Supabase provides by default",
+  "Advertising data or cross-app tracking — we don't use ad networks and don't track you across other apps or websites",
+  "Your cookies or logged-in account information (name, email, user ID) through our crash-reporting tool — we've turned this off in our Sentry configuration",
 ];
 
 const dataUses = [
@@ -25,6 +27,7 @@ const dataUses = [
   "To store and display your lists, dishes, and photos",
   "To let you search for and autofill restaurant names, addresses, and cities when adding an entry",
   "To enable link sharing so others can view lists you choose to share",
+  "To detect, diagnose, and fix crashes and bugs",
   "To allow you to delete your account and all associated data",
 ];
 
@@ -77,7 +80,7 @@ export default function PrivacyScreen() {
 
         <View className="gap-7 pt-8">
           <Text className="font-body text-[14px] text-[#8E8E93]">
-            Last updated: July 6, 2026
+            Last updated: July 9, 2026
           </Text>
 
           <View className="gap-3">
@@ -162,6 +165,19 @@ export default function PrivacyScreen() {
               device&apos;s location — only the text you type. Google&apos;s privacy
               policy applies to this data and can be found at
               policies.google.com/privacy.
+            </Text>
+            <Text className="font-body text-[16px] leading-6 text-[#1C1C1E]">
+              We use Sentry for crash and error reporting, so we can detect
+              and fix bugs. Sentry receives crash logs, device information
+              (model, OS version, app version), diagnostic console logs, and,
+              for some sessions, masked screen recordings. Sentry also
+              receives the IP address of the device sending the report, as it
+              does for any network request. We&apos;ve turned off the setting
+              that would otherwise send cookies or your logged-in account
+              information (name, email, user ID) with each report — your
+              crash reports aren&apos;t linked to your account. Sentry&apos;s
+              privacy policy applies to this data and can be found at
+              sentry.io/privacy.
             </Text>
             <Text className="font-body text-[16px] leading-6 text-[#1C1C1E]">
               These are the only third-party services with access to your data.

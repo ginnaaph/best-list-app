@@ -51,7 +51,7 @@ export default function TermsScreen() {
 
         <View className="gap-7 pt-8">
           <Text className="font-body text-[14px] text-[#8E8E93]">
-            Last updated: July 6, 2026
+            Last updated: July 9, 2026
           </Text>
 
           <View className="gap-3">
@@ -154,7 +154,8 @@ export default function TermsScreen() {
                 Privacy Policy
               </Link>
               , which is part of these terms. Please read it — it explains what
-              Supabase stores on our behalf and how we handle your information.
+              Supabase stores on our behalf, what Sentry collects for crash
+              and error reporting, and how we handle your information.
             </Text>
           </View>
 
