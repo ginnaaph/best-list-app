@@ -18,6 +18,12 @@ import { colors } from "@/constants/theme";
 const GOOGLE_PLACES_API_KEY =
   process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY ??
   process.env.EXPO_PUBLIC_GOOGLE_PLACES_KEY;
+const GOOGLE_PLACES_IOS_BUNDLE_IDENTIFIER = "com.gina.bestlist";
+const GOOGLE_PLACES_FETCH_OPTIONS = {
+  headers: {
+    "X-Ios-Bundle-Identifier": GOOGLE_PLACES_IOS_BUNDLE_IDENTIFIER,
+  },
+};
 const AUTOCOMPLETE_DEBOUNCE_MS = 300;
 
 type PlacesAutocompleteType = "establishment" | "(cities)";
@@ -217,6 +223,7 @@ export function EntryForm({
       try {
         const response = await fetch(
           getAutocompleteUrl(trimmedPlaceName, "establishment"),
+          GOOGLE_PLACES_FETCH_OPTIONS,
         );
 
         if (!response.ok) {
@@ -271,7 +278,10 @@ export function EntryForm({
 
     const timeout = setTimeout(async () => {
       try {
-        const response = await fetch(getAutocompleteUrl(trimmedCity, "(cities)"));
+        const response = await fetch(
+          getAutocompleteUrl(trimmedCity, "(cities)"),
+          GOOGLE_PLACES_FETCH_OPTIONS,
+        );
 
         if (!response.ok) {
           throw new Error("City autocomplete request failed.");
@@ -335,7 +345,10 @@ export function EntryForm({
     }
 
     try {
-      const response = await fetch(getPlaceDetailsUrl(prediction.place_id));
+      const response = await fetch(
+        getPlaceDetailsUrl(prediction.place_id),
+        GOOGLE_PLACES_FETCH_OPTIONS,
+      );
 
       if (!response.ok) {
         throw new Error("Place details request failed.");
@@ -382,7 +395,10 @@ export function EntryForm({
     }
 
     try {
-      const response = await fetch(getPlaceDetailsUrl(prediction.place_id));
+      const response = await fetch(
+        getPlaceDetailsUrl(prediction.place_id),
+        GOOGLE_PLACES_FETCH_OPTIONS,
+      );
 
       if (!response.ok) {
         throw new Error("City details request failed.");
