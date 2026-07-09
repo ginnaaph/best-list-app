@@ -21,3 +21,22 @@ test("autocomplete waits for a user edit before using prefilled values", () => {
   assert.match(source, /setHasEditedPlace\(true\)/);
   assert.match(source, /setHasEditedCity\(true\)/);
 });
+
+test("Google Places fetches include the iOS bundle identifier header", () => {
+  assert.match(
+    source,
+    /const GOOGLE_PLACES_IOS_BUNDLE_IDENTIFIER = "com\.gina\.bestlist";/,
+  );
+  assert.match(
+    source,
+    /const GOOGLE_PLACES_FETCH_OPTIONS = \{\s*headers: \{\s*"X-Ios-Bundle-Identifier": GOOGLE_PLACES_IOS_BUNDLE_IDENTIFIER,\s*\},\s*\};/s,
+  );
+
+  const fetchCallMatches = source.match(/fetch\(/g);
+  const placesFetchOptionsMatches = source.match(
+    /GOOGLE_PLACES_FETCH_OPTIONS/g,
+  );
+
+  assert.equal(fetchCallMatches?.length, 4);
+  assert.equal(placesFetchOptionsMatches?.length, 5);
+});

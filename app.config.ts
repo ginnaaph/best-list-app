@@ -6,6 +6,10 @@ const baseConfig = appJson.expo as ExpoConfig;
 
 export default function configureExpo({ config }: ConfigContext): ExpoConfig {
   const googleIosClientId = process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID;
+  const isEasBuild = process.env.EAS_BUILD === "true";
+
+  assertGoogleIosClientIdConfigured(googleIosClientId, isEasBuild);
+
   const googlePlugin: NonNullable<ExpoConfig["plugins"]> = googleIosClientId
     ? [
         [
@@ -20,6 +24,19 @@ export default function configureExpo({ config }: ConfigContext): ExpoConfig {
     ...baseConfig,
     plugins: [...(baseConfig.plugins ?? []), ...googlePlugin],
   };
+}
+
+function assertGoogleIosClientIdConfigured(
+  clientId: string | undefined,
+  isEasBuild: boolean,
+): asserts clientId is string {
+  if (!isEasBuild) {
+    return;
+  }
+
+  if (!clientId) {
+    throw new Error("Missing EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID.");
+  }
 }
 
 function getGoogleIosUrlScheme(clientId: string) {

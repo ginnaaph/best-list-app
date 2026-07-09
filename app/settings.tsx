@@ -1,12 +1,11 @@
+import { DeleteAccountSheet } from "@/components/delete-account-sheet";
+import { getSupabaseClient } from "@/lib/supabase";
+import { useStore } from "@/store";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
 import { Linking, Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-import { DeleteAccountSheet } from "@/components/delete-account-sheet";
-import { getSupabaseClient } from "@/lib/supabase";
-import { useStore } from "@/store";
 
 type DeleteAccountResponse = {
   success: boolean;

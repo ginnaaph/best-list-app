@@ -54,3 +54,5 @@ app-example
 
 # Local git worktrees
 .worktrees/
+
+.env.local

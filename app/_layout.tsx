@@ -10,10 +10,31 @@ import { useAppFonts } from "@/hooks/use-app-fonts";
 import { createSessionFromUrl } from "@/lib/auth";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import { useStore } from "@/store";
+import * as Sentry from '@sentry/react-native';
+
+Sentry.init({
+  dsn: 'https://bbfcdcd6f7694dfe2583889393059f68@o4511699661488128.ingest.us.sentry.io/4511699668500480',
+
+  // Adds more context data to events (IP address, cookies, user, etc.)
+  // For more information, visit: https://docs.sentry.io/platforms/react-native/data-management/data-collected/
+  sendDefaultPii: false,
+  environment: __DEV__ ? 'development' : 'production',
+
+  // Enable Logs
+  enableLogs: true,
+
+  // Configure Session Replay
+  replaysSessionSampleRate: 0.1,
+  replaysOnErrorSampleRate: 1,
+  integrations: [Sentry.mobileReplayIntegration(), Sentry.feedbackIntegration()],
+
+  // uncomment the line below to enable Spotlight (https://spotlightjs.com)
+  // spotlight: __DEV__,
+});
 
 SplashScreen.preventAutoHideAsync();
 
-export default function RootLayout() {
+export default Sentry.wrap(function RootLayout() {
   const { fontsLoaded } = useAppFonts();
   const syncFromSupabase = useStore((state) => state.syncFromSupabase);
   const clearStore = useStore((state) => state.clearStore);
@@ -95,4 +116,4 @@ export default function RootLayout() {
       />
     </GestureHandlerRootView>
   );
-}
+});
