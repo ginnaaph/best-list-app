@@ -26,9 +26,9 @@ const scoreRows = [
 ];
 
 const rankingRows = [
-  { rank: "1", name: "Nopalito", score: "9.4", width: "w-16" },
-  { rank: "2", name: "La Taqueria", score: "9.2", width: "w-14.5" },
-  { rank: "3", name: "Cancun", score: "8.9", width: "w-12" },
+  { rank: "1", name: "Nopalito", score: "9.4" },
+  { rank: "2", name: "La Taqueria", score: "9.2" },
+  { rank: "3", name: "Cancun", score: "8.9" },
 ];
 
 export function DishCardPreview() {
@@ -91,9 +91,6 @@ export function RankingPreview() {
             <Text className="flex-1 font-display text-[16px] font-bold leading-4.75 text-primary">
               {row.name}
             </Text>
-            <View
-              className={`mr-4 h-2.5 rounded-full bg-accent ${row.width}`}
-            />
             <Text className="w-9 text-right font-body text-[14px] font-bold leading-4.25 text-accent">
               {row.score}
             </Text>

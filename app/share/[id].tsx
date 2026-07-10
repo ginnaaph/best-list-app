@@ -1,3 +1,4 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -11,7 +12,6 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 import { images } from "@/constants/images";
 import {
@@ -34,10 +34,6 @@ const scoreDimensions: { label: string; key: ScoreDimension }[] = [
   { label: "VIBE", key: "vibe" },
 ];
 
-function getAvatarInitial(ownerLabel: string) {
-  return ownerLabel.charAt(0).toUpperCase();
-}
-
 export default function ShareListScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [category, setCategory] = useState<Category | null>(null);
@@ -48,11 +44,9 @@ export default function ShareListScreen() {
   const shareUrl = getCategoryShareUrl(id);
   const normalizedOwnerUsername =
     ownerUsername?.replace(/^@+/, "").trim() || null;
-  const ownerLabel = normalizedOwnerUsername ?? "BestList";
   const ownerHandle = normalizedOwnerUsername
     ? `@${normalizedOwnerUsername}`
     : null;
-  const ownerInitial = getAvatarInitial(ownerLabel);
 
   const shareList = async () => {
     if (!category || !shareUrl) {
@@ -153,10 +147,12 @@ export default function ShareListScreen() {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: "#F5F0E8" }}>
         <View className="flex-1 px-5 pb-8 pt-10">
-          <View className="h-11 w-11 items-center justify-center rounded-full bg-accent">
-            <Text className="font-body text-[18px] font-bold leading-5 text-white">
-              B
-            </Text>
+          <View className="h-11 w-11 overflow-hidden rounded-full bg-accent">
+            <Image
+              className="h-full w-full"
+              resizeMode="cover"
+              source={images.bestListMark}
+            />
           </View>
 
           <View className="mt-12 gap-3">
@@ -182,10 +178,12 @@ export default function ShareListScreen() {
       <View className="flex-1 px-5 pb-5 pt-4">
         <View className="flex-row items-center justify-between">
           <View className="items-center gap-1">
-            <View className="h-9 w-9 items-center justify-center rounded-full bg-white shadow-card">
-              <View className="h-9 w-9 items-center justify-center rounded-full bg-accent">
-                <Text className="text-label text-white">{ownerInitial}</Text>
-              </View>
+            <View className="h-9 w-9 overflow-hidden rounded-full bg-white shadow-card">
+              <Image
+                className="h-full w-full"
+                resizeMode="cover"
+                source={images.bestListMark}
+              />
             </View>
 
             {ownerHandle ? (
@@ -201,7 +199,7 @@ export default function ShareListScreen() {
             className="h-9 w-9 items-center justify-center rounded-full bg-white shadow-card"
             onPress={shareList}
           >
-            <FontAwesome name="share" size={16} color="#000000" />
+            <Ionicons name="share-outline" size={18} color="#000000" />
           </Pressable>
         </View>
 

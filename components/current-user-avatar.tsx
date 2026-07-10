@@ -16,7 +16,7 @@ const profileColumns = "id,username,full_name,city,bio,avatar_url,created_at";
 const sizeStyles = {
   small: {
     container:
-      "h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-accent",
+      "h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-accent",
     text: "text-label text-white",
   },
   large: {
