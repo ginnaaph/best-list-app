@@ -38,6 +38,13 @@ test("requires the exact DELETE confirmation before enabling deletion", () => {
   assert.match(componentSource, /Type DELETE to confirm/);
 });
 
+test("normalizes typed confirmation before storing it", () => {
+  assert.match(
+    componentSource,
+    /function updateConfirmation\(value: string\) \{\s+setConfirmation\(value\.toUpperCase\(\)\);/,
+  );
+});
+
 test("exposes explicit close and sign-in actions", () => {
   assert.match(componentSource, /onClose: \(\) => void/);
   assert.match(componentSource, /onBackToSignIn: \(\) => void/);

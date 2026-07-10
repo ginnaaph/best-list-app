@@ -49,7 +49,7 @@ export function DeleteAccountSheet({
   }
 
   function updateConfirmation(value: string) {
-    setConfirmation(value);
+    setConfirmation(value.toUpperCase());
     setDeleteError(null);
   }
 
