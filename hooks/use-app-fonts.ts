@@ -5,7 +5,7 @@ import { useFonts } from "expo-font";
 /**
  * Loads the app font family assets.
  *
- * @returns Whether fonts are ready for rendering.
+ * @returns Whether font loading has completed, including the error fallback.
  */
 export function useAppFonts() {
   const [fontsLoaded, fontError] = useFonts({
