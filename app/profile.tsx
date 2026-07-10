@@ -1,6 +1,6 @@
 import { Link, router, useFocusEffect } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import { useCallback, useState } from "react";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
 import {
   ActivityIndicator,
   Image,
@@ -214,20 +214,18 @@ export default function Profile() {
         <View className="flex-row items-center justify-between">
           <Pressable
             onPress={() => router.back()}
-            className="h-11 w-11 items-center justify-center rounded-full border border-subtle bg-white"
+            className="h-9 w-9 items-center justify-center rounded-full bg-white shadow-card"
           >
-            <Text className="font-body text-[34px] -mt-4.5 leading-9 text-primary">
-              ‹
-            </Text>
+            <Ionicons name="chevron-back" size={22} color="#000000" />
           </Pressable>
 
           <Pressable
             accessibilityLabel="Open settings"
             accessibilityRole="button"
-            className="h-11 w-11 items-center justify-center rounded-full border border-subtle bg-white"
+            className="h-9 w-9 items-center justify-center rounded-full bg-white shadow-card"
             onPress={() => router.push("/settings")}
           >
-            <FontAwesome name="sliders" size={20} color="#000000" />
+            <Ionicons name="settings-outline" size={20} color="#000000" />
           </Pressable>
         </View>
 
@@ -353,9 +351,11 @@ export default function Profile() {
                           </Text>
                         </View>
 
-                        <Text className="font-body text-[44px] leading-11 text-bestlist-border">
-                          ›
-                        </Text>
+                        <Ionicons
+                          name="chevron-forward"
+                          size={22}
+                          color="#D1C9BA"
+                        />
                       </Pressable>
                     </Link>
                   );

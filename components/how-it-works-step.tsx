@@ -8,7 +8,12 @@ type HowItWorksStepProps = {
   children: React.ReactNode;
 };
 
-export function HowItWorksStep({ number, title, description, children }: HowItWorksStepProps) {
+export function HowItWorksStep({
+  number,
+  title,
+  description,
+  children,
+}: HowItWorksStepProps) {
   return (
     <View className="flex-row gap-3">
       <View className="h-8 w-8 items-center">
@@ -21,7 +26,7 @@ export function HowItWorksStep({ number, title, description, children }: HowItWo
 
       <View className="flex-1 gap-2">
         <View>
-          <Text className="font-display text-[21px] font-bold leading-6.25 text-primary">
+          <Text className="font-display text-[21px] font-bold leading-6.25 text-shadow-bestlist-green">
             {title}
           </Text>
           <Text className="max-w-75 font-body text-[15px] leading-4.5 text-secondary">

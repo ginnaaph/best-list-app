@@ -156,10 +156,10 @@ export default function SettingsScreen() {
           <Pressable
             accessibilityLabel="Go back"
             accessibilityRole="button"
-            className="absolute left-0 h-11 w-11 items-center justify-center rounded-full border border-[#E5E5E5] bg-white"
+            className="absolute left-0 h-9 w-9 items-center justify-center rounded-full bg-white shadow-card"
             onPress={() => router.back()}
           >
-            <Ionicons name="chevron-back" size={28} color="#1C1C1E" />
+            <Ionicons name="chevron-back" size={22} color="#1C1C1E" />
           </Pressable>
 
           <Text className="font-display text-[34px] font-bold text-[#1C1C1E]">

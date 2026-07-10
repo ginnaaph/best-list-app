@@ -1,7 +1,7 @@
 import { router, useLocalSearchParams } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import { Image, Pressable, ScrollView, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 import { CurrentUserAvatar } from "@/components/current-user-avatar";
 import { images } from "@/constants/images";
@@ -39,13 +39,13 @@ function EntryNotFoundScreen() {
               router.canGoBack() ? router.back() : router.replace("/")
             }
           >
-            <Text className="text-card-title text-primary">‹</Text>
+            <Ionicons name="chevron-back" size={22} color="#000000" />
           </Pressable>
 
           <Pressable
             accessibilityLabel="Open profile"
             accessibilityRole="button"
-            className="h-7 w-7 items-center justify-center rounded-full bg-white shadow-card"
+            className="h-9 w-9 items-center justify-center rounded-full bg-white shadow-card"
             onPress={() => router.push("/profile")}
           >
             <CurrentUserAvatar />
@@ -90,7 +90,7 @@ export default function EntryDetailScreen() {
               router.canGoBack() ? router.back() : router.replace("/")
             }
           >
-            <Text className="text-card-title text-primary">‹</Text>
+            <Ionicons name="chevron-back" size={22} color="#000000" />
           </Pressable>
 
           <Pressable
@@ -99,7 +99,7 @@ export default function EntryDetailScreen() {
             className="h-9 w-9 items-center justify-center rounded-full bg-white shadow-card"
             onPress={() => router.push(`/entry/${entry.id}/edit`)}
           >
-            <FontAwesome name="edit" size={20} color="#000000" />
+            <Ionicons name="create-outline" size={20} color="#000000" />
           </Pressable>
         </View>
 
