@@ -163,7 +163,6 @@ export function VerificationModal({
               className="absolute inset-0 z-10 h-full w-full bg-transparent p-0"
               inputMode="numeric"
               keyboardType="number-pad"
-              maxLength={CODE_LENGTH}
               onChangeText={(value) => {
                 if (!isVerifying && !isResending) {
                   void handleCodeChange(value);
