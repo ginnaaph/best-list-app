@@ -40,7 +40,13 @@ export default function ReportABugScreen() {
         name: name.trim(),
         email: email.trim(),
       });
-      setIsSubmitted(true);
+      const didFlush = (await Sentry.getClient()?.flush(2000)) ?? false;
+
+      if (didFlush) {
+        setIsSubmitted(true);
+      } else {
+        setSubmitError(GENERIC_ERROR_MESSAGE);
+      }
     } catch {
       setSubmitError(GENERIC_ERROR_MESSAGE);
     } finally {
