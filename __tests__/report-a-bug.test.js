@@ -22,7 +22,7 @@ test("Report a bug submits required user feedback to Sentry", () => {
   );
   assert.match(
     screenSource,
-    /const canSend = Boolean\(name\.trim\(\) && email\.trim\(\) && message\.trim\(\)\);/,
+    /const emailRegex = \/\^\[\^\\s@\]\+@\[\^\\s@\]\+\\\.\[\^\\s@\]\+\$\/;\s*const canSend = Boolean\(\s*name\.trim\(\) && emailRegex\.test\(email\.trim\(\)\) && message\.trim\(\),\s*\);/,
   );
 });
 
