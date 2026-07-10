@@ -276,6 +276,7 @@ export default function EditProfileScreen() {
       }
 
       if (!user) {
+        setSaveStatus("idle");
         router.replace("/sign-in");
         return;
       }
