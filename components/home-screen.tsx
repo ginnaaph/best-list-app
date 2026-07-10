@@ -15,6 +15,9 @@ import { useStore } from "@/store";
 
 const addCategoryRoute = "/add-category" as Href;
 
+/**
+ * Renders the authenticated home screen.
+ */
 export function HomeScreen() {
   const router = useRouter();
   const categories = useStore((state) => state.categories);

@@ -3,6 +3,11 @@ import { useEffect, useState } from "react";
 
 import { getSupabaseClient, isSupabaseConfigured } from "@/lib/supabase";
 
+/**
+ * Tracks the current Supabase auth session.
+ *
+ * @returns The loading state and current session.
+ */
 export function useAuthSession() {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);

@@ -6,6 +6,9 @@ type SplashScreenProps = {
   onGifLoad: () => void;
 };
 
+/**
+ * Renders the animated app splash screen.
+ */
 export function SplashScreen({ onGifLoad }: SplashScreenProps) {
   return (
     <View className="flex-1 items-center justify-center">

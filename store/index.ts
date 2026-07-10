@@ -42,21 +42,81 @@ type StoreState = {
   categories: Category[];
   entries: Entry[];
   isLoading: boolean;
+  /**
+   * Loads categories and entries from Supabase into the local store.
+   *
+   * @returns A promise that resolves when syncing finishes.
+   */
   syncFromSupabase: () => Promise<void>;
+  /**
+   * Clears local category and entry state.
+   *
+   * @returns A promise that resolves when persisted state is removed.
+   */
   clearStore: () => Promise<void>;
+  /**
+   * Creates a category and adds it to the local store.
+   *
+   * @param name - The category name to create.
+   * @returns The created category.
+   */
   addCategory: (name: string) => Promise<Category>;
+  /**
+   * Updates a category and refreshes its local summary.
+   *
+   * @param categoryId - The category to update.
+   * @param category - The category fields to save.
+   * @returns The updated category, or undefined when it is not found.
+   */
   updateCategory: (
     categoryId: string,
     category: UpdateCategoryInput,
   ) => Promise<Category | undefined>;
+  /**
+   * Deletes a category and its local entries.
+   *
+   * @param categoryId - The category to delete.
+   * @returns The deleted category, or undefined when it is not found.
+   */
   deleteCategory: (categoryId: string) => Promise<Category | undefined>;
+  /**
+   * Creates an entry and updates the matching category summary.
+   *
+   * @param entry - The entry fields to create.
+   * @returns The created entry.
+   */
   addEntry: (entry: AddEntryInput) => Promise<Entry>;
+  /**
+   * Updates a category's public sharing state.
+   *
+   * @param categoryId - The category to update.
+   * @param isPublic - Whether the category should be publicly shareable.
+   * @returns A promise that resolves when the sharing update finishes.
+   */
   setCategoryPublic: (categoryId: string, isPublic: boolean) => Promise<void>;
+  /**
+   * Updates an entry and refreshes the matching category summary.
+   *
+   * @param entryId - The entry to update.
+   * @param entry - The entry fields to save.
+   * @returns The updated entry, or undefined when it is not found.
+   */
   updateEntry: (
     entryId: string,
     entry: UpdateEntryInput,
   ) => Promise<Entry | undefined>;
+  /**
+   * Deletes an entry and refreshes the matching category summary.
+   *
+   * @param entryId - The entry to delete.
+   * @returns The deleted entry, or undefined when it is not found.
+   */
   deleteEntry: (entryId: string) => Promise<Entry | undefined>;
+  /**
+   * Preserves the legacy category seeding action without adding mock data.
+   *
+   * @param categoryId - The category to check.
+   */
   ensureCategorySeeded: (categoryId: string) => void;
 };
 
@@ -104,6 +164,11 @@ function reportMutationError(action: string, error: unknown) {
   console.error(`Failed to ${action}:`, error);
 }
 
+/**
+ * Provides the global BestList category and entry store.
+ *
+ * @returns Zustand state and actions for app data.
+ */
 export const useStore = create<StoreState>()(
   persist(
     (set, get) => ({

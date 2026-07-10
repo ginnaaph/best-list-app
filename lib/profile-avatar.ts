@@ -31,6 +31,13 @@ function getAvatarStoragePath(avatarUrl: string) {
   return null;
 }
 
+/**
+ * Creates a signed avatar URL with a cache key.
+ *
+ * @param avatarUrl - The stored avatar URL or path.
+ * @param cacheKey - The cache-busting value to append.
+ * @returns The displayable avatar URL.
+ */
 export async function resolveAvatarDisplayUrl(
   avatarUrl: string,
   cacheKey = Date.now(),

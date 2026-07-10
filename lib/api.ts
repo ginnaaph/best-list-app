@@ -131,6 +131,11 @@ function toUpdateEntryPayload(entry: UpdateEntryPayload) {
   };
 }
 
+/**
+ * Fetches the signed-in user's categories from Supabase.
+ *
+ * @returns The user's categories.
+ */
 export async function getCategories(): Promise<Category[]> {
   const { data, error } = await getSupabaseClient()
     .from("categories")
@@ -145,6 +150,11 @@ export async function getCategories(): Promise<Category[]> {
   return data.map(mapCategory);
 }
 
+/**
+ * Fetches the signed-in user's entries from Supabase.
+ *
+ * @returns The user's entries.
+ */
 export async function getEntries(): Promise<Entry[]> {
   const { data, error } = await getSupabaseClient()
     .from("entries")
@@ -159,6 +169,12 @@ export async function getEntries(): Promise<Entry[]> {
   return data.map(mapEntry);
 }
 
+/**
+ * Creates a category in Supabase.
+ *
+ * @param category - The category fields to insert.
+ * @returns The created category.
+ */
 export async function insertCategory(
   category: InsertCategoryPayload,
 ): Promise<Category> {
@@ -183,6 +199,14 @@ export async function insertCategory(
   return mapCategory(data);
 }
 
+/**
+ * Updates a category's sharing settings.
+ *
+ * @param categoryId - The category to update.
+ * @param isPublic - Whether the category should be publicly shareable.
+ * @param shareId - The share link id to set when making the category public. Omit when un-sharing.
+ * @returns The updated category.
+ */
 export async function updateCategoryVisibility(
   categoryId: string,
   isPublic: boolean,
@@ -211,6 +235,13 @@ export async function updateCategoryVisibility(
   return mapCategory(data);
 }
 
+/**
+ * Updates a category's editable fields.
+ *
+ * @param categoryId - The category to update.
+ * @param category - The category fields to save.
+ * @returns The updated category.
+ */
 export async function updateCategory(
   categoryId: string,
   category: UpdateCategoryPayload,
@@ -230,6 +261,12 @@ export async function updateCategory(
   return mapCategory(data);
 }
 
+/**
+ * Deletes a category from Supabase.
+ *
+ * @param categoryId - The category to delete.
+ * @returns The deleted category.
+ */
 export async function deleteCategory(categoryId: string): Promise<Category> {
   const { data, error } = await getSupabaseClient()
     .from("categories")
@@ -246,6 +283,12 @@ export async function deleteCategory(categoryId: string): Promise<Category> {
   return mapCategory(data);
 }
 
+/**
+ * Fetches a publicly shared category by its share id.
+ *
+ * @param shareId - The public share id to look up.
+ * @returns The shared category, or null when it is unavailable.
+ */
 export async function getPublicCategoryByShareId(
   shareId: string,
 ): Promise<Category | null> {
@@ -264,6 +307,12 @@ export async function getPublicCategoryByShareId(
   return data ? mapCategory(data) : null;
 }
 
+/**
+ * Fetches the owner username for a publicly shared category.
+ *
+ * @param shareId - The public share id to look up.
+ * @returns The owner's username, or null when none is available.
+ */
 export async function getPublicCategoryOwnerUsername(
   shareId: string,
 ): Promise<string | null> {
@@ -279,6 +328,12 @@ export async function getPublicCategoryOwnerUsername(
   return data;
 }
 
+/**
+ * Adds an email address to the public share waitlist.
+ *
+ * @param email - The email address to register.
+ * @returns Whether the email joined or was already registered.
+ */
 export async function joinWaitlist(
   email: string,
 ): Promise<WaitlistJoinResult> {
@@ -301,6 +356,12 @@ export async function joinWaitlist(
   return "joined";
 }
 
+/**
+ * Fetches entries for a publicly shared category.
+ *
+ * @param categoryId - The category whose public entries should be loaded.
+ * @returns The public entries for the category.
+ */
 export async function getPublicEntries(categoryId: string): Promise<Entry[]> {
   const { data, error } = await getPublicSupabaseClient()
     .from("entries")
@@ -316,6 +377,12 @@ export async function getPublicEntries(categoryId: string): Promise<Entry[]> {
   return data.map(mapEntry);
 }
 
+/**
+ * Creates an entry in Supabase.
+ *
+ * @param entry - The entry fields to insert.
+ * @returns The created entry.
+ */
 export async function insertEntry(entry: InsertEntryPayload): Promise<Entry> {
   const client = getSupabaseClient();
   const entryWithPhoto = await resolveEntryPhotoInput(entry, {
@@ -336,6 +403,13 @@ export async function insertEntry(entry: InsertEntryPayload): Promise<Entry> {
   return mapEntry(data);
 }
 
+/**
+ * Updates an entry in Supabase.
+ *
+ * @param entryId - The entry to update.
+ * @param entry - The entry fields to save.
+ * @returns The updated entry.
+ */
 export async function updateEntry(
   entryId: string,
   entry: UpdateEntryPayload,
@@ -360,6 +434,12 @@ export async function updateEntry(
   return mapEntry(data);
 }
 
+/**
+ * Deletes an entry from Supabase.
+ *
+ * @param entryId - The entry to delete.
+ * @returns The deleted entry.
+ */
 export async function deleteEntry(entryId: string): Promise<Entry> {
   const { data, error } = await getSupabaseClient()
     .from("entries")

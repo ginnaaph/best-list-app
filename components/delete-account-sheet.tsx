@@ -18,6 +18,9 @@ type DeleteAccountSheetProps = {
   onDelete: () => Promise<void>;
 };
 
+/**
+ * Renders the delete account confirmation sheet.
+ */
 export function DeleteAccountSheet({
   visible,
   onClose,

@@ -78,6 +78,12 @@ function createUniqueFileName() {
   return `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
+/**
+ * Uploads a local entry photo and returns a displayable URL.
+ *
+ * @param options - The photo upload options.
+ * @returns The remote photo URL, original remote URL, or undefined.
+ */
 export async function resolveEntryPhotoUrl({
   client,
   entryId,
@@ -124,6 +130,13 @@ export async function resolveEntryPhotoUrl({
   return bucket.getPublicUrl(path).data.publicUrl;
 }
 
+/**
+ * Resolves an entry-like input's photo URL before saving.
+ *
+ * @param input - The entry-like input to resolve.
+ * @param options - The photo upload options.
+ * @returns The input with its resolved photo URL.
+ */
 export async function resolveEntryPhotoInput<T extends { photoUrl?: string }>(
   input: T,
   options: ResolveEntryPhotoInputOptions,

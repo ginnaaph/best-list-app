@@ -61,6 +61,12 @@ function mapProfileEntry(row: ProfileEntryRow): Entry {
   };
 }
 
+/**
+ * Maps a Supabase profile row into app profile data.
+ *
+ * @param row - The profile row to map.
+ * @returns The mapped profile, or null when no row exists.
+ */
 export function mapProfileRow(row: ProfileRow | null): Profile | null {
   if (!row) {
     return null;
@@ -77,6 +83,13 @@ export function mapProfileRow(row: ProfileRow | null): Profile | null {
   };
 }
 
+/**
+ * Gets the display initial for a profile.
+ *
+ * @param profile - The profile to read.
+ * @param email - The fallback email address.
+ * @returns The display initial.
+ */
 export function getProfileInitial(
   profile: Profile | null,
   email: string | undefined,
@@ -85,18 +98,39 @@ export function getProfileInitial(
   return label.trim().charAt(0).toUpperCase() || "?";
 }
 
+/**
+ * Gets the route a user should see after authentication.
+ *
+ * @param profile - The profile username state.
+ * @returns The post-auth route.
+ */
 export function getPostAuthDestination(
   profile: { username: string | null } | null | undefined,
 ) {
   return profile?.username ? ("/home" as const) : ("/setup-handle" as const);
 }
 
+/**
+ * Builds a profile update from an Apple full name.
+ *
+ * @param fullName - The full name returned by Apple.
+ * @returns The profile update, or null when the name is empty.
+ */
 export function prepareAppleNameProfileUpdate(fullName: string) {
   const normalizedFullName = fullName.trim().replace(/\s+/g, " ");
 
   return normalizedFullName ? { full_name: normalizedFullName } : null;
 }
 
+/**
+ * Builds the profile update from setup handle form values.
+ *
+ * @param handle - The requested username or handle.
+ * @param city - The user's city.
+ * @param bio - The user's optional bio.
+ * @param avatarUrl - The user's optional avatar URL.
+ * @returns The profile update payload.
+ */
 export function prepareSetupHandleProfileUpdate(
   handle: string,
   city: string,
@@ -113,6 +147,13 @@ export function prepareSetupHandleProfileUpdate(
   };
 }
 
+/**
+ * Adds entry summary data to profile categories.
+ *
+ * @param categories - The profile category rows to summarize.
+ * @param entries - The profile entry rows to use for summaries.
+ * @returns Categories with entry counts, top entries, and cover photos.
+ */
 export function summarizeProfileCategories(
   categories: ProfileCategoryRow[],
   entries: ProfileEntryRow[],

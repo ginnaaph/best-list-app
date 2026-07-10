@@ -50,6 +50,9 @@ function triggerLightImpact() {
   void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 }
 
+/**
+ * Renders a draggable score slider.
+ */
 export function ScoreSlider({
   label,
   value,

@@ -30,6 +30,9 @@ const categoryImages: Partial<Record<string, ImageSourcePropType>> = {
   cookies: images.food.cookies,
 };
 
+/**
+ * Renders a category card for the home grid.
+ */
 export function CategoryCard({ category }: CategoryCardProps) {
   const deleteCategory = useStore((state) => state.deleteCategory);
   const categoryImage: ImageSourcePropType = category.coverPhoto

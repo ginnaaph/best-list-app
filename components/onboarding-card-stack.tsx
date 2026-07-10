@@ -34,6 +34,9 @@ const cards: CardConfig[] = [
   },
 ];
 
+/**
+ * Renders the stacked food cards shown during onboarding.
+ */
 export function OnboardingCardStack() {
   return (
     <View className="h-28 w-44 items-center justify-center">

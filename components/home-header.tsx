@@ -8,6 +8,9 @@ import { useStore } from "@/store";
 
 const profileRoute = "/profile" as Href;
 
+/**
+ * Renders the home screen header and profile shortcut.
+ */
 export function HomeHeader() {
   const [username, setUsername] = useState<string>();
   const entries = useStore((state) => state.entries);

@@ -70,6 +70,9 @@ async function loadCurrentUserAvatar(): Promise<AvatarData> {
   };
 }
 
+/**
+ * Renders the signed-in user's avatar or fallback initial.
+ */
 export function CurrentUserAvatar({ size = "small" }: CurrentUserAvatarProps) {
   const [avatarData, setAvatarData] = useState<AvatarData>({
     profile: null,

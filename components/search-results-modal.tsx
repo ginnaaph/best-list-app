@@ -23,6 +23,9 @@ type SearchResultsModalProps = {
   onClose: () => void;
 };
 
+/**
+ * Renders the full-screen entry search modal.
+ */
 export function SearchResultsModal({
   visible,
   onClose,
