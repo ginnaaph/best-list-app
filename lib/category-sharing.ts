@@ -3,7 +3,7 @@ type CategorySharingState = {
   shareId?: string;
 };
 
-const shareBaseUrl = "https://best-list.vercel.app/share";
+const shareBaseUrl = "https://bestlist-app.com/share";
 
 export function getNextCategorySharingState(
   category: CategorySharingState,

@@ -107,7 +107,7 @@ export function CategoryDetailScreen({
             <Pressable
               accessibilityLabel="Open profile"
               accessibilityRole="button"
-              className="h-9 w-9 items-center justify-center rounded-full bg-white shadow-card"
+              className="h-9 w-9 items-center justify-center rounded-full shadow-card"
               onPress={() => router.push("/profile")}
             >
               <CurrentUserAvatar />
@@ -223,7 +223,7 @@ export function CategoryNotFoundScreen() {
           <Pressable
             accessibilityLabel="Open profile"
             accessibilityRole="button"
-            className="h-9 w-9 items-center justify-center rounded-full bg-white shadow-card"
+            className="h-9 w-9 items-center justify-center rounded-full shadow-card"
             onPress={() => router.push("/profile")}
           >
             <CurrentUserAvatar />

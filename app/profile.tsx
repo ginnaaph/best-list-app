@@ -1,5 +1,5 @@
-import { Link, router, useFocusEffect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { Link, router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
@@ -326,7 +326,7 @@ export default function Profile() {
                       href={`./category/${category.id}`}
                       asChild
                     >
-                      <Pressable className="flex-row items-center rounded-bestlist-xl border border-subtle bg-white px-3 gap-2 shadow-card">
+                      <Pressable className="flex-row items-center rounded-bestlist-xl border border-subtle bg-white px-3  py-2 gap-2 shadow-card">
                         <View className="h-20 w-20 overflow-hidden rounded-bestlist-md">
                           <Image
                             source={categoryImage}
