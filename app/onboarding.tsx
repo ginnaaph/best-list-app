@@ -29,9 +29,14 @@ export default function Onboarding() {
             <OnboardingCardStack />
 
             <View className="items-center gap-3">
-              <Text className="font-display text-[34px] font-bold leading-9.5 text-primary">
-                BestList
-              </Text>
+              <View className="flex-row items-center justify-center">
+                <Text className="font-display text-[44px] font-bold leading-[44px] text-primary">
+                  Best
+                </Text>
+                <Text className="font-display text-[44px] font-bold leading-[44px] text-bestlist-green">
+                  List
+                </Text>
+              </View>
               <Text className="max-w-44 text-center font-display text-[18px] leading-4 text-secondary">
                 A place to store your favorite food — ranked, remembered, and
                 ready to share.

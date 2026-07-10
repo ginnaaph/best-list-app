@@ -16,11 +16,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { VerificationModal } from "@/components/verification-modal";
 import { images } from "@/constants/images";
 import { colors } from "@/constants/theme";
-import {
-  sendEmailOtp,
-  signInWithApple,
-  signInWithGoogle,
-} from "@/lib/auth";
+import { sendEmailOtp, signInWithApple, signInWithGoogle } from "@/lib/auth";
 
 type AuthScreenProps = {
   mode: "sign-up" | "sign-in";
@@ -31,7 +27,7 @@ const authCopy = {
     eyebrow: "Start your field guide",
     title: "Create your account.",
     subtitle: "Track your favorite dishes and share your list with friends.",
-    email: "you@kitchen.com",
+    email: "youremail@email.com",
     button: "Sign up",
     footerLead: "Already have an account?",
     footerAction: "Sign in",

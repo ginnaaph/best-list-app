@@ -86,7 +86,7 @@ export function HomeHeader() {
       <Link href={profileRoute} asChild>
         <Pressable
           accessibilityLabel="Open profile"
-          className="h-7 w-7 items-center justify-center rounded-full bg-white shadow-card"
+          className="h-9 w-9 items-center justify-center rounded-full bg-white shadow-card"
         >
           <CurrentUserAvatar />
         </Pressable>

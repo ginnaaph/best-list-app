@@ -1,4 +1,5 @@
 import { router, useLocalSearchParams } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { Alert, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -19,7 +20,7 @@ function EntryNotFoundScreen() {
               router.canGoBack() ? router.back() : router.replace("/")
             }
           >
-            <Text className="text-card-title text-primary">‹</Text>
+            <Ionicons name="chevron-back" size={22} color="#000000" />
           </Pressable>
         </View>
 
@@ -133,7 +134,7 @@ export default function EditEntryScreen() {
           className="h-9 w-9 items-center justify-center rounded-full bg-white shadow-card"
           onPress={() => router.back()}
         >
-          <Text className="text-card-title text-primary">‹</Text>
+          <Ionicons name="chevron-back" size={22} color="#000000" />
         </Pressable>
 
         <Text className="font-display text-[18px] font-bold text-primary">

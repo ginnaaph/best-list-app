@@ -26,16 +26,19 @@ const scoreRows = [
 ];
 
 const rankingRows = [
-  { rank: "1", name: "Nopalito", score: "9.4" },
-  { rank: "2", name: "La Taqueria", score: "9.2", bar: true },
-  { rank: "3", name: "Cancun", score: "8.9" },
+  { rank: "1", name: "Nopalito", score: "9.4", width: "w-16" },
+  { rank: "2", name: "La Taqueria", score: "9.2", width: "w-14.5" },
+  { rank: "3", name: "Cancun", score: "8.9", width: "w-12" },
 ];
 
 export function DishCardPreview() {
   return (
     <View className="flex-row gap-2 pt-1">
       {dishCards.map((card, index) => (
-        <View key={index} className="h-22 w-22 overflow-hidden rounded-bestlist-sm">
+        <View
+          key={index}
+          className="h-22 w-22 overflow-hidden rounded-bestlist-sm"
+        >
           <Image
             source={card.image}
             resizeMode="cover"
@@ -43,7 +46,9 @@ export function DishCardPreview() {
           />
           {card.badge ? (
             <View className="absolute right-2 top-2 h-6 w-6 items-center justify-center rounded-full bg-white">
-              <Text className="font-body text-[10px] font-bold leading-3 text-accent">{card.badge}</Text>
+              <Text className="font-body text-[8px] font-medium leading-3 text-accent">
+                {card.badge}
+              </Text>
             </View>
           ) : null}
         </View>
@@ -58,7 +63,9 @@ export function ScorePreview() {
       <View className="gap-4">
         {scoreRows.map((row) => (
           <View key={row.label} className="flex-row items-center gap-4">
-            <Text className="w-16 font-body text-[14px] font-bold leading-4.25 text-primary">{row.label}</Text>
+            <Text className="w-16 font-body text-[14px] font-bold leading-4.25 text-primary">
+              {row.label}
+            </Text>
             <View className="h-1 flex-1 rounded-full bg-[#DAD8D3]">
               <View className={`h-1 rounded-full bg-accent ${row.width}`} />
             </View>
@@ -78,9 +85,15 @@ export function RankingPreview() {
       <View className="gap-2">
         {rankingRows.map((row) => (
           <View key={row.name} className="flex-row items-center">
-            <Text className="w-6 font-body text-[14px] font-bold leading-4.25 text-primary">{row.rank}</Text>
-            <Text className="flex-1 font-display text-[16px] font-bold leading-4.75 text-primary">{row.name}</Text>
-            {row.bar ? <View className="mr-4 h-2.5 w-16 rounded-full bg-accent" /> : null}
+            <Text className="w-6 font-body text-[14px] font-bold leading-4.25 text-primary">
+              {row.rank}
+            </Text>
+            <Text className="flex-1 font-display text-[16px] font-bold leading-4.75 text-primary">
+              {row.name}
+            </Text>
+            <View
+              className={`mr-4 h-2.5 rounded-full bg-accent ${row.width}`}
+            />
             <Text className="w-9 text-right font-body text-[14px] font-bold leading-4.25 text-accent">
               {row.score}
             </Text>

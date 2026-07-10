@@ -1,8 +1,8 @@
 import { router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { Pressable, ScrollView, Share, Switch, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import FontAwesome from "react-native-vector-icons/FontAwesome";
 
 import { CurrentUserAvatar } from "@/components/current-user-avatar";
 import { EntryCard } from "@/components/entry-card";
@@ -65,13 +65,13 @@ export function CategoryDetailScreen({
               router.canGoBack() ? router.back() : router.replace("/")
             }
           >
-            <Text className="text-card-title text-primary">‹</Text>
+            <Ionicons name="chevron-back" size={22} color="#000000" />
           </Pressable>
 
-          <View className="flex-row items-center gap-2 ">
+          <View className="flex-row items-center gap-2">
             <View className="h-11 flex-row items-center justify-center gap-2 rounded-full bg-white px-3 shadow-card">
-              <FontAwesome
-                name={category.isPublic ? "users" : "lock"}
+              <Ionicons
+                name={category.isPublic ? "people-outline" : "lock-closed-outline"}
                 size={14}
                 color="#000000"
               />
@@ -101,13 +101,13 @@ export function CategoryDetailScreen({
               disabled={shareDisabled}
               onPress={shareCategory}
             >
-              <FontAwesome name="share" size={16} color="#000000" />
+              <Ionicons name="share-outline" size={18} color="#000000" />
             </Pressable>
 
             <Pressable
               accessibilityLabel="Open profile"
               accessibilityRole="button"
-              className="h-7 w-7 items-center justify-center rounded-full bg-white shadow-card"
+              className="h-9 w-9 items-center justify-center rounded-full bg-white shadow-card"
               onPress={() => router.push("/profile")}
             >
               <CurrentUserAvatar />
@@ -217,13 +217,13 @@ export function CategoryNotFoundScreen() {
               router.canGoBack() ? router.back() : router.replace("/")
             }
           >
-            <Text className="text-card-title text-primary">‹</Text>
+            <Ionicons name="chevron-back" size={22} color="#000000" />
           </Pressable>
 
           <Pressable
             accessibilityLabel="Open profile"
             accessibilityRole="button"
-            className="h-7 w-7 items-center justify-center rounded-full bg-white shadow-card"
+            className="h-9 w-9 items-center justify-center rounded-full bg-white shadow-card"
             onPress={() => router.push("/profile")}
           >
             <CurrentUserAvatar />
