@@ -137,10 +137,7 @@ export function VerificationModal({
             </View>
           </View>
 
-          <Pressable
-            className="mt-8 flex-row justify-between gap-2"
-            onPress={() => inputRef.current?.focus()}
-          >
+          <View className="relative mt-8 flex-row justify-between gap-2">
             {Array.from({ length: CODE_LENGTH }).map((_, index) => {
               const digit = code[index];
               const isActive =
@@ -159,7 +156,25 @@ export function VerificationModal({
                 </View>
               );
             })}
-          </Pressable>
+
+            <TextInput
+              accessibilityLabel="Verification code"
+              caretHidden
+              className="absolute inset-0 z-10 h-full w-full bg-transparent p-0"
+              inputMode="numeric"
+              keyboardType="number-pad"
+              maxLength={CODE_LENGTH}
+              onChangeText={(value) => {
+                if (!isVerifying && !isResending) {
+                  void handleCodeChange(value);
+                }
+              }}
+              ref={inputRef}
+              style={{ color: "transparent" }}
+              textContentType="oneTimeCode"
+              value={code}
+            />
+          </View>
 
           <View className="mt-6 flex-row items-center justify-between">
             <View className="flex-row items-center">
@@ -189,22 +204,6 @@ export function VerificationModal({
                 .padStart(2, "0")}`}
             </Text>
           </View>
-
-          <TextInput
-            accessibilityLabel="Verification code"
-            className="absolute h-0 w-0 opacity-0"
-            inputMode="numeric"
-            keyboardType="number-pad"
-            maxLength={CODE_LENGTH}
-            onChangeText={(value) => {
-              if (!isVerifying && !isResending) {
-                void handleCodeChange(value);
-              }
-            }}
-            ref={inputRef}
-            textContentType="oneTimeCode"
-            value={code}
-          />
         </View>
       </KeyboardAvoidingView>
     </Modal>
