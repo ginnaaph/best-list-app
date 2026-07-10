@@ -37,6 +37,11 @@ const supportRows = [
     showsChevron: true,
     onPress: () => router.push("/contact-us"),
   },
+  {
+    label: "Report a bug",
+    showsChevron: true,
+    onPress: () => router.push("/report-a-bug"),
+  },
 ];
 
 type SettingsRow = {
