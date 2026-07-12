@@ -6,6 +6,9 @@ type FloatingAddButtonProps = {
   onPress?: PressableProps["onPress"];
 };
 
+/**
+ * Renders the floating add action button.
+ */
 export function FloatingAddButton({
   accessibilityLabel = "Add category",
   onPress,

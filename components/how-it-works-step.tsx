@@ -8,6 +8,9 @@ type HowItWorksStepProps = {
   children: React.ReactNode;
 };
 
+/**
+ * Renders one onboarding explanation step.
+ */
 export function HowItWorksStep({
   number,
   title,

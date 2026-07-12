@@ -7,6 +7,9 @@ type CategoryGridProps = {
   categories: Category[];
 };
 
+/**
+ * Renders the responsive category card grid.
+ */
 export function CategoryGrid({ categories }: CategoryGridProps) {
   return (
     <View className="flex-row flex-wrap justify-between gap-y-4">

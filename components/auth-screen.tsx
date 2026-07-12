@@ -47,6 +47,9 @@ const authCopy = {
   },
 } as const;
 
+/**
+ * Renders the sign-in or sign-up screen.
+ */
 export function AuthScreen({ mode }: AuthScreenProps) {
   const copy = authCopy[mode];
   const [email, setEmail] = useState<string>(copy.email);

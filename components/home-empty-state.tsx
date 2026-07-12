@@ -3,6 +3,9 @@ import { Pressable, Text, View } from "react-native";
 
 const addCategoryRoute = "/add-category" as Href;
 
+/**
+ * Renders the home screen empty state.
+ */
 export function HomeEmptyState() {
   const router = useRouter();
 

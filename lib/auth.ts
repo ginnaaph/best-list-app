@@ -28,6 +28,13 @@ export const authRedirectTo =
     ? Linking.createURL("auth/callback")
     : "bestlist://auth/callback";
 
+/**
+ * Sends an email OTP for sign-up or sign-in.
+ *
+ * @param email - The email address to authenticate.
+ * @param mode - The email auth flow to use.
+ * @returns The normalized email address.
+ */
 export async function sendEmailOtp(email: string, mode: EmailAuthMode) {
   assertSupabaseConfigured();
 
@@ -53,6 +60,13 @@ export async function sendEmailOtp(email: string, mode: EmailAuthMode) {
   return normalizedEmail;
 }
 
+/**
+ * Creates a Supabase account with email and password.
+ *
+ * @param email - The email address to register.
+ * @param password - The password to register.
+ * @returns The auth session state after sign-up.
+ */
 export async function signUpWithPassword(email: string, password: string) {
   assertSupabaseConfigured();
 
@@ -71,6 +85,13 @@ export async function signUpWithPassword(email: string, password: string) {
   return { needsEmailConfirmation: false, session: data.session } as const;
 }
 
+/**
+ * Signs in with a Supabase email and password.
+ *
+ * @param email - The account email address.
+ * @param password - The account password.
+ * @returns The authenticated session.
+ */
 export async function signInWithPassword(email: string, password: string) {
   assertSupabaseConfigured();
 
@@ -89,6 +110,13 @@ export async function signInWithPassword(email: string, password: string) {
   return data.session;
 }
 
+/**
+ * Verifies an email OTP and creates a session.
+ *
+ * @param email - The email address being verified.
+ * @param code - The OTP code to verify.
+ * @returns The authenticated session.
+ */
 export async function verifyEmailOtp(email: string, code: string) {
   const supabase = getSupabaseClient();
 
@@ -105,6 +133,11 @@ export async function verifyEmailOtp(email: string, code: string) {
   return data.session;
 }
 
+/**
+ * Starts a browser-based social sign-in flow.
+ *
+ * @param provider - The social auth provider to use.
+ */
 export async function signInWithSocialProvider(provider: SocialAuthProvider) {
   const supabase = getSupabaseClient();
 
@@ -153,6 +186,9 @@ export async function signInWithSocialProvider(provider: SocialAuthProvider) {
   throw new Error(`${getProviderLabel(provider)} sign in did not complete.`);
 }
 
+/**
+ * Signs in with native Google Sign-In.
+ */
 export async function signInWithGoogle() {
   if (!googleWebClientId || !googleIosClientId) {
     throw new Error(
@@ -185,6 +221,9 @@ export async function signInWithGoogle() {
   }
 }
 
+/**
+ * Signs in with Apple on iOS or browser OAuth elsewhere.
+ */
 export async function signInWithApple() {
   if (Platform.OS !== "ios") {
     return signInWithSocialProvider("apple");
@@ -246,6 +285,12 @@ export async function signInWithApple() {
   }
 }
 
+/**
+ * Creates a Supabase session from an auth callback URL.
+ *
+ * @param url - The auth callback URL containing a code or tokens.
+ * @returns The authenticated session, or null when the URL has no tokens.
+ */
 export async function createSessionFromUrl(url: string) {
   const supabase = getSupabaseClient();
 

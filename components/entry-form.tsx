@@ -171,6 +171,9 @@ function getCityFallbackFromPrediction(prediction: PlacePrediction) {
   return [mainText, state].filter(Boolean).join(", ");
 }
 
+/**
+ * Renders the entry create and edit form.
+ */
 export function EntryForm({
   initialValues,
   saveLabel,

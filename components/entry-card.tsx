@@ -9,6 +9,9 @@ type EntryCardProps = {
   rank: number;
 };
 
+/**
+ * Renders a ranked entry summary card.
+ */
 export function EntryCard({ entry, rank }: EntryCardProps) {
   const overallScore = calculateOverallScore(entry);
   const rankingLabel = `#${rank} - ${entry.city.toUpperCase()}`;

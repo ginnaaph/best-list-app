@@ -24,6 +24,9 @@ type VerificationModalProps = {
 const CODE_LENGTH = 6;
 const RESEND_DELAY_SECONDS = 60;
 
+/**
+ * Renders the email OTP verification modal.
+ */
 export function VerificationModal({
   email,
   mode,

@@ -29,6 +29,9 @@ type CategoryDetailScreenProps = {
   toggleDisabled: boolean;
 };
 
+/**
+ * Renders the category detail ranking screen.
+ */
 export function CategoryDetailScreen({
   category,
   entries,
@@ -205,6 +208,9 @@ export function CategoryDetailScreen({
   );
 }
 
+/**
+ * Renders the fallback screen for a missing category.
+ */
 export function CategoryNotFoundScreen() {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>

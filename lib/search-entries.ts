@@ -17,6 +17,14 @@ function getOverallScore(entry: Entry) {
   return Math.round((total / 4) * 10) / 10;
 }
 
+/**
+ * Searches entries by category, place, or city.
+ *
+ * @param entries - The entries to search.
+ * @param categories - The categories used for result labels.
+ * @param query - The search query.
+ * @returns Matching entries sorted by overall score.
+ */
 export function searchEntries(
   entries: Entry[],
   categories: Category[],

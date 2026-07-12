@@ -4,6 +4,9 @@ import { Pressable, Text } from "react-native";
 
 import { SearchResultsModal } from "@/components/search-results-modal";
 
+/**
+ * Renders the compact search launcher for the home screen.
+ */
 export function SearchPill() {
   const [isSearchVisible, setIsSearchVisible] = useState(false);
 

@@ -31,6 +31,9 @@ const rankingRows = [
   { rank: "3", name: "Cancun", score: "8.9" },
 ];
 
+/**
+ * Renders the onboarding dish card preview.
+ */
 export function DishCardPreview() {
   return (
     <View className="flex-row gap-2 pt-1">
@@ -57,6 +60,9 @@ export function DishCardPreview() {
   );
 }
 
+/**
+ * Renders the onboarding scoring preview.
+ */
 export function ScorePreview() {
   return (
     <View className="w-full rounded-bestlist-sm border border-subtle bg-white px-5 py-5">
@@ -79,6 +85,9 @@ export function ScorePreview() {
   );
 }
 
+/**
+ * Renders the onboarding ranking preview.
+ */
 export function RankingPreview() {
   return (
     <View className="w-full rounded-bestlist-sm border border-subtle bg-white px-5 py-4">

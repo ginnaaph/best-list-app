@@ -31,6 +31,13 @@ function getAvatarStoragePath(avatarUrl: string) {
   return null;
 }
 
+/**
+ * Resolves storage avatar paths to signed URLs and passes external URLs through.
+ *
+ * @param avatarUrl - The stored avatar URL or path.
+ * @param cacheKey - The cache-busting value to append.
+ * @returns The displayable avatar URL.
+ */
 export async function resolveAvatarDisplayUrl(
   avatarUrl: string,
   cacheKey = Date.now(),

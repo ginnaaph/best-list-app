@@ -9,6 +9,9 @@ const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
 export const isSupabaseConfigured = !!(supabaseUrl && supabaseAnonKey);
 
+/**
+ * Throws when Supabase environment variables are missing.
+ */
 export function assertSupabaseConfigured() {
   if (!isSupabaseConfigured) {
     throw new Error(
@@ -40,11 +43,21 @@ export const publicSupabase = createClient(
   },
 );
 
+/**
+ * Gets the configured Supabase client.
+ *
+ * @returns The configured Supabase client.
+ */
 export function getSupabaseClient() {
   assertSupabaseConfigured();
   return supabase;
 }
 
+/**
+ * Gets the public Supabase client for read-only share flows.
+ *
+ * @returns The configured public Supabase client.
+ */
 export function getPublicSupabaseClient() {
   assertSupabaseConfigured();
   return publicSupabase;
