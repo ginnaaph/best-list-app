@@ -32,7 +32,7 @@ function getAvatarStoragePath(avatarUrl: string) {
 }
 
 /**
- * Creates a signed avatar URL with a cache key.
+ * Resolves storage avatar paths to signed URLs and passes external URLs through.
  *
  * @param avatarUrl - The stored avatar URL or path.
  * @param cacheKey - The cache-busting value to append.

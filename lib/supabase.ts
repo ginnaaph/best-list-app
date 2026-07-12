@@ -44,7 +44,7 @@ export const publicSupabase = createClient(
 );
 
 /**
- * Gets the authenticated Supabase client.
+ * Gets the configured Supabase client.
  *
  * @returns The configured Supabase client.
  */
