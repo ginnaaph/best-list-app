@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Image,
+  Platform,
   Pressable,
   ScrollView,
   Share,
@@ -248,14 +249,17 @@ export default function ShareListScreen() {
 
 function SharedListLogo() {
   const [hasImageError, setHasImageError] = useState(false);
-  const logoSource = hasImageError
-    ? sharedListLogoFallbackSource
-    : sharedListLogoSource;
+  const isWeb = Platform.OS === "web";
+  const logoSource = isWeb
+    ? hasImageError
+      ? sharedListLogoFallbackSource
+      : sharedListLogoSource
+    : images.bestListMark;
 
   return (
     <Image
       className="h-full w-full"
-      onError={() => setHasImageError(true)}
+      onError={isWeb ? () => setHasImageError(true) : undefined}
       resizeMode="cover"
       source={logoSource}
     />
