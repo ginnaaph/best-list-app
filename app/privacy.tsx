@@ -12,6 +12,7 @@ const collectedInformation = [
   "Shared links — when you share a list via link, we store that link so others can view it.",
   "Crash and diagnostic data — if the app crashes or hits an error, our crash-reporting tool (Sentry) automatically receives a report with your device model, OS version, app version, your device's IP address, a stack trace of the code that was running, and diagnostic console logs. For a small sample of sessions, and for any session where a crash happens, it also captures a screen recording of what was on screen — text and images in these recordings are masked by default, so the actual content of your lists or photos isn't exposed. These automatic crash reports do not include your name, email, or account ID (bug reports you choose to submit are covered below; see \"Third-Party Services\" below).",
   "Bug reports you submit — if you use the \"Report a bug\" option in Settings, the name, email, and description you type there are sent directly to Sentry as part of your report. This is separate from the automatic crash data above, and only happens when you choose to submit a report.",
+  "Contact form submissions — if you use the \"Contact Us\" option in Settings, the name, email, subject, and message you submit are sent to and stored by our contact form provider, Formspree, so we can respond to you (see \"Third-Party Services\" below).",
 ];
 
 const informationNotCollected = [
@@ -30,6 +31,7 @@ const dataUses = [
   "To enable link sharing so others can view lists you choose to share",
   "To detect, diagnose, and fix crashes and bugs",
   "To let you submit a bug report with your name, email, and description, if you choose to",
+  "To let you contact us through the in-app contact form, if you choose to",
   "To allow you to delete your account and all associated data",
 ];
 
@@ -82,7 +84,7 @@ export default function PrivacyScreen() {
 
         <View className="gap-7 pt-8">
           <Text className="font-body text-[14px] text-[#8E8E93]">
-            Last updated: July 9, 2026
+            Last updated: July 12, 2026
           </Text>
 
           <View className="gap-3">
@@ -182,6 +184,14 @@ export default function PrivacyScreen() {
               email, and message you provide are sent to Sentry as part of
               that report. Sentry&apos;s privacy policy applies to this data and
               can be found at sentry.io/privacy.
+            </Text>
+            <Text className="font-body text-[16px] leading-6 text-[#1C1C1E]">
+              We use Formspree to handle submissions from the &quot;Contact
+              Us&quot; form. If you reach out through that form, the name,
+              email, subject, and message you provide are sent to and stored
+              by Formspree so we can respond to you. Formspree&apos;s privacy
+              policy applies to this data and can be found at
+              formspree.io/legal/privacy-policy.
             </Text>
             <Text className="font-body text-[16px] leading-6 text-[#1C1C1E]">
               These are the only third-party services with access to your data.
