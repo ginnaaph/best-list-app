@@ -4,12 +4,14 @@ import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Image,
+  Platform,
   Pressable,
   ScrollView,
   Share,
   Text,
   TextInput,
   View,
+  type ImageSourcePropType,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -33,6 +35,11 @@ const scoreDimensions: { label: string; key: ScoreDimension }[] = [
   { label: "PORTION", key: "portion" },
   { label: "VIBE", key: "vibe" },
 ];
+
+const sharedListLogoSource: ImageSourcePropType = { uri: "/favicon.ico" };
+const sharedListLogoFallbackSource: ImageSourcePropType = {
+  uri: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%232D6A4F'/%3E%3Ctext x='32' y='39' text-anchor='middle' font-family='Arial,sans-serif' font-size='18' font-weight='700' fill='white'%3EBL%3C/text%3E%3C/svg%3E",
+};
 
 export default function ShareListScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -148,15 +155,12 @@ export default function ShareListScreen() {
       <SafeAreaView style={{ flex: 1, backgroundColor: "#F5F0E8" }}>
         <View className="flex-1 px-5 pb-8 pt-10">
           <View className="h-11 w-11 overflow-hidden rounded-full bg-accent">
-            <Image
-              className="h-full w-full"
-              resizeMode="cover"
-              source={images.bestListMark}
-            />
+            <SharedListLogo />
           </View>
 
           <View className="mt-12 gap-3">
-            <Text className="text-center font-display text-[38px] font-bold leading-10 text-primary">
+            {/* leading-10 compiles to two conflicting rules on web export; see 2026-07-13 debugging session; leading-[40px] avoids it. */}
+            <Text className="text-center font-display text-[38px] font-bold leading-[40px] text-primary">
               List not found
             </Text>
             <Text className="text-center font-body text-[15px] leading-6 text-secondary">
@@ -179,11 +183,7 @@ export default function ShareListScreen() {
         <View className="flex-row items-center justify-between">
           <View className="items-center gap-1">
             <View className="h-9 w-9 overflow-hidden rounded-full bg-white shadow-card">
-              <Image
-                className="h-full w-full"
-                resizeMode="cover"
-                source={images.bestListMark}
-              />
+              <SharedListLogo />
             </View>
 
             {ownerHandle ? (
@@ -204,7 +204,8 @@ export default function ShareListScreen() {
         </View>
 
         <View className="gap-2">
-          <Text className="text-center font-display text-[38px] font-bold leading-10 text-primary">
+          {/* leading-10 compiles to two conflicting rules on web export; see 2026-07-13 debugging session; leading-[40px] avoids it. */}
+          <Text className="text-center font-display text-[38px] font-bold leading-[40px] text-primary">
             {category.name}
           </Text>
           <Text className="text-center font-mono-bestlist text-[12px] font-bold uppercase leading-5 tracking-[4px] text-secondary">
@@ -243,6 +244,25 @@ export default function ShareListScreen() {
         </ScrollView>
       </View>
     </SafeAreaView>
+  );
+}
+
+function SharedListLogo() {
+  const [hasImageError, setHasImageError] = useState(false);
+  const isWeb = Platform.OS === "web";
+  const logoSource = isWeb
+    ? hasImageError
+      ? sharedListLogoFallbackSource
+      : sharedListLogoSource
+    : images.bestListMark;
+
+  return (
+    <Image
+      className="h-full w-full"
+      onError={isWeb ? () => setHasImageError(true) : undefined}
+      resizeMode="cover"
+      source={logoSource}
+    />
   );
 }
 
