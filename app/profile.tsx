@@ -288,7 +288,7 @@ export default function Profile() {
               </Text>
 
               <Text className="mt-1 text-center font-mono-bestlist text-[11px] uppercase leading-3.5 tracking-[3px] text-accent">
-                {isGuest ? "Browsing as a guest" : getUsernameLabel(profile)}
+                {isGuest ? "" : getUsernameLabel(profile)}
                 {cityLabel ? ` · ${cityLabel}` : null}
               </Text>
 
@@ -303,7 +303,7 @@ export default function Profile() {
 
               {isGuest ? (
                 <Pressable
-                  className="mt-2 h-10 items-center justify-center rounded-full border border-subtle bg-white px-5"
+                  className="mt-2 h-10 items-center justify-center rounded-full bg-accent px-5"
                   onPress={() => {
                     // Temporary placeholder: plain sign-up creates a separate account today
                     // and does not carry over the guest's existing lists. Real
@@ -311,7 +311,7 @@ export default function Profile() {
                     router.push("/sign-up");
                   }}
                 >
-                  <Text className="font-body text-[14px] font-semibold leading-5 text-primary">
+                  <Text className="font-body text-[14px] font-semibold leading-5 text-white">
                     Create account to save your list
                   </Text>
                 </Pressable>
