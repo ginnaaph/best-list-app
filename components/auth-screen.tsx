@@ -16,7 +16,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { VerificationModal } from "@/components/verification-modal";
 import { images } from "@/constants/images";
 import { colors } from "@/constants/theme";
-import { sendEmailOtp, signInWithApple, signInWithGoogle } from "@/lib/auth";
+import {
+  sendEmailOtp,
+  signInAsGuest,
+  signInWithApple,
+  signInWithGoogle,
+} from "@/lib/auth";
 
 type AuthScreenProps = {
   mode: "sign-up" | "sign-in";
@@ -89,6 +94,19 @@ export function AuthScreen({ mode }: AuthScreenProps) {
 
     try {
       await signInWithApple();
+      router.replace("/");
+    } catch (error) {
+      Alert.alert("Authentication error", getErrorMessage(error));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleGuestPress = async () => {
+    setIsSubmitting(true);
+
+    try {
+      await signInAsGuest();
       router.replace("/");
     } catch (error) {
       Alert.alert("Authentication error", getErrorMessage(error));
@@ -210,6 +228,16 @@ export function AuthScreen({ mode }: AuthScreenProps) {
             </Text>
           </Pressable>
         </Link>
+
+        <Pressable
+          className="items-center py-1"
+          disabled={isSubmitting}
+          onPress={handleGuestPress}
+        >
+          <Text className="text-caption text-secondary">
+            {isSubmitting ? "Continuing..." : "Continue without an account"}
+          </Text>
+        </Pressable>
       </View>
 
       <VerificationModal

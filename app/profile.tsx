@@ -3,6 +3,7 @@ import { Link, router, useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   Image,
   type ImageSourcePropType,
   Pressable,
@@ -35,6 +36,7 @@ const entryColumns =
 type ProfileScreenData = {
   profile: DatabaseProfile | null;
   email?: string;
+  isGuest: boolean;
   categories: Category[];
   stats: {
     loggedEntries: number;
@@ -54,6 +56,11 @@ function getCityLabel(profile: DatabaseProfile | null) {
   return profile?.city?.toUpperCase() ?? null;
 }
 
+/**
+ * Loads the current user's profile, guest state, category summaries, and stats.
+ *
+ * @returns Profile screen data for the signed-in user, or empty data when signed out.
+ */
 async function loadProfileScreenData(): Promise<ProfileScreenData> {
   const supabase = getSupabaseClient();
   const {
@@ -68,6 +75,7 @@ async function loadProfileScreenData(): Promise<ProfileScreenData> {
   if (!user) {
     return {
       profile: null,
+      isGuest: false,
       categories: [],
       stats: { loggedEntries: 0, distinctEntryCategories: 0 },
     };
@@ -116,6 +124,7 @@ async function loadProfileScreenData(): Promise<ProfileScreenData> {
         }
       : profile,
     email: user.email,
+    isGuest: Boolean(user.is_anonymous),
     categories: summarizeProfileCategories(
       categoriesResult.data,
       entriesResult.data,
@@ -138,6 +147,7 @@ export default function Profile() {
   const [profileError, setProfileError] = useState<string | null>(null);
   const profile = profileData?.profile ?? null;
   const profileEmail = profileData?.email;
+  const isGuest = profileData?.isGuest ?? false;
   const cityLabel = getCityLabel(profile);
   const listCategories = profileData?.categories.slice(0, 4) ?? [];
   const stats = [
@@ -182,7 +192,7 @@ export default function Profile() {
     }, []),
   );
 
-  async function handleSignOut() {
+  async function completeSignOut() {
     if (isSigningOut) {
       return;
     }
@@ -203,6 +213,28 @@ export default function Profile() {
       setIsSigningOut(false);
       router.replace("/sign-in");
     }
+  }
+
+  async function handleSignOut() {
+    if (!isGuest) {
+      await completeSignOut();
+      return;
+    }
+
+    Alert.alert(
+      "End guest session?",
+      "This will permanently delete your guest list since there is no way to sign back into an anonymous session.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "End session",
+          style: "destructive",
+          onPress: () => {
+            void completeSignOut();
+          },
+        },
+      ],
+    );
   }
 
   return (
@@ -252,11 +284,11 @@ export default function Profile() {
               <CurrentUserAvatar size="large" />
 
               <Text className="mt-1 font-display text-[33px] font-bold leading-9 text-primary">
-                {getDisplayName(profile, profileEmail)}
+                {isGuest ? "Guest" : getDisplayName(profile, profileEmail)}
               </Text>
 
               <Text className="mt-1 text-center font-mono-bestlist text-[11px] uppercase leading-3.5 tracking-[3px] text-accent">
-                {getUsernameLabel(profile)}
+                {isGuest ? "Browsing as a guest" : getUsernameLabel(profile)}
                 {cityLabel ? ` · ${cityLabel}` : null}
               </Text>
 
@@ -269,16 +301,32 @@ export default function Profile() {
                 </Text>
               ) : null}
 
-              <Pressable
-                className="mt-2 h-10 items-center justify-center rounded-full border border-subtle bg-white px-5"
-                onPress={() => {
-                  router.push("/edit-profile");
-                }}
-              >
-                <Text className="font-body text-[14px] font-semibold leading-5 text-primary">
-                  Edit profile
-                </Text>
-              </Pressable>
+              {isGuest ? (
+                <Pressable
+                  className="mt-2 h-10 items-center justify-center rounded-full border border-subtle bg-white px-5"
+                  onPress={() => {
+                    // Temporary placeholder: plain sign-up creates a separate account today
+                    // and does not carry over the guest's existing lists. Real
+                    // guest-to-account linking is scope 3.
+                    router.push("/sign-up");
+                  }}
+                >
+                  <Text className="font-body text-[14px] font-semibold leading-5 text-primary">
+                    Create account to save your list
+                  </Text>
+                </Pressable>
+              ) : (
+                <Pressable
+                  className="mt-2 h-10 items-center justify-center rounded-full border border-subtle bg-white px-5"
+                  onPress={() => {
+                    router.push("/edit-profile");
+                  }}
+                >
+                  <Text className="font-body text-[14px] font-semibold leading-5 text-primary">
+                    Edit profile
+                  </Text>
+                </Pressable>
+              )}
             </View>
 
             <View className="mt-5 flex-row items-center rounded-bestlist-xl border border-subtle bg-white px-6 py-5 shadow-card">
