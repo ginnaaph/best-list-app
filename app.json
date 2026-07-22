@@ -14,8 +14,8 @@
       "usesAppleSignIn": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "NSCameraUsageDescription": "Allow BestList to use your camera to take photos.",
-        "NSPhotoLibraryUsageDescription": "Allow BestList to access your photo library to choose photos."
+        "NSCameraUsageDescription": "BestList uses your camera so you can snap a photo of a dish to attach to your entry.",
+        "NSPhotoLibraryUsageDescription": "BestList accesses your photo library so you can attach an existing photo of a dish to your entry."
       }
     },
     "android": {
@@ -37,8 +37,8 @@
       [
         "expo-image-picker",
         {
-          "cameraPermission": "Allow BestList to use your camera to take photos.",
-          "photosPermission": "Allow BestList to access your photo library to choose photos."
+          "cameraPermission": "BestList uses your camera so you can snap a photo of a dish to attach to your entry.",
+          "photosPermission": "BestList accesses your photo library so you can attach an existing photo of a dish to your entry."
         }
       ],
       [
