@@ -1,5 +1,5 @@
 import { type Href, useRouter } from "expo-router";
-import { ScrollView, View } from "react-native";
+import { Alert, ScrollView, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import {
@@ -10,18 +10,22 @@ import {
   SearchPill,
 } from "@/components";
 import { colors } from "@/constants/theme";
+import { useAuthSession } from "@/hooks/use-auth-session";
 import { sortEntries } from "@/lib/entry-score";
 import { useStore } from "@/store";
 
 const addCategoryRoute = "/add-category" as Href;
+const signUpRoute = "/sign-up" as Href;
 
 /**
  * Renders the authenticated home screen.
  */
 export function HomeScreen() {
   const router = useRouter();
+  const { session } = useAuthSession();
   const categories = useStore((state) => state.categories);
   const entries = useStore((state) => state.entries);
+  const isGuest = Boolean(session?.user.is_anonymous);
   const categoriesWithStats = categories.map((category) => {
     const categoryEntries = entries.filter(
       (entry) => entry.categoryId === category.id,
@@ -35,6 +39,29 @@ export function HomeScreen() {
       coverPhoto: topEntry?.photoUrl ?? category.coverPhoto,
     };
   });
+  const handleAddCategoryPress = () => {
+    if (isGuest && categories.length >= 1) {
+      Alert.alert(
+        "Create an account to keep going",
+        "Guests can save one list. Create an account to keep this one and start more.",
+        [
+          { text: "Not now", style: "cancel" },
+          {
+            text: "Create account",
+            onPress: () => {
+              // Temporary placeholder: plain sign-up creates a separate account today
+              // and does not carry over the guest's existing lists. Real
+              // guest-to-account linking is scope 3.
+              router.push(signUpRoute);
+            },
+          },
+        ],
+      );
+      return;
+    }
+
+    router.push(addCategoryRoute);
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
@@ -56,7 +83,7 @@ export function HomeScreen() {
         </ScrollView>
 
         {categories.length > 0 && (
-          <FloatingAddButton onPress={() => router.push(addCategoryRoute)} />
+          <FloatingAddButton onPress={handleAddCategoryPress} />
         )}
       </View>
     </SafeAreaView>

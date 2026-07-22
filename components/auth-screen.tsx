@@ -234,7 +234,7 @@ export function AuthScreen({ mode }: AuthScreenProps) {
           disabled={isSubmitting}
           onPress={handleGuestPress}
         >
-          <Text className="text-caption text-secondary">
+          <Text className="font-body text-[16px] font-bold leading-5 text-accent">
             {isSubmitting ? "Continuing..." : "Continue without an account"}
           </Text>
         </Pressable>
