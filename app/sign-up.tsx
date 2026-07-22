@@ -10,7 +10,7 @@ export default function SignUp() {
     return null;
   }
 
-  if (session) {
+  if (session && !session.user.is_anonymous) {
     return <Redirect href="/" />;
   }
 

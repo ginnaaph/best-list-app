@@ -16,7 +16,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { VerificationModal } from "@/components/verification-modal";
 import { images } from "@/constants/images";
 import { colors } from "@/constants/theme";
+import { useAuthSession } from "@/hooks/use-auth-session";
 import {
+  linkGuestEmail,
   sendEmailOtp,
   signInAsGuest,
   signInWithApple,
@@ -57,16 +59,21 @@ const authCopy = {
  */
 export function AuthScreen({ mode }: AuthScreenProps) {
   const copy = authCopy[mode];
+  const { session } = useAuthSession();
   const [email, setEmail] = useState<string>(copy.email);
   const [isVerificationVisible, setIsVerificationVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [verifiedEmail, setVerifiedEmail] = useState<string>(copy.email);
+  const isGuestSignUp =
+    mode === "sign-up" && Boolean(session?.user.is_anonymous);
 
   const handlePrimaryPress = async () => {
     setIsSubmitting(true);
 
     try {
-      const normalizedEmail = await sendEmailOtp(email, mode);
+      const normalizedEmail = isGuestSignUp
+        ? await linkGuestEmail(email)
+        : await sendEmailOtp(email, mode);
       setVerifiedEmail(normalizedEmail);
       setIsVerificationVisible(true);
     } catch (error) {
@@ -77,6 +84,14 @@ export function AuthScreen({ mode }: AuthScreenProps) {
   };
 
   const handleGooglePress = async () => {
+    if (isGuestSignUp) {
+      Alert.alert(
+        "Use email for now",
+        "Google account linking for guests is coming soon. Use email to preserve your guest lists.",
+      );
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -90,6 +105,14 @@ export function AuthScreen({ mode }: AuthScreenProps) {
   };
 
   const handleApplePress = async () => {
+    if (isGuestSignUp) {
+      Alert.alert(
+        "Use email for now",
+        "Apple account linking for guests is coming soon. Use email to preserve your guest lists.",
+      );
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -242,6 +265,7 @@ export function AuthScreen({ mode }: AuthScreenProps) {
 
       <VerificationModal
         email={verifiedEmail}
+        flow={isGuestSignUp ? "guest-email-link" : "email-auth"}
         mode={mode}
         onClose={() => setIsVerificationVisible(false)}
         visible={isVerificationVisible}
