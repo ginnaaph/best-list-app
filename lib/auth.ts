@@ -111,6 +111,28 @@ export async function signInWithPassword(email: string, password: string) {
 }
 
 /**
+ * Signs in with a Supabase anonymous guest session.
+ *
+ * @returns The anonymous authenticated session.
+ */
+export async function signInAsGuest() {
+  assertSupabaseConfigured();
+
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase.auth.signInAnonymously();
+
+  if (error) {
+    throw error;
+  }
+
+  if (!data.session) {
+    throw new Error("Guest sign in did not return a session. Try again.");
+  }
+
+  return data.session;
+}
+
+/**
  * Verifies an email OTP and creates a session.
  *
  * @param email - The email address being verified.

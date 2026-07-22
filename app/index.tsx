@@ -46,6 +46,11 @@ export default function Index() {
     const userId = session.user.id;
     setProfileSetupResult(null);
 
+    if (session.user.is_anonymous) {
+      setProfileSetupResult({ userId, destination: "/home" });
+      return;
+    }
+
     async function checkProfileSetup() {
       try {
         const supabase = getSupabaseClient();
