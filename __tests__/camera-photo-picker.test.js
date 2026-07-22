@@ -55,19 +55,19 @@ test("iOS and expo-image-picker declare matching photo permissions", () => {
 
   assert.equal(
     infoPlist.NSCameraUsageDescription,
-    "BestList uses your camera so you can snap a photo of a dish to attach to your entry.",
+    "BestList uses your camera so you can snap a photo of a dish for an entry or take a profile avatar photo.",
   );
   assert.equal(
     infoPlist.NSPhotoLibraryUsageDescription,
-    "BestList accesses your photo library so you can attach an existing photo of a dish to your entry.",
+    "BestList accesses your photo library so you can attach an existing dish photo to an entry or choose a profile avatar.",
   );
   assert.deepEqual(imagePickerPlugin, [
     "expo-image-picker",
     {
       cameraPermission:
-        "BestList uses your camera so you can snap a photo of a dish to attach to your entry.",
+        "BestList uses your camera so you can snap a photo of a dish for an entry or take a profile avatar photo.",
       photosPermission:
-        "BestList accesses your photo library so you can attach an existing photo of a dish to your entry.",
+        "BestList accesses your photo library so you can attach an existing dish photo to an entry or choose a profile avatar.",
     },
   ]);
 });
