@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import type { Session } from "@supabase/supabase-js";
 import { Link, router } from "expo-router";
 import { useState } from "react";
 import {
@@ -16,7 +17,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { VerificationModal } from "@/components/verification-modal";
 import { images } from "@/constants/images";
 import { colors } from "@/constants/theme";
-import { useAuthSession } from "@/hooks/use-auth-session";
 import {
   linkGuestEmail,
   sendEmailOtp,
@@ -27,6 +27,7 @@ import {
 
 type AuthScreenProps = {
   mode: "sign-up" | "sign-in";
+  session: Session | null;
 };
 
 const authCopy = {
@@ -57,9 +58,8 @@ const authCopy = {
 /**
  * Renders the sign-in or sign-up screen.
  */
-export function AuthScreen({ mode }: AuthScreenProps) {
+export function AuthScreen({ mode, session }: AuthScreenProps) {
   const copy = authCopy[mode];
-  const { session } = useAuthSession();
   const [email, setEmail] = useState<string>(copy.email);
   const [isVerificationVisible, setIsVerificationVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);

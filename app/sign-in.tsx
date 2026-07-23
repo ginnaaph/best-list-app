@@ -14,5 +14,5 @@ export default function SignIn() {
     return <Redirect href="/" />;
   }
 
-  return <AuthScreen mode="sign-in" />;
+  return <AuthScreen mode="sign-in" session={session} />;
 }

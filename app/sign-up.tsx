@@ -14,5 +14,5 @@ export default function SignUp() {
     return <Redirect href="/" />;
   }
 
-  return <AuthScreen mode="sign-up" />;
+  return <AuthScreen mode="sign-up" session={session} />;
 }
