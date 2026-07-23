@@ -305,14 +305,13 @@ export default function Profile() {
                 <Pressable
                   className="mt-2 h-10 items-center justify-center rounded-full bg-accent px-5"
                   onPress={() => {
-                    // Temporary placeholder: plain sign-up creates a separate account today
-                    // and does not carry over the guest's existing lists. Real
-                    // guest-to-account linking is scope 3.
+                    // The sign-up screen links guest sessions by email; social
+                    // account linking for guests is still guarded there.
                     router.push("/sign-up");
                   }}
                 >
                   <Text className="font-body text-[14px] font-semibold leading-5 text-white">
-                    Create account to save your list
+                    Add email to keep your list
                   </Text>
                 </Pressable>
               ) : (
