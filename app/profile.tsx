@@ -311,7 +311,7 @@ export default function Profile() {
                   }}
                 >
                   <Text className="font-body text-[14px] font-semibold leading-5 text-white">
-                    Add email to keep your list
+                    Create an account to keep your list
                   </Text>
                 </Pressable>
               ) : (
