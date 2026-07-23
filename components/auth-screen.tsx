@@ -68,6 +68,10 @@ export function AuthScreen({ mode, session }: AuthScreenProps) {
     mode === "sign-up" && Boolean(session?.user.is_anonymous);
 
   const handlePrimaryPress = async () => {
+    if (isSubmitting) {
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -84,6 +88,10 @@ export function AuthScreen({ mode, session }: AuthScreenProps) {
   };
 
   const handleGooglePress = async () => {
+    if (isSubmitting) {
+      return;
+    }
+
     if (isGuestSignUp) {
       Alert.alert(
         "Use email for now",
@@ -105,6 +113,10 @@ export function AuthScreen({ mode, session }: AuthScreenProps) {
   };
 
   const handleApplePress = async () => {
+    if (isSubmitting) {
+      return;
+    }
+
     if (isGuestSignUp) {
       Alert.alert(
         "Use email for now",
@@ -126,6 +138,10 @@ export function AuthScreen({ mode, session }: AuthScreenProps) {
   };
 
   const handleGuestPress = async () => {
+    if (isSubmitting) {
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
