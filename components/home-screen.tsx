@@ -22,7 +22,7 @@ const signUpRoute = "/sign-up" as Href;
  */
 export function HomeScreen() {
   const router = useRouter();
-  const { session } = useAuthSession();
+  const { isLoading, session } = useAuthSession();
   const categories = useStore((state) => state.categories);
   const entries = useStore((state) => state.entries);
   const isGuest = Boolean(session?.user.is_anonymous);
@@ -40,6 +40,10 @@ export function HomeScreen() {
     };
   });
   const handleAddCategoryPress = () => {
+    if (isLoading) {
+      return;
+    }
+
     if (isGuest && categories.length >= 1) {
       Alert.alert(
         "Create an account to keep going",
