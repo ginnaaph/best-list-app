@@ -7,6 +7,10 @@ const screenSource = readFileSync(
   "utf8",
 );
 
+// These are source-text checks with known blind spots: they will not catch a
+// semantically equivalent reintroduction under different JSX or import syntax.
+// Real rendered-output assertions would require adding @testing-library/react-native
+// or react-test-renderer as a new dependency in a separate approved task.
 test("does not render public share waitlist capture CTAs", () => {
   assert.doesNotMatch(screenSource, /<WaitlistCapture/);
   assert.doesNotMatch(screenSource, /function WaitlistCapture/);
@@ -14,6 +18,10 @@ test("does not render public share waitlist capture CTAs", () => {
   assert.doesNotMatch(screenSource, /href="\/"/);
 });
 
+// These are source-text checks with known blind spots: they will not catch a
+// semantically equivalent reintroduction under different JSX or import syntax.
+// Real rendered-output assertions would require adding @testing-library/react-native
+// or react-test-renderer as a new dependency in a separate approved task.
 test("does not collect anonymous visitor email addresses", () => {
   assert.doesNotMatch(screenSource, /joinWaitlist/);
   assert.doesNotMatch(screenSource, /TextInput/);
