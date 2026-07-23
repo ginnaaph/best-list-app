@@ -1,11 +1,83 @@
 import "react-native-url-polyfill/auto";
 
+import {
+  createClient,
+  processLock,
+  type SupportedStorage,
+} from "@supabase/supabase-js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { createClient, processLock } from "@supabase/supabase-js";
+import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+const secureStoreValueLimitBytes = 2048;
+
+/**
+ * Stores Supabase auth sessions in SecureStore and migrates existing
+ * AsyncStorage sessions into SecureStore the first time they are read.
+ */
+const secureStoreAdapter: SupportedStorage = {
+  getItem: async (key: string) => {
+    const secureValue = await SecureStore.getItemAsync(key);
+
+    if (secureValue != null) {
+      return secureValue;
+    }
+
+    const legacyValue = await AsyncStorage.getItem(key);
+
+    if (legacyValue == null) {
+      return legacyValue;
+    }
+
+    await SecureStore.setItemAsync(key, legacyValue);
+    await AsyncStorage.removeItem(key);
+
+    return legacyValue;
+  },
+  setItem: (key: string, value: string) => {
+    if (isOverSecureStoreValueLimit(value)) {
+      console.warn(
+        "Supabase auth session is larger than SecureStore's 2048-byte Android value limit.",
+      );
+    }
+
+    return SecureStore.setItemAsync(key, value);
+  },
+  removeItem: (key: string) => SecureStore.deleteItemAsync(key),
+};
+
+function isOverSecureStoreValueLimit(value: string) {
+  let bytes = 0;
+
+  for (let index = 0; index < value.length; index++) {
+    const codePoint = value.charCodeAt(index);
+
+    if (codePoint >= 0xd800 && codePoint < 0xe000) {
+      const nextCodePoint = value.charCodeAt(index + 1);
+
+      if (
+        codePoint < 0xdc00 &&
+        nextCodePoint >= 0xdc00 &&
+        nextCodePoint < 0xe000
+      ) {
+        bytes += 4;
+        index++;
+      } else {
+        bytes += 3;
+      }
+    } else {
+      bytes += codePoint < 0x80 ? 1 : codePoint < 0x800 ? 2 : 3;
+    }
+
+    if (bytes > secureStoreValueLimitBytes) {
+      return true;
+    }
+  }
+
+  return false;
+}
 
 export const isSupabaseConfigured = !!(supabaseUrl && supabaseAnonKey);
 
@@ -22,7 +94,7 @@ export function assertSupabaseConfigured() {
 
 export const supabase = createClient(supabaseUrl ?? "", supabaseAnonKey ?? "", {
   auth: {
-    ...(Platform.OS !== "web" ? { storage: AsyncStorage } : {}),
+    ...(Platform.OS !== "web" ? { storage: secureStoreAdapter } : {}),
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: false,

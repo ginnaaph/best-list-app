@@ -7,23 +7,33 @@ const screenSource = readFileSync(
   "utf8",
 );
 
-test("renders the waitlist capture in both former CTA locations", () => {
-  assert.equal((screenSource.match(/<WaitlistCapture/g) ?? []).length, 2);
+// These are source-text checks with known blind spots: they will not catch a
+// semantically equivalent reintroduction under different JSX or import syntax.
+// Real rendered-output assertions would require adding @testing-library/react-native
+// or react-test-renderer as a new dependency in a separate approved task.
+test("does not render public share waitlist capture CTAs", () => {
+  assert.doesNotMatch(screenSource, /<WaitlistCapture/);
+  assert.doesNotMatch(screenSource, /function WaitlistCapture/);
   assert.doesNotMatch(screenSource, /import \{ Link,/);
   assert.doesNotMatch(screenSource, /href="\/"/);
-  assert.match(screenSource, /Join the App Store waitlist/);
 });
 
-test("captures an email and renders friendly terminal states", () => {
-  assert.match(screenSource, /joinWaitlist\(email\)/);
-  assert.match(screenSource, /inputMode="email"/);
-  assert.match(screenSource, /keyboardType="email-address"/);
-  assert.match(screenSource, /textContentType="emailAddress"/);
-  assert.match(
+// These are source-text checks with known blind spots: they will not catch a
+// semantically equivalent reintroduction under different JSX or import syntax.
+// Real rendered-output assertions would require adding @testing-library/react-native
+// or react-test-renderer as a new dependency in a separate approved task.
+test("does not collect anonymous visitor email addresses", () => {
+  assert.doesNotMatch(screenSource, /joinWaitlist/);
+  assert.doesNotMatch(screenSource, /TextInput/);
+  assert.doesNotMatch(screenSource, /inputMode="email"/);
+  assert.doesNotMatch(screenSource, /keyboardType="email-address"/);
+  assert.doesNotMatch(screenSource, /textContentType="emailAddress"/);
+  assert.doesNotMatch(screenSource, /Join the App Store waitlist/);
+  assert.doesNotMatch(
     screenSource,
     /You're on the list — we'll email you when BestList is live\./,
   );
-  assert.match(
+  assert.doesNotMatch(
     screenSource,
     /You're already on the list — we'll email you when BestList is live\./,
   );
