@@ -276,7 +276,7 @@ export function AuthScreen({ mode, session }: AuthScreenProps) {
           onPress={handleGuestPress}
         >
           <Text className="font-body text-[16px] font-bold leading-5 text-accent">
-            {isSubmitting ? "Continuing..." : "Continue without an account"}
+            {isSubmitting ? "Continuing..." : "Continue as guest"}
           </Text>
         </Pressable>
       </View>

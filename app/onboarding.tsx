@@ -83,7 +83,7 @@ export default function Onboarding() {
             <Text className="text-caption text-secondary">
               {isGuestSubmitting
                 ? "Continuing..."
-                : "Continue without an account"}
+                : "Continue as guest"}
             </Text>
           </Pressable>
         </View>
