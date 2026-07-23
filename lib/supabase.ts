@@ -5,6 +5,7 @@ import {
   processLock,
   type SupportedStorage,
 } from "@supabase/supabase-js";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
 import { Platform } from "react-native";
 
@@ -12,8 +13,29 @@ const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 const secureStoreValueLimitBytes = 2048;
 
+/**
+ * Stores Supabase auth sessions in SecureStore and migrates existing
+ * AsyncStorage sessions into SecureStore the first time they are read.
+ */
 const secureStoreAdapter: SupportedStorage = {
-  getItem: (key: string) => SecureStore.getItemAsync(key),
+  getItem: async (key: string) => {
+    const secureValue = await SecureStore.getItemAsync(key);
+
+    if (secureValue != null) {
+      return secureValue;
+    }
+
+    const legacyValue = await AsyncStorage.getItem(key);
+
+    if (legacyValue == null) {
+      return legacyValue;
+    }
+
+    await SecureStore.setItemAsync(key, legacyValue);
+    await AsyncStorage.removeItem(key);
+
+    return legacyValue;
+  },
   setItem: (key: string, value: string) => {
     if (isOverSecureStoreValueLimit(value)) {
       console.warn(
