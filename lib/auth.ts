@@ -79,9 +79,13 @@ export async function linkGuestEmail(email: string) {
   const { error } = await supabase.auth.updateUser({ email: normalizedEmail });
 
   if (error) {
-    throw new Error(
-      "This email already has an account. Sign in instead to use that account.",
-    );
+    if (error.code === "email_exists") {
+      throw new Error(
+        "This email already has an account. Sign in instead to use that account.",
+      );
+    }
+
+    throw new Error(error.message);
   }
 
   return normalizedEmail;
