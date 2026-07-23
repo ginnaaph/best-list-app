@@ -229,11 +229,13 @@ export function AuthScreen({ mode }: AuthScreenProps) {
 
             <SocialButton
               alignIconLeft={mode === "sign-up"}
+              disabled={isSubmitting}
               icon="google"
               label="Continue with Google"
               onPress={handleGooglePress}
             />
             <SocialButton
+              disabled={isSubmitting}
               icon="apple"
               label="Continue with Apple"
               onPress={handleApplePress}
@@ -276,6 +278,7 @@ export function AuthScreen({ mode }: AuthScreenProps) {
 
 type SocialButtonProps = {
   alignIconLeft?: boolean;
+  disabled?: boolean;
   icon: "google" | "apple";
   label: string;
   onPress: () => void;
@@ -283,6 +286,7 @@ type SocialButtonProps = {
 
 function SocialButton({
   alignIconLeft = false,
+  disabled = false,
   icon,
   label,
   onPress,
@@ -296,6 +300,7 @@ function SocialButton({
           ? "relative h-15.25 flex-row items-center justify-center rounded-bestlist-md border border-subtle bg-card px-6"
           : "h-15.25 flex-row items-center rounded-bestlist-md border border-subtle bg-card px-6"
       }
+      disabled={disabled}
       onPress={onPress}
     >
       <View
