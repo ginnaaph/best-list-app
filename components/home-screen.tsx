@@ -53,9 +53,9 @@ export function HomeScreen() {
           {
             text: "Create account",
             onPress: () => {
-              // Temporary placeholder: plain sign-up creates a separate account today
-              // and does not carry over the guest's existing lists. Real
-              // guest-to-account linking is scope 3.
+              // Email sign-up links the current guest user/data via linkGuestEmail.
+              // Google and Apple guest linking are not built yet; AuthScreen blocks
+              // those guest buttons with a "use email for now" message.
               router.push(signUpRoute);
             },
           },
