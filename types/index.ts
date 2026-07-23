@@ -1,3 +1,0 @@
-export type { Category, CategoryCardTone } from "@/types/category";
-export type { Entry } from "@/types/entry";
-export type { Profile, ProfileRow } from "@/types/profile";
