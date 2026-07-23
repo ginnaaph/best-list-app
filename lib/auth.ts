@@ -92,56 +92,6 @@ export async function linkGuestEmail(email: string) {
 }
 
 /**
- * Creates a Supabase account with email and password.
- *
- * @param email - The email address to register.
- * @param password - The password to register.
- * @returns The auth session state after sign-up.
- */
-export async function signUpWithPassword(email: string, password: string) {
-  assertSupabaseConfigured();
-
-  const credentials = getPasswordCredentials(email, password);
-  const supabase = getSupabaseClient();
-  const { data, error } = await supabase.auth.signUp(credentials);
-
-  if (error) {
-    throw new Error(getAuthErrorMessage(error.message, "sign-up"));
-  }
-
-  if (!data.session) {
-    return { needsEmailConfirmation: true, session: null } as const;
-  }
-
-  return { needsEmailConfirmation: false, session: data.session } as const;
-}
-
-/**
- * Signs in with a Supabase email and password.
- *
- * @param email - The account email address.
- * @param password - The account password.
- * @returns The authenticated session.
- */
-export async function signInWithPassword(email: string, password: string) {
-  assertSupabaseConfigured();
-
-  const credentials = getPasswordCredentials(email, password);
-  const supabase = getSupabaseClient();
-  const { data, error } = await supabase.auth.signInWithPassword(credentials);
-
-  if (error) {
-    throw error;
-  }
-
-  if (!data.session) {
-    throw new Error("Sign in did not return a session. Try again.");
-  }
-
-  return data.session;
-}
-
-/**
  * Signs in with a Supabase anonymous guest session.
  *
  * @returns The anonymous authenticated session.
@@ -475,20 +425,6 @@ function getAuthErrorMessage(message: string, mode: EmailAuthMode) {
   }
 
   return message;
-}
-
-function getPasswordCredentials(email: string, password: string) {
-  const normalizedEmail = email.trim().toLowerCase();
-
-  if (!normalizedEmail) {
-    throw new Error("Enter an email address.");
-  }
-
-  if (!password) {
-    throw new Error("Enter a password.");
-  }
-
-  return { email: normalizedEmail, password };
 }
 
 function getProviderLabel(provider?: SocialAuthProvider | null) {
