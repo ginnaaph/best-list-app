@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import type { Session } from "@supabase/supabase-js";
 import { Link, router } from "expo-router";
 import { useState } from "react";
 import {
@@ -16,10 +17,17 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { VerificationModal } from "@/components/verification-modal";
 import { images } from "@/constants/images";
 import { colors } from "@/constants/theme";
-import { sendEmailOtp, signInWithApple, signInWithGoogle } from "@/lib/auth";
+import {
+  linkGuestEmail,
+  sendEmailOtp,
+  signInAsGuest,
+  signInWithApple,
+  signInWithGoogle,
+} from "@/lib/auth";
 
 type AuthScreenProps = {
   mode: "sign-up" | "sign-in";
+  session: Session | null;
 };
 
 const authCopy = {
@@ -50,18 +58,26 @@ const authCopy = {
 /**
  * Renders the sign-in or sign-up screen.
  */
-export function AuthScreen({ mode }: AuthScreenProps) {
+export function AuthScreen({ mode, session }: AuthScreenProps) {
   const copy = authCopy[mode];
   const [email, setEmail] = useState<string>(copy.email);
   const [isVerificationVisible, setIsVerificationVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [verifiedEmail, setVerifiedEmail] = useState<string>(copy.email);
+  const isGuestSignUp =
+    mode === "sign-up" && Boolean(session?.user.is_anonymous);
 
   const handlePrimaryPress = async () => {
+    if (isSubmitting) {
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      const normalizedEmail = await sendEmailOtp(email, mode);
+      const normalizedEmail = isGuestSignUp
+        ? await linkGuestEmail(email)
+        : await sendEmailOtp(email, mode);
       setVerifiedEmail(normalizedEmail);
       setIsVerificationVisible(true);
     } catch (error) {
@@ -72,6 +88,18 @@ export function AuthScreen({ mode }: AuthScreenProps) {
   };
 
   const handleGooglePress = async () => {
+    if (isSubmitting) {
+      return;
+    }
+
+    if (isGuestSignUp) {
+      Alert.alert(
+        "Use email for now",
+        "Google account linking for guests is coming soon. Use email to preserve your guest lists.",
+      );
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -85,10 +113,39 @@ export function AuthScreen({ mode }: AuthScreenProps) {
   };
 
   const handleApplePress = async () => {
+    if (isSubmitting) {
+      return;
+    }
+
+    if (isGuestSignUp) {
+      Alert.alert(
+        "Use email for now",
+        "Apple account linking for guests is coming soon. Use email to preserve your guest lists.",
+      );
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
       await signInWithApple();
+      router.replace("/");
+    } catch (error) {
+      Alert.alert("Authentication error", getErrorMessage(error));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleGuestPress = async () => {
+    if (isSubmitting) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      await signInAsGuest();
       router.replace("/");
     } catch (error) {
       Alert.alert("Authentication error", getErrorMessage(error));
@@ -188,11 +245,13 @@ export function AuthScreen({ mode }: AuthScreenProps) {
 
             <SocialButton
               alignIconLeft={mode === "sign-up"}
+              disabled={isSubmitting}
               icon="google"
               label="Continue with Google"
               onPress={handleGooglePress}
             />
             <SocialButton
+              disabled={isSubmitting}
               icon="apple"
               label="Continue with Apple"
               onPress={handleApplePress}
@@ -210,10 +269,21 @@ export function AuthScreen({ mode }: AuthScreenProps) {
             </Text>
           </Pressable>
         </Link>
+
+        <Pressable
+          className="items-center py-1"
+          disabled={isSubmitting}
+          onPress={handleGuestPress}
+        >
+          <Text className="font-body text-[16px] font-bold leading-5 text-accent">
+            {isSubmitting ? "Continuing..." : "Continue as guest"}
+          </Text>
+        </Pressable>
       </View>
 
       <VerificationModal
         email={verifiedEmail}
+        flow={isGuestSignUp ? "guest-email-link" : "email-auth"}
         mode={mode}
         onClose={() => setIsVerificationVisible(false)}
         visible={isVerificationVisible}
@@ -224,6 +294,7 @@ export function AuthScreen({ mode }: AuthScreenProps) {
 
 type SocialButtonProps = {
   alignIconLeft?: boolean;
+  disabled?: boolean;
   icon: "google" | "apple";
   label: string;
   onPress: () => void;
@@ -231,6 +302,7 @@ type SocialButtonProps = {
 
 function SocialButton({
   alignIconLeft = false,
+  disabled = false,
   icon,
   label,
   onPress,
@@ -244,6 +316,7 @@ function SocialButton({
           ? "relative h-15.25 flex-row items-center justify-center rounded-bestlist-md border border-subtle bg-card px-6"
           : "h-15.25 flex-row items-center rounded-bestlist-md border border-subtle bg-card px-6"
       }
+      disabled={disabled}
       onPress={onPress}
     >
       <View

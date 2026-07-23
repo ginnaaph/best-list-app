@@ -2,6 +2,7 @@ import { useFocusEffect } from "expo-router";
 import { useCallback, useState } from "react";
 import { Image, Text, View } from "react-native";
 
+import { images } from "@/constants/images";
 import { getProfileInitial, mapProfileRow } from "@/lib/profile-data";
 import { resolveAvatarDisplayUrl } from "@/lib/profile-avatar";
 import { getSupabaseClient } from "@/lib/supabase";
@@ -79,6 +80,8 @@ export function CurrentUserAvatar({ size = "small" }: CurrentUserAvatarProps) {
   });
   const styles = sizeStyles[size];
   const avatarUrl = avatarData.profile?.avatarUrl;
+  const fallbackInitial = getProfileInitial(avatarData.profile, avatarData.email);
+  const showsLogoFallback = !avatarUrl && fallbackInitial === "?";
 
   useFocusEffect(
     useCallback(() => {
@@ -106,17 +109,23 @@ export function CurrentUserAvatar({ size = "small" }: CurrentUserAvatarProps) {
   );
 
   return (
-    <View className={styles.container}>
+    <View
+      className={showsLogoFallback ? `${styles.container} bg-white` : styles.container}
+    >
       {avatarUrl ? (
         <Image
           source={{ uri: avatarUrl }}
           resizeMode="cover"
           className="h-full w-full"
         />
+      ) : showsLogoFallback ? (
+        <Image
+          source={images.bestListMark}
+          resizeMode="cover"
+          className="h-full w-full"
+        />
       ) : (
-        <Text className={styles.text}>
-          {getProfileInitial(avatarData.profile, avatarData.email)}
-        </Text>
+        <Text className={styles.text}>{fallbackInitial}</Text>
       )}
     </View>
   );

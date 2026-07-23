@@ -10,9 +10,9 @@ export default function SignIn() {
     return null;
   }
 
-  if (session) {
+  if (session && !session.user.is_anonymous) {
     return <Redirect href="/" />;
   }
 
-  return <AuthScreen mode="sign-in" />;
+  return <AuthScreen mode="sign-in" session={session} />;
 }

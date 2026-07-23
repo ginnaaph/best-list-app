@@ -1,13 +1,28 @@
 import { Link, Redirect } from "expo-router";
-import { Pressable, Text, View } from "react-native";
+import { useState } from "react";
+import { Alert, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { OnboardingCardStack } from "@/components";
 import { colors } from "@/constants/theme";
 import { useAuthSession } from "@/hooks/use-auth-session";
+import { signInAsGuest } from "@/lib/auth";
 
 export default function Onboarding() {
   const { isLoading, session } = useAuthSession();
+  const [isGuestSubmitting, setIsGuestSubmitting] = useState(false);
+
+  const handleGuestPress = async () => {
+    setIsGuestSubmitting(true);
+
+    try {
+      await signInAsGuest();
+    } catch (error) {
+      Alert.alert("Authentication error", getErrorMessage(error));
+    } finally {
+      setIsGuestSubmitting(false);
+    }
+  };
 
   if (isLoading) {
     return null;
@@ -59,8 +74,24 @@ export default function Onboarding() {
               </Text>
             </Pressable>
           </Link>
+
+          <Pressable
+            className="items-center py-1"
+            disabled={isGuestSubmitting}
+            onPress={handleGuestPress}
+          >
+            <Text className="text-caption text-secondary">
+              {isGuestSubmitting
+                ? "Continuing..."
+                : "Continue as guest"}
+            </Text>
+          </Pressable>
         </View>
       </View>
     </SafeAreaView>
   );
+}
+
+function getErrorMessage(error: unknown) {
+  return error instanceof Error ? error.message : "Something went wrong.";
 }

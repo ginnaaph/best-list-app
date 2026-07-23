@@ -61,6 +61,37 @@ export async function sendEmailOtp(email: string, mode: EmailAuthMode) {
 }
 
 /**
+ * Links an email address to the current anonymous guest user.
+ *
+ * @param email - The email address to attach to the guest user.
+ * @returns The normalized email address.
+ */
+export async function linkGuestEmail(email: string) {
+  assertSupabaseConfigured();
+
+  const normalizedEmail = email.trim().toLowerCase();
+
+  if (!normalizedEmail) {
+    throw new Error("Enter an email address.");
+  }
+
+  const supabase = getSupabaseClient();
+  const { error } = await supabase.auth.updateUser({ email: normalizedEmail });
+
+  if (error) {
+    if (error.code === "email_exists") {
+      throw new Error(
+        "This email already has an account. Sign in instead to use that account.",
+      );
+    }
+
+    throw new Error(error.message);
+  }
+
+  return normalizedEmail;
+}
+
+/**
  * Creates a Supabase account with email and password.
  *
  * @param email - The email address to register.
@@ -111,6 +142,28 @@ export async function signInWithPassword(email: string, password: string) {
 }
 
 /**
+ * Signs in with a Supabase anonymous guest session.
+ *
+ * @returns The anonymous authenticated session.
+ */
+export async function signInAsGuest() {
+  assertSupabaseConfigured();
+
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase.auth.signInAnonymously();
+
+  if (error) {
+    throw error;
+  }
+
+  if (!data.session) {
+    throw new Error("Guest sign in did not return a session. Try again.");
+  }
+
+  return data.session;
+}
+
+/**
  * Verifies an email OTP and creates a session.
  *
  * @param email - The email address being verified.
@@ -124,6 +177,29 @@ export async function verifyEmailOtp(email: string, code: string) {
     email: email.trim().toLowerCase(),
     token: code,
     type: "email",
+  });
+
+  if (error) {
+    throw error;
+  }
+
+  return data.session;
+}
+
+/**
+ * Verifies the OTP sent while linking an email to a guest user.
+ *
+ * @param email - The email address being linked.
+ * @param code - The OTP code to verify.
+ * @returns The authenticated session after the email change is confirmed.
+ */
+export async function verifyGuestEmailLink(email: string, code: string) {
+  const supabase = getSupabaseClient();
+
+  const { data, error } = await supabase.auth.verifyOtp({
+    email: email.trim().toLowerCase(),
+    token: code,
+    type: "email_change",
   });
 
   if (error) {

@@ -12,14 +12,23 @@ import {
   View,
 } from "react-native";
 
-import { sendEmailOtp, verifyEmailOtp, type EmailAuthMode } from "@/lib/auth";
+import {
+  linkGuestEmail,
+  sendEmailOtp,
+  verifyEmailOtp,
+  verifyGuestEmailLink,
+  type EmailAuthMode,
+} from "@/lib/auth";
 
 type VerificationModalProps = {
   email: string;
+  flow?: VerificationFlow;
   mode: EmailAuthMode;
   visible: boolean;
   onClose: () => void;
 };
+
+type VerificationFlow = "email-auth" | "guest-email-link";
 
 const CODE_LENGTH = 6;
 const RESEND_DELAY_SECONDS = 60;
@@ -29,6 +38,7 @@ const RESEND_DELAY_SECONDS = 60;
  */
 export function VerificationModal({
   email,
+  flow = "email-auth",
   mode,
   visible,
   onClose,
@@ -74,7 +84,11 @@ export function VerificationModal({
       setIsVerifying(true);
 
       try {
-        await verifyEmailOtp(email, nextCode);
+        if (flow === "guest-email-link") {
+          await verifyGuestEmailLink(email, nextCode);
+        } else {
+          await verifyEmailOtp(email, nextCode);
+        }
         onClose();
         router.replace("/");
       } catch (error) {
@@ -94,7 +108,11 @@ export function VerificationModal({
     setIsResending(true);
 
     try {
-      await sendEmailOtp(email, mode);
+      if (flow === "guest-email-link") {
+        await linkGuestEmail(email);
+      } else {
+        await sendEmailOtp(email, mode);
+      }
       setCode("");
       setSecondsRemaining(RESEND_DELAY_SECONDS);
       inputRef.current?.focus();
