@@ -24,35 +24,41 @@ const GOOGLE_PLACES_FETCH_OPTIONS = {
     "X-Ios-Bundle-Identifier": GOOGLE_PLACES_IOS_BUNDLE_IDENTIFIER,
   },
 };
+const GOOGLE_PLACES_AUTOCOMPLETE_URL =
+  "https://places.googleapis.com/v1/places:autocomplete";
 const AUTOCOMPLETE_DEBOUNCE_MS = 300;
 
 type PlacesAutocompleteType = "establishment" | "(cities)";
 
+type PlacePredictionText = {
+  text?: string;
+};
+
 type PlacePrediction = {
-  description: string;
-  place_id: string;
-  structured_formatting?: {
-    main_text?: string;
-    secondary_text?: string;
+  placeId: string;
+  text?: PlacePredictionText;
+  structuredFormat?: {
+    mainText?: PlacePredictionText;
+    secondaryText?: PlacePredictionText;
   };
 };
 
+type PlaceAutocompleteSuggestion = {
+  placePrediction?: PlacePrediction;
+};
+
 type PlacesAutocompleteResponse = {
-  predictions?: PlacePrediction[];
-  status: string;
+  suggestions?: PlaceAutocompleteSuggestion[];
 };
 
 type AddressComponent = {
-  long_name: string;
-  short_name: string;
+  longText: string;
+  shortText: string;
   types: string[];
 };
 
 type PlaceDetailsResponse = {
-  result?: {
-    address_components?: AddressComponent[];
-  };
-  status: string;
+  addressComponents?: AddressComponent[];
 };
 
 export type EntryFormValues = {
@@ -109,42 +115,82 @@ function TextField({
   );
 }
 
-function getAutocompleteUrl(input: string, type: PlacesAutocompleteType) {
-  const params = [
-    `input=${encodeURIComponent(input)}`,
-    `types=${encodeURIComponent(type)}`,
-    `key=${encodeURIComponent(GOOGLE_PLACES_API_KEY ?? "")}`,
-  ];
+function getAutocompleteUrl() {
+  return GOOGLE_PLACES_AUTOCOMPLETE_URL;
+}
 
-  return `https://maps.googleapis.com/maps/api/place/autocomplete/json?${params.join(
-    "&",
-  )}`;
+function getAutocompleteRequestBody(
+  input: string,
+  type: PlacesAutocompleteType,
+) {
+  if (type === "(cities)") {
+    return {
+      input,
+      includedPrimaryTypes: ["(cities)"],
+    };
+  }
+
+  return { input };
+}
+
+function getAutocompleteFetchOptions(
+  input: string,
+  type: PlacesAutocompleteType,
+): RequestInit {
+  return {
+    ...GOOGLE_PLACES_FETCH_OPTIONS,
+    method: "POST",
+    headers: {
+      ...GOOGLE_PLACES_FETCH_OPTIONS.headers,
+      "Content-Type": "application/json",
+      "X-Goog-Api-Key": GOOGLE_PLACES_API_KEY ?? "",
+    },
+    body: JSON.stringify(getAutocompleteRequestBody(input, type)),
+  };
 }
 
 function getPlaceDetailsUrl(placeId: string) {
-  const params = [
-    `place_id=${encodeURIComponent(placeId)}`,
-    "fields=address_components",
-    `key=${encodeURIComponent(GOOGLE_PLACES_API_KEY ?? "")}`,
-  ];
-
-  return `https://maps.googleapis.com/maps/api/place/details/json?${params.join(
-    "&",
+  return `https://places.googleapis.com/v1/places/${encodeURIComponent(
+    placeId,
   )}`;
 }
 
+function getPlaceDetailsFetchOptions(): RequestInit {
+  return {
+    ...GOOGLE_PLACES_FETCH_OPTIONS,
+    headers: {
+      ...GOOGLE_PLACES_FETCH_OPTIONS.headers,
+      "X-Goog-Api-Key": GOOGLE_PLACES_API_KEY ?? "",
+      "X-Goog-FieldMask": "addressComponents",
+    },
+  };
+}
+
 function getPredictionMainText(prediction: PlacePrediction) {
-  return prediction.structured_formatting?.main_text ?? prediction.description;
+  return (
+    prediction.structuredFormat?.mainText?.text ?? prediction.text?.text ?? ""
+  );
 }
 
 function getPredictionSecondaryText(prediction: PlacePrediction) {
-  return prediction.structured_formatting?.secondary_text ?? "";
+  return prediction.structuredFormat?.secondaryText?.text ?? "";
+}
+
+function getPlacePredictions(data: PlacesAutocompleteResponse) {
+  return (
+    data.suggestions
+      ?.map((suggestion) => suggestion.placePrediction)
+      .filter(
+        (prediction): prediction is PlacePrediction =>
+          prediction?.placeId !== undefined,
+      ) ?? []
+  );
 }
 
 function getAddressComponent(
   components: AddressComponent[],
   type: string,
-  name: "long_name" | "short_name" = "long_name",
+  name: "longText" | "shortText" = "longText",
 ) {
   return components.find((component) => component.types.includes(type))?.[name];
 }
@@ -157,7 +203,7 @@ function getCityFromAddressComponents(components: AddressComponent[]) {
   const state = getAddressComponent(
     components,
     "administrative_area_level_1",
-    "short_name",
+    "shortText",
   );
 
   return [locality, state].filter(Boolean).join(", ");
@@ -225,8 +271,8 @@ export function EntryForm({
     const timeout = setTimeout(async () => {
       try {
         const response = await fetch(
-          getAutocompleteUrl(trimmedPlaceName, "establishment"),
-          GOOGLE_PLACES_FETCH_OPTIONS,
+          getAutocompleteUrl(),
+          getAutocompleteFetchOptions(trimmedPlaceName, "establishment"),
         );
 
         if (!response.ok) {
@@ -239,13 +285,7 @@ export function EntryForm({
           return;
         }
 
-        if (data.status !== "OK") {
-          setPlaceSuggestions([]);
-          setShowPlaceSuggestions(false);
-          return;
-        }
-
-        const predictions = data.predictions ?? [];
+        const predictions = getPlacePredictions(data);
         setPlaceSuggestions(predictions);
         setShowPlaceSuggestions(predictions.length > 0);
       } catch {
@@ -282,8 +322,8 @@ export function EntryForm({
     const timeout = setTimeout(async () => {
       try {
         const response = await fetch(
-          getAutocompleteUrl(trimmedCity, "(cities)"),
-          GOOGLE_PLACES_FETCH_OPTIONS,
+          getAutocompleteUrl(),
+          getAutocompleteFetchOptions(trimmedCity, "(cities)"),
         );
 
         if (!response.ok) {
@@ -296,13 +336,7 @@ export function EntryForm({
           return;
         }
 
-        if (data.status !== "OK") {
-          setCitySuggestions([]);
-          setShowCitySuggestions(false);
-          return;
-        }
-
-        const predictions = data.predictions ?? [];
+        const predictions = getPlacePredictions(data);
         setCitySuggestions(predictions);
         setShowCitySuggestions(predictions.length > 0);
       } catch {
@@ -349,8 +383,8 @@ export function EntryForm({
 
     try {
       const response = await fetch(
-        getPlaceDetailsUrl(prediction.place_id),
-        GOOGLE_PLACES_FETCH_OPTIONS,
+        getPlaceDetailsUrl(prediction.placeId),
+        getPlaceDetailsFetchOptions(),
       );
 
       if (!response.ok) {
@@ -358,7 +392,7 @@ export function EntryForm({
       }
 
       const data = (await response.json()) as PlaceDetailsResponse;
-      const addressComponents = data.result?.address_components ?? [];
+      const addressComponents = data.addressComponents ?? [];
       const selectedCity = getCityFromAddressComponents(addressComponents);
 
       if (placeDetailsRequestIdRef.current !== placeDetailsRequestId) {
@@ -399,8 +433,8 @@ export function EntryForm({
 
     try {
       const response = await fetch(
-        getPlaceDetailsUrl(prediction.place_id),
-        GOOGLE_PLACES_FETCH_OPTIONS,
+        getPlaceDetailsUrl(prediction.placeId),
+        getPlaceDetailsFetchOptions(),
       );
 
       if (!response.ok) {
@@ -408,7 +442,7 @@ export function EntryForm({
       }
 
       const data = (await response.json()) as PlaceDetailsResponse;
-      const addressComponents = data.result?.address_components ?? [];
+      const addressComponents = data.addressComponents ?? [];
       const selectedCity = getCityFromAddressComponents(addressComponents);
 
       if (selectedCity) {
@@ -567,7 +601,7 @@ export function EntryForm({
 
                   return (
                     <Pressable
-                      key={suggestion.place_id}
+                      key={suggestion.placeId}
                       accessibilityRole="button"
                       accessibilityLabel={`Select ${mainText}`}
                       className={`px-4 py-3 ${
@@ -618,7 +652,7 @@ export function EntryForm({
 
                   return (
                     <Pressable
-                      key={suggestion.place_id}
+                      key={suggestion.placeId}
                       accessibilityRole="button"
                       accessibilityLabel={`Select ${mainText}`}
                       className={`px-4 py-3 ${
