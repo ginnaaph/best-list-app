@@ -25,7 +25,11 @@ test("autocomplete waits for a user edit before using prefilled values", () => {
 test("Google Places fetches include the iOS bundle identifier header", () => {
   assert.match(
     source,
-    /const GOOGLE_PLACES_IOS_BUNDLE_IDENTIFIER = "com\.gina\.bestlist";/,
+    /import Constants from "expo-constants";/,
+  );
+  assert.match(
+    source,
+    /const GOOGLE_PLACES_IOS_BUNDLE_IDENTIFIER =\s*Constants\.expoConfig\?\.ios\?\.bundleIdentifier \?\? "com\.gina\.bestlist";/,
   );
   assert.match(
     source,
