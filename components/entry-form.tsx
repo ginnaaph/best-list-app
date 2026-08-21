@@ -1,4 +1,7 @@
+import Constants from "expo-constants";
+import * as Crypto from "expo-crypto";
 import * as ImagePicker from "expo-image-picker";
+import type { MutableRefObject } from "react";
 import { useEffect, useRef, useState } from "react";
 import {
   Alert,
@@ -18,7 +21,8 @@ import { colors } from "@/constants/theme";
 const GOOGLE_PLACES_API_KEY =
   process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY ??
   process.env.EXPO_PUBLIC_GOOGLE_PLACES_KEY;
-const GOOGLE_PLACES_IOS_BUNDLE_IDENTIFIER = "com.gina.bestlist";
+const GOOGLE_PLACES_IOS_BUNDLE_IDENTIFIER =
+  Constants.expoConfig?.ios?.bundleIdentifier ?? "com.gina.bestlist";
 const GOOGLE_PLACES_FETCH_OPTIONS = {
   headers: {
     "X-Ios-Bundle-Identifier": GOOGLE_PLACES_IOS_BUNDLE_IDENTIFIER,
@@ -122,20 +126,23 @@ function getAutocompleteUrl() {
 function getAutocompleteRequestBody(
   input: string,
   type: PlacesAutocompleteType,
+  sessionToken: string,
 ) {
   if (type === "(cities)") {
     return {
       input,
       includedPrimaryTypes: ["(cities)"],
+      sessionToken,
     };
   }
 
-  return { input };
+  return { input, sessionToken };
 }
 
 function getAutocompleteFetchOptions(
   input: string,
   type: PlacesAutocompleteType,
+  sessionToken: string,
 ): RequestInit {
   return {
     ...GOOGLE_PLACES_FETCH_OPTIONS,
@@ -145,14 +152,16 @@ function getAutocompleteFetchOptions(
       "Content-Type": "application/json",
       "X-Goog-Api-Key": GOOGLE_PLACES_API_KEY ?? "",
     },
-    body: JSON.stringify(getAutocompleteRequestBody(input, type)),
+    body: JSON.stringify(
+      getAutocompleteRequestBody(input, type, sessionToken),
+    ),
   };
 }
 
-function getPlaceDetailsUrl(placeId: string) {
+function getPlaceDetailsUrl(placeId: string, sessionToken: string) {
   return `https://places.googleapis.com/v1/places/${encodeURIComponent(
     placeId,
-  )}`;
+  )}?sessionToken=${encodeURIComponent(sessionToken)}`;
 }
 
 function getPlaceDetailsFetchOptions(): RequestInit {
@@ -217,6 +226,23 @@ function getCityFallbackFromPrediction(prediction: PlacePrediction) {
   return [mainText, state].filter(Boolean).join(", ");
 }
 
+function getOrCreateSessionToken(ref: MutableRefObject<string | null>) {
+  if (!ref.current) {
+    ref.current = Crypto.randomUUID();
+  }
+
+  return ref.current;
+}
+
+function clearSessionToken(
+  ref: MutableRefObject<string | null>,
+  sessionToken: string,
+) {
+  if (ref.current === sessionToken) {
+    ref.current = null;
+  }
+}
+
 /**
  * Renders the entry create and edit form.
  */
@@ -250,6 +276,8 @@ export function EntryForm({
   const autocompleteRequestIdRef = useRef(0);
   const cityAutocompleteRequestIdRef = useRef(0);
   const placeDetailsRequestIdRef = useRef(0);
+  const placeSessionTokenRef = useRef<string | null>(null);
+  const citySessionTokenRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!hasEditedPlace || isSelectingPlace) {
@@ -272,7 +300,11 @@ export function EntryForm({
       try {
         const response = await fetch(
           getAutocompleteUrl(),
-          getAutocompleteFetchOptions(trimmedPlaceName, "establishment"),
+          getAutocompleteFetchOptions(
+            trimmedPlaceName,
+            "establishment",
+            getOrCreateSessionToken(placeSessionTokenRef),
+          ),
         );
 
         if (!response.ok) {
@@ -323,7 +355,11 @@ export function EntryForm({
       try {
         const response = await fetch(
           getAutocompleteUrl(),
-          getAutocompleteFetchOptions(trimmedCity, "(cities)"),
+          getAutocompleteFetchOptions(
+            trimmedCity,
+            "(cities)",
+            getOrCreateSessionToken(citySessionTokenRef),
+          ),
         );
 
         if (!response.ok) {
@@ -381,9 +417,11 @@ export function EntryForm({
       return;
     }
 
+    const sessionToken = getOrCreateSessionToken(placeSessionTokenRef);
+
     try {
       const response = await fetch(
-        getPlaceDetailsUrl(prediction.placeId),
+        getPlaceDetailsUrl(prediction.placeId, sessionToken),
         getPlaceDetailsFetchOptions(),
       );
 
@@ -415,6 +453,8 @@ export function EntryForm({
       setShowCitySuggestions(false);
       setCity("");
       return;
+    } finally {
+      clearSessionToken(placeSessionTokenRef, sessionToken);
     }
   };
 
@@ -431,9 +471,11 @@ export function EntryForm({
       return;
     }
 
+    const sessionToken = getOrCreateSessionToken(citySessionTokenRef);
+
     try {
       const response = await fetch(
-        getPlaceDetailsUrl(prediction.placeId),
+        getPlaceDetailsUrl(prediction.placeId, sessionToken),
         getPlaceDetailsFetchOptions(),
       );
 
@@ -450,6 +492,8 @@ export function EntryForm({
       }
     } catch {
       return;
+    } finally {
+      clearSessionToken(citySessionTokenRef, sessionToken);
     }
   };
 
