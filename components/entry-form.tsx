@@ -1,4 +1,7 @@
+import Constants from "expo-constants";
+import * as Crypto from "expo-crypto";
 import * as ImagePicker from "expo-image-picker";
+import type { MutableRefObject } from "react";
 import { useEffect, useRef, useState } from "react";
 import {
   Alert,
@@ -18,41 +21,48 @@ import { colors } from "@/constants/theme";
 const GOOGLE_PLACES_API_KEY =
   process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY ??
   process.env.EXPO_PUBLIC_GOOGLE_PLACES_KEY;
-const GOOGLE_PLACES_IOS_BUNDLE_IDENTIFIER = "com.gina.bestlist";
+const GOOGLE_PLACES_IOS_BUNDLE_IDENTIFIER =
+  Constants.expoConfig?.ios?.bundleIdentifier ?? "com.gina.bestlist";
 const GOOGLE_PLACES_FETCH_OPTIONS = {
   headers: {
     "X-Ios-Bundle-Identifier": GOOGLE_PLACES_IOS_BUNDLE_IDENTIFIER,
   },
 };
+const GOOGLE_PLACES_AUTOCOMPLETE_URL =
+  "https://places.googleapis.com/v1/places:autocomplete";
 const AUTOCOMPLETE_DEBOUNCE_MS = 300;
 
 type PlacesAutocompleteType = "establishment" | "(cities)";
 
+type PlacePredictionText = {
+  text?: string;
+};
+
 type PlacePrediction = {
-  description: string;
-  place_id: string;
-  structured_formatting?: {
-    main_text?: string;
-    secondary_text?: string;
+  placeId: string;
+  text?: PlacePredictionText;
+  structuredFormat?: {
+    mainText?: PlacePredictionText;
+    secondaryText?: PlacePredictionText;
   };
 };
 
+type PlaceAutocompleteSuggestion = {
+  placePrediction?: PlacePrediction;
+};
+
 type PlacesAutocompleteResponse = {
-  predictions?: PlacePrediction[];
-  status: string;
+  suggestions?: PlaceAutocompleteSuggestion[];
 };
 
 type AddressComponent = {
-  long_name: string;
-  short_name: string;
+  longText: string;
+  shortText: string;
   types: string[];
 };
 
 type PlaceDetailsResponse = {
-  result?: {
-    address_components?: AddressComponent[];
-  };
-  status: string;
+  addressComponents?: AddressComponent[];
 };
 
 export type EntryFormValues = {
@@ -109,42 +119,87 @@ function TextField({
   );
 }
 
-function getAutocompleteUrl(input: string, type: PlacesAutocompleteType) {
-  const params = [
-    `input=${encodeURIComponent(input)}`,
-    `types=${encodeURIComponent(type)}`,
-    `key=${encodeURIComponent(GOOGLE_PLACES_API_KEY ?? "")}`,
-  ];
-
-  return `https://maps.googleapis.com/maps/api/place/autocomplete/json?${params.join(
-    "&",
-  )}`;
+function getAutocompleteUrl() {
+  return GOOGLE_PLACES_AUTOCOMPLETE_URL;
 }
 
-function getPlaceDetailsUrl(placeId: string) {
-  const params = [
-    `place_id=${encodeURIComponent(placeId)}`,
-    "fields=address_components",
-    `key=${encodeURIComponent(GOOGLE_PLACES_API_KEY ?? "")}`,
-  ];
+function getAutocompleteRequestBody(
+  input: string,
+  type: PlacesAutocompleteType,
+  sessionToken: string,
+) {
+  if (type === "(cities)") {
+    return {
+      input,
+      includedPrimaryTypes: ["(cities)"],
+      sessionToken,
+    };
+  }
 
-  return `https://maps.googleapis.com/maps/api/place/details/json?${params.join(
-    "&",
-  )}`;
+  return { input, sessionToken };
+}
+
+function getAutocompleteFetchOptions(
+  input: string,
+  type: PlacesAutocompleteType,
+  sessionToken: string,
+): RequestInit {
+  return {
+    ...GOOGLE_PLACES_FETCH_OPTIONS,
+    method: "POST",
+    headers: {
+      ...GOOGLE_PLACES_FETCH_OPTIONS.headers,
+      "Content-Type": "application/json",
+      "X-Goog-Api-Key": GOOGLE_PLACES_API_KEY ?? "",
+    },
+    body: JSON.stringify(
+      getAutocompleteRequestBody(input, type, sessionToken),
+    ),
+  };
+}
+
+function getPlaceDetailsUrl(placeId: string, sessionToken: string) {
+  return `https://places.googleapis.com/v1/places/${encodeURIComponent(
+    placeId,
+  )}?sessionToken=${encodeURIComponent(sessionToken)}`;
+}
+
+function getPlaceDetailsFetchOptions(): RequestInit {
+  return {
+    ...GOOGLE_PLACES_FETCH_OPTIONS,
+    headers: {
+      ...GOOGLE_PLACES_FETCH_OPTIONS.headers,
+      "X-Goog-Api-Key": GOOGLE_PLACES_API_KEY ?? "",
+      "X-Goog-FieldMask": "addressComponents",
+    },
+  };
 }
 
 function getPredictionMainText(prediction: PlacePrediction) {
-  return prediction.structured_formatting?.main_text ?? prediction.description;
+  return (
+    prediction.structuredFormat?.mainText?.text ?? prediction.text?.text ?? ""
+  );
 }
 
 function getPredictionSecondaryText(prediction: PlacePrediction) {
-  return prediction.structured_formatting?.secondary_text ?? "";
+  return prediction.structuredFormat?.secondaryText?.text ?? "";
+}
+
+function getPlacePredictions(data: PlacesAutocompleteResponse) {
+  return (
+    data.suggestions
+      ?.map((suggestion) => suggestion.placePrediction)
+      .filter(
+        (prediction): prediction is PlacePrediction =>
+          prediction?.placeId !== undefined,
+      ) ?? []
+  );
 }
 
 function getAddressComponent(
   components: AddressComponent[],
   type: string,
-  name: "long_name" | "short_name" = "long_name",
+  name: "longText" | "shortText" = "longText",
 ) {
   return components.find((component) => component.types.includes(type))?.[name];
 }
@@ -157,7 +212,7 @@ function getCityFromAddressComponents(components: AddressComponent[]) {
   const state = getAddressComponent(
     components,
     "administrative_area_level_1",
-    "short_name",
+    "shortText",
   );
 
   return [locality, state].filter(Boolean).join(", ");
@@ -169,6 +224,23 @@ function getCityFallbackFromPrediction(prediction: PlacePrediction) {
   const state = secondaryText.split(",")[0]?.trim();
 
   return [mainText, state].filter(Boolean).join(", ");
+}
+
+function getOrCreateSessionToken(ref: MutableRefObject<string | null>) {
+  if (!ref.current) {
+    ref.current = Crypto.randomUUID();
+  }
+
+  return ref.current;
+}
+
+function clearSessionToken(
+  ref: MutableRefObject<string | null>,
+  sessionToken: string,
+) {
+  if (ref.current === sessionToken) {
+    ref.current = null;
+  }
 }
 
 /**
@@ -204,6 +276,8 @@ export function EntryForm({
   const autocompleteRequestIdRef = useRef(0);
   const cityAutocompleteRequestIdRef = useRef(0);
   const placeDetailsRequestIdRef = useRef(0);
+  const placeSessionTokenRef = useRef<string | null>(null);
+  const citySessionTokenRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!hasEditedPlace || isSelectingPlace) {
@@ -225,8 +299,12 @@ export function EntryForm({
     const timeout = setTimeout(async () => {
       try {
         const response = await fetch(
-          getAutocompleteUrl(trimmedPlaceName, "establishment"),
-          GOOGLE_PLACES_FETCH_OPTIONS,
+          getAutocompleteUrl(),
+          getAutocompleteFetchOptions(
+            trimmedPlaceName,
+            "establishment",
+            getOrCreateSessionToken(placeSessionTokenRef),
+          ),
         );
 
         if (!response.ok) {
@@ -239,13 +317,7 @@ export function EntryForm({
           return;
         }
 
-        if (data.status !== "OK") {
-          setPlaceSuggestions([]);
-          setShowPlaceSuggestions(false);
-          return;
-        }
-
-        const predictions = data.predictions ?? [];
+        const predictions = getPlacePredictions(data);
         setPlaceSuggestions(predictions);
         setShowPlaceSuggestions(predictions.length > 0);
       } catch {
@@ -282,8 +354,12 @@ export function EntryForm({
     const timeout = setTimeout(async () => {
       try {
         const response = await fetch(
-          getAutocompleteUrl(trimmedCity, "(cities)"),
-          GOOGLE_PLACES_FETCH_OPTIONS,
+          getAutocompleteUrl(),
+          getAutocompleteFetchOptions(
+            trimmedCity,
+            "(cities)",
+            getOrCreateSessionToken(citySessionTokenRef),
+          ),
         );
 
         if (!response.ok) {
@@ -296,13 +372,7 @@ export function EntryForm({
           return;
         }
 
-        if (data.status !== "OK") {
-          setCitySuggestions([]);
-          setShowCitySuggestions(false);
-          return;
-        }
-
-        const predictions = data.predictions ?? [];
+        const predictions = getPlacePredictions(data);
         setCitySuggestions(predictions);
         setShowCitySuggestions(predictions.length > 0);
       } catch {
@@ -347,10 +417,12 @@ export function EntryForm({
       return;
     }
 
+    const sessionToken = getOrCreateSessionToken(placeSessionTokenRef);
+
     try {
       const response = await fetch(
-        getPlaceDetailsUrl(prediction.place_id),
-        GOOGLE_PLACES_FETCH_OPTIONS,
+        getPlaceDetailsUrl(prediction.placeId, sessionToken),
+        getPlaceDetailsFetchOptions(),
       );
 
       if (!response.ok) {
@@ -358,7 +430,7 @@ export function EntryForm({
       }
 
       const data = (await response.json()) as PlaceDetailsResponse;
-      const addressComponents = data.result?.address_components ?? [];
+      const addressComponents = data.addressComponents ?? [];
       const selectedCity = getCityFromAddressComponents(addressComponents);
 
       if (placeDetailsRequestIdRef.current !== placeDetailsRequestId) {
@@ -381,6 +453,8 @@ export function EntryForm({
       setShowCitySuggestions(false);
       setCity("");
       return;
+    } finally {
+      clearSessionToken(placeSessionTokenRef, sessionToken);
     }
   };
 
@@ -397,10 +471,12 @@ export function EntryForm({
       return;
     }
 
+    const sessionToken = getOrCreateSessionToken(citySessionTokenRef);
+
     try {
       const response = await fetch(
-        getPlaceDetailsUrl(prediction.place_id),
-        GOOGLE_PLACES_FETCH_OPTIONS,
+        getPlaceDetailsUrl(prediction.placeId, sessionToken),
+        getPlaceDetailsFetchOptions(),
       );
 
       if (!response.ok) {
@@ -408,7 +484,7 @@ export function EntryForm({
       }
 
       const data = (await response.json()) as PlaceDetailsResponse;
-      const addressComponents = data.result?.address_components ?? [];
+      const addressComponents = data.addressComponents ?? [];
       const selectedCity = getCityFromAddressComponents(addressComponents);
 
       if (selectedCity) {
@@ -416,6 +492,8 @@ export function EntryForm({
       }
     } catch {
       return;
+    } finally {
+      clearSessionToken(citySessionTokenRef, sessionToken);
     }
   };
 
@@ -567,7 +645,7 @@ export function EntryForm({
 
                   return (
                     <Pressable
-                      key={suggestion.place_id}
+                      key={suggestion.placeId}
                       accessibilityRole="button"
                       accessibilityLabel={`Select ${mainText}`}
                       className={`px-4 py-3 ${
@@ -618,7 +696,7 @@ export function EntryForm({
 
                   return (
                     <Pressable
-                      key={suggestion.place_id}
+                      key={suggestion.placeId}
                       accessibilityRole="button"
                       accessibilityLabel={`Select ${mainText}`}
                       className={`px-4 py-3 ${
