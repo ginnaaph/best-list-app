@@ -75,9 +75,6 @@ export default function EntryDetailScreen() {
   }
 
   const overallScore = calculateOverallScore(entry);
-  const entryImageSource = entry.photoUrl
-    ? { uri: entry.photoUrl }
-    : images.noImages;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
@@ -108,10 +105,24 @@ export default function EntryDetailScreen() {
           showsVerticalScrollIndicator={false}
         >
           <View className="gap-6 pb-8">
-            <Image
-              className="aspect-square w-full rounded-bestlist-xl bg-white"
-              source={entryImageSource}
-            />
+            {entry.photoUrl ? (
+              <Image
+                className="aspect-square w-full rounded-bestlist-xl bg-white"
+                resizeMode="cover"
+                source={{ uri: entry.photoUrl }}
+              />
+            ) : (
+              <View className="aspect-square w-full items-center justify-center rounded-bestlist-xl border border-dashed border-subtle bg-white gap-2">
+                <Image
+                  className="h-16 w-16 opacity-40"
+                  resizeMode="contain"
+                  source={images.noImages}
+                />
+                <Text className="font-body text-[14px] text-secondary">
+                  No photo added
+                </Text>
+              </View>
+            )}
 
             <View className="flex-row items-start justify-between gap-4">
               <View className="min-w-0 flex-1 gap-2 pt-2">
