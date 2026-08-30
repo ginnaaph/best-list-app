@@ -45,7 +45,7 @@ export default function configureExpo({ config }: ConfigContext): ExpoConfig {
  * @returns The bundle identifier for known variants, defaulting to production.
  */
 function getBundleIdentifier(appVariant: string | undefined) {
-  if (appVariant && appVariant in bundleIdentifiers) {
+  if (appVariant && Object.hasOwn(bundleIdentifiers, appVariant)) {
     return bundleIdentifiers[appVariant as AppVariant];
   }
 
