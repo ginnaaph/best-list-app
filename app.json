@@ -25,7 +25,8 @@
         "monochromeImage": "./assets/BestList1.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": ["android.permission.RECORD_AUDIO"]
     },
     "web": {
       "output": "single",
@@ -75,6 +76,12 @@
       "eas": {
         "projectId": "08d14eb2-8d28-4702-9ddc-ce7a5f89cc6a"
       }
+    },
+    "runtimeVersion": {
+      "policy": "fingerprint"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/08d14eb2-8d28-4702-9ddc-ce7a5f89cc6a"
     }
   }
 }
