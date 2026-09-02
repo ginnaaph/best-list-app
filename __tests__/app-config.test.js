@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import configureExpo from "../app.config.ts";
+import configureExpo from "../app.config.js";
 
 test("Expo config skips the Google iOS client ID outside EAS Build", () => {
   const originalClientId = process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID;
