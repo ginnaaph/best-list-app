@@ -28,7 +28,7 @@ const aboutRows = [
     showsChevron: true,
     onPress: () => router.push("/credits"),
   },
-  { label: "App version", value: "1.0.0", showsChevron: false },
+  { label: "App version", value: "1.0.1", showsChevron: false },
 ];
 
 const supportRows = [
