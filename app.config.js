@@ -1,6 +1,3 @@
-import { createRequire } from "node:module";
-
-const require = createRequire(import.meta.url);
 const appJson = require("./app.json");
 
 const bundleIdentifiers = {
@@ -9,7 +6,7 @@ const bundleIdentifiers = {
   production: "com.gina.bestlist",
 };
 
-export default function configureExpo({ config }) {
+module.exports = function configureExpo({ config }) {
   const googleIosClientId = process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID;
   const isEasBuild = process.env.EAS_BUILD === "true";
   assertGoogleIosClientIdConfigured(googleIosClientId, isEasBuild);
@@ -32,7 +29,7 @@ export default function configureExpo({ config }) {
     },
     plugins: [...(appJson.expo.plugins ?? []), ...googlePlugin],
   };
-}
+};
 
 function getBundleIdentifier(appVariant) {
   if (appVariant && Object.hasOwn(bundleIdentifiers, appVariant)) {
