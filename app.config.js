@@ -1,5 +1,7 @@
+import { createRequire } from "node:module";
+
+const require = createRequire(import.meta.url);
 const appJson = require("./app.json");
-const baseConfig = appJson.expo;
 
 const bundleIdentifiers = {
   development: "com.gina.bestlist.dev",
@@ -7,7 +9,7 @@ const bundleIdentifiers = {
   production: "com.gina.bestlist",
 };
 
-module.exports = ({ config }) => {
+export default function configureExpo({ config }) {
   const googleIosClientId = process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID;
   const isEasBuild = process.env.EAS_BUILD === "true";
   assertGoogleIosClientIdConfigured(googleIosClientId, isEasBuild);
@@ -23,14 +25,14 @@ module.exports = ({ config }) => {
 
   return {
     ...config,
-    ...baseConfig,
+    ...appJson.expo,
     ios: {
-      ...baseConfig.ios,
+      ...appJson.expo.ios,
       bundleIdentifier: getBundleIdentifier(process.env.APP_VARIANT),
     },
-    plugins: [...(baseConfig.plugins ?? []), ...googlePlugin],
+    plugins: [...(appJson.expo.plugins ?? []), ...googlePlugin],
   };
-};
+}
 
 function getBundleIdentifier(appVariant) {
   if (appVariant && Object.hasOwn(bundleIdentifiers, appVariant)) {
