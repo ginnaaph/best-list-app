@@ -174,7 +174,11 @@ export function CategoryDetailScreen({
                   accessibilityLabel={`Open ${entry.placeName}`}
                   onPress={() => router.push(`/entry/${entry.id}`)}
                 >
-                  <EntryCard entry={entry} rank={index + 1} />
+                  <EntryCard
+                    entry={entry}
+                    rank={index + 1}
+                    selectedDimension={selectedSort}
+                  />
                 </Pressable>
               ))}
             </View>

@@ -1,19 +1,25 @@
 import { Image, Text, View } from "react-native";
 
 import { images } from "@/constants/images";
-import { calculateOverallScore } from "@/lib/entry-score";
+import { calculateOverallScore, type SortDimension } from "@/lib/entry-score";
 import type { Entry } from "@/types/entry";
 
 type EntryCardProps = {
   entry: Entry;
   rank: number;
+  selectedDimension: SortDimension;
 };
 
 /**
- * Renders a ranked entry summary card.
+ * Renders a ranked entry summary card with the selected score dimension shown.
+ *
+ * @param props - Entry data, rank, and selected score dimension for the card.
  */
-export function EntryCard({ entry, rank }: EntryCardProps) {
-  const overallScore = calculateOverallScore(entry);
+export function EntryCard({ entry, rank, selectedDimension }: EntryCardProps) {
+  const displayedScore =
+    selectedDimension === "overall"
+      ? calculateOverallScore(entry)
+      : entry[selectedDimension];
   const rankingLabel = `#${rank} - ${entry.city.toUpperCase()}`;
   const entryImageSource = entry.photoUrl
     ? { uri: entry.photoUrl }
@@ -51,7 +57,7 @@ export function EntryCard({ entry, rank }: EntryCardProps) {
 
           <View className="shrink-0 items-center pt-4 pb-4">
             <Text className="font-display mt-1.5 text-[42px] font-extrabold leading-13.5 text-accent">
-              {overallScore.toFixed(1)}
+              {displayedScore.toFixed(1)}
             </Text>
           </View>
         </View>
