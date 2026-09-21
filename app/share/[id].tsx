@@ -104,7 +104,7 @@ export default function ShareListScreen() {
           return;
         }
 
-        const publicEntries = await getPublicEntries(publicCategory.id);
+        const publicEntries = await getPublicEntries(id);
 
         if (!isMounted) {
           return;

@@ -290,19 +290,19 @@ export async function deleteCategory(categoryId: string): Promise<Category> {
 export async function getPublicCategoryByShareId(
   shareId: string,
 ): Promise<Category | null> {
-  const { data, error } = await getPublicSupabaseClient()
-    .from("categories")
-    .select(categoryColumns)
-    .eq("share_id", shareId)
-    .eq("is_shared", true)
-    .maybeSingle()
-    .returns<CategoryRow | null>();
+  const { data, error } = await getPublicSupabaseClient().rpc(
+    "get_shared_category",
+    { category_share_id: shareId },
+  );
 
   if (error) {
     throw error;
   }
 
-  return data ? mapCategory(data) : null;
+  const categories = (data ?? []) as unknown as CategoryRow[];
+  const category = categories[0] ?? null;
+
+  return category ? mapCategory(category) : null;
 }
 
 /**
@@ -327,24 +327,24 @@ export async function getPublicCategoryOwnerUsername(
 }
 
 /**
- * Fetches entries for a publicly shared category.
+ * Fetches entries for a publicly shared category by share id.
  *
- * @param categoryId - The category whose public entries should be loaded.
+ * @param shareId - The public share id whose entries should be loaded.
  * @returns The public entries for the category.
  */
-export async function getPublicEntries(categoryId: string): Promise<Entry[]> {
-  const { data, error } = await getPublicSupabaseClient()
-    .from("entries")
-    .select(entryColumns)
-    .eq("category_id", categoryId)
-    .order("created_at", { ascending: true })
-    .returns<EntryRow[]>();
+export async function getPublicEntries(shareId: string): Promise<Entry[]> {
+  const { data, error } = await getPublicSupabaseClient().rpc(
+    "get_shared_entries",
+    { category_share_id: shareId },
+  );
 
   if (error) {
     throw error;
   }
 
-  return data.map(mapEntry);
+  const entries = (data ?? []) as unknown as EntryRow[];
+
+  return entries.map(mapEntry);
 }
 
 /**
