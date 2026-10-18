@@ -7,13 +7,13 @@ import verificationReference from "@/assets/BL-Verification.png";
 import designGuide from "@/assets/DesignGuide.png";
 import googleLogo from "@/assets/logos/google.png";
 import noImages from "@/assets/NoImages.jpg";
-import breakfastBurrito from "@/assets/stockimages/Food/BreakfastBurrito.png";
-import cookies from "@/assets/stockimages/Food/Cookies.png";
+import breakfastBurrito from "@/assets/stockimages/Food/BreakfastBurrito.jpg";
+import cookies from "@/assets/stockimages/Food/Cookies.jpg";
 import iceCoffee from "@/assets/stockimages/Food/iceCoffee.png";
-import latte from "@/assets/stockimages/Food/latte.png";
-import pizza from "@/assets/stockimages/Food/pizza.png";
+import latte from "@/assets/stockimages/Food/latte.jpg";
+import pizza from "@/assets/stockimages/Food/pizza.jpg";
 import ramen from "@/assets/stockimages/Food/ramen.png";
-import tacos from "@/assets/stockimages/Food/tacos.png";
+import tacos from "@/assets/stockimages/Food/tacos.jpg";
 import wireframe from "@/assets/WireFrame.png";
 
 export const images = {

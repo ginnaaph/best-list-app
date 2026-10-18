@@ -24,27 +24,51 @@ Overall score is auto-calculated. User can re-sort any list by any single dimens
 - **Framework:** React Native + Expo
 - **Styling:** NativeWind (Tailwind for RN)
 - **Backend/DB/auth:** Supabase
+- **State:** Zustand
+- **Build & Deployment:** EAS (development, preview, production profiles)
+- **Crash Reporting:** Sentry
 - **IDE:** VS Code
-- **Testing:** Expo Go
 
 ## Environment Variables
 Create a local `.env` file from the example template before running the app:
-
 ```bash
 cp .env.example .env
 ```
 
 Set these Supabase values in `.env`:
-
 - `EXPO_PUBLIC_SUPABASE_URL` — your Supabase project URL.
 - `EXPO_PUBLIC_SUPABASE_ANON_KEY` — your Supabase anon key used by the Expo client.
 
 You can find both values in your Supabase project settings under API configuration. Restart the Expo dev server after changing environment variables.
 
-## Screens (MVP)
-1. Home — category grid tiles
-2. Category / Ranked List — ranked entry cards, sortable
-3. Add Entry — photo + place + composite score sliders + note
-4. Entry Detail — full view with score breakdown
-5. Shareable List — read-only public view
-6. Profile - user stats and categories
+## Screens
+
+### Onboarding & Auth
+- **Splash** — app logo, tap to enter
+- **Onboarding** — carousel walkthrough (food ranking concept)
+- **How It Works** — explainer before sign-in
+- **Sign In / Sign Up** — Google OAuth + Apple Sign-In
+- **Setup Handle** — public username for shareable lists
+
+### Core App
+- **Home** — category grid with entry counts; tap to view ranked list or create new category
+- **Add Category** — name + emoji, create new food type
+- **Ranked List** — entries sorted by composite score; auto-ranked by weighted dimensions (taste, value, portion, vibe)
+- **Add Entry** — photo capture, location, multi-slider scoring, notes
+- **Entry Detail** — full score breakdown, notes, edit/delete actions
+- **Edit Entry** — modify any field or delete entry
+
+### Social & Sharing
+- **Shareable List** — read-only public view of ranked category; shows owner @handle; non-owners see App Store waitlist signup CTA
+- **Profile** — view user stats, created categories, account info
+
+### Account Management
+- **Settings** — edit profile, change password, delete account (3-step confirmation flow)
+- **Edit Profile** — name, bio, profile photo
+
+### Support & Legal
+- **Contact Us** — Formspree contact form
+- **Report a Bug** — in-app bug reporter (sends to Sentry)
+- **Privacy Policy** — full disclosure of crash reporting + bug data collection
+- **Terms of Service** — standard TOS
+- **Credits** — photo/asset attribution
