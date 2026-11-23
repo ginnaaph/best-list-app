@@ -234,7 +234,7 @@ export default function AddCategoryScreen() {
               {showRenameWarning ? (
                 <View
                   accessibilityLiveRegion="polite"
-                  className="flex-row items-center gap-2 rounded-xl border border-[#dfb950] bg-[#dfb950]/15 px-3 py-2.5"
+                  className="min-h-11.5 flex-row items-center gap-2 rounded-xl border border-[#dfb950] bg-[#dfb950]/15 px-3 py-2.5"
                 >
                   <Ionicons
                     accessible={false}
