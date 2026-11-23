@@ -1,6 +1,8 @@
+import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
+  AccessibilityInfo,
   Alert,
   KeyboardAvoidingView,
   Platform,
@@ -26,6 +28,7 @@ const labelClassName =
   "font-mono-bestlist text-[10px] font-bold uppercase tracking-[1.5px] text-secondary";
 const inputClassName =
   "h-12 rounded-xl border bg-white px-4 font-body text-[16px] text-primary";
+const renameWarning = "Old scores will now show under the new name.";
 
 /** Renders the add or edit category form for the current route. */
 export default function AddCategoryScreen() {
@@ -43,14 +46,29 @@ export default function AddCategoryScreen() {
     ? categories.find((item) => item.id === categoryId)
     : undefined;
   const [name, setName] = useState(() => category?.name ?? "");
-  const [criteriaLabels, setCriteriaLabels] = useState<CriteriaLabels>(() =>
+  const [savedCriteriaLabels] = useState(() =>
     category ? getCriteriaLabels(category) : DEFAULT_CRITERIA_LABELS,
   );
+  const [criteriaLabels, setCriteriaLabels] = useState(savedCriteriaLabels);
   const [criteriaErrors, setCriteriaErrors] = useState<ReturnType<
     typeof validateCriteriaLabels
   > | null>(null);
   const criterionInputs = useRef<(TextInput | null)[]>([]);
   const [isSaving, setIsSaving] = useState(false);
+  const showRenameWarning =
+    isEditMode &&
+    (category?.entryCount ?? 0) > 0 &&
+    criteriaLabels.some(
+      (label, index) => label.trim() !== savedCriteriaLabels[index].trim(),
+    );
+
+  useEffect(() => {
+    if (Platform.OS === "ios" && showRenameWarning) {
+      AccessibilityInfo.announceForAccessibilityWithOptions(renameWarning, {
+        queue: true,
+      });
+    }
+  }, [showRenameWarning]);
 
   const updateCriterion = (index: number, value: string) => {
     const nextLabels: CriteriaLabels = [...criteriaLabels];
@@ -212,6 +230,23 @@ export default function AddCategoryScreen() {
                   </View>
                 );
               })}
+
+              {showRenameWarning ? (
+                <View
+                  accessibilityLiveRegion="polite"
+                  className="flex-row items-center gap-2 rounded-xl border border-[#dfb950] bg-[#dfb950]/15 px-3 py-2.5"
+                >
+                  <Ionicons
+                    accessible={false}
+                    name="information-circle-outline"
+                    size={16}
+                    color={colors.primaryText}
+                  />
+                  <Text className="shrink font-body text-[13px] text-primary">
+                    {renameWarning}
+                  </Text>
+                </View>
+              ) : null}
             </View>
 
             <Pressable
