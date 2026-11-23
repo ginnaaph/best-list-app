@@ -17,6 +17,7 @@ import {
   DEFAULT_CRITERIA_LABELS,
   getCriteriaLabels,
   MAX_CRITERIA_LABEL_LENGTH,
+  validateCriteriaLabels,
 } from "@/lib/criteria-labels";
 import { useStore } from "@/store";
 import type { CriteriaLabels } from "@/types/category";
@@ -24,7 +25,7 @@ import type { CriteriaLabels } from "@/types/category";
 const labelClassName =
   "font-mono-bestlist text-[10px] font-bold uppercase tracking-[1.5px] text-secondary";
 const inputClassName =
-  "h-12 rounded-xl border border-subtle bg-white px-4 font-body text-[16px] text-primary";
+  "h-12 rounded-xl border bg-white px-4 font-body text-[16px] text-primary";
 
 /** Renders the add or edit category form for the current route. */
 export default function AddCategoryScreen() {
@@ -45,15 +46,20 @@ export default function AddCategoryScreen() {
   const [criteriaLabels, setCriteriaLabels] = useState<CriteriaLabels>(() =>
     category ? getCriteriaLabels(category) : DEFAULT_CRITERIA_LABELS,
   );
+  const [criteriaErrors, setCriteriaErrors] = useState<ReturnType<
+    typeof validateCriteriaLabels
+  > | null>(null);
   const criterionInputs = useRef<(TextInput | null)[]>([]);
   const [isSaving, setIsSaving] = useState(false);
 
   const updateCriterion = (index: number, value: string) => {
-    setCriteriaLabels((labels) => {
-      const nextLabels: CriteriaLabels = [...labels];
-      nextLabels[index] = value;
-      return nextLabels;
-    });
+    const nextLabels: CriteriaLabels = [...criteriaLabels];
+    nextLabels[index] = value;
+    setCriteriaLabels(nextLabels);
+
+    if (criteriaErrors) {
+      setCriteriaErrors(validateCriteriaLabels(nextLabels));
+    }
   };
 
   const handleSave = async () => {
@@ -68,12 +74,19 @@ export default function AddCategoryScreen() {
       return;
     }
 
+    const errors = validateCriteriaLabels(criteriaLabels);
+    if (errors.some((error) => error !== null)) {
+      setCriteriaErrors(errors);
+      return;
+    }
+
     try {
       setIsSaving(true);
 
       if (categoryId) {
         const updatedCategory = await updateCategory(categoryId, {
           name: trimmedName,
+          criteriaLabels,
         });
 
         if (!updatedCategory) {
@@ -86,7 +99,7 @@ export default function AddCategoryScreen() {
         return;
       }
 
-      const newCategory = await addCategory(trimmedName);
+      const newCategory = await addCategory(trimmedName, criteriaLabels);
       router.replace(`/category/${newCategory.id}`);
     } catch (error: unknown) {
       console.error("Failed to save category:", error);
@@ -130,7 +143,7 @@ export default function AddCategoryScreen() {
               <TextInput
                 autoCapitalize="words"
                 autoFocus
-                className={inputClassName}
+                className={`${inputClassName} border-subtle`}
                 placeholder="e.g. Breakfast Burrito"
                 placeholderTextColor={colors.secondaryText}
                 returnKeyType="next"
@@ -151,6 +164,7 @@ export default function AddCategoryScreen() {
 
               {criteriaLabels.map((label, index) => {
                 const fieldLabel = `Criterion ${index + 1}`;
+                const error = criteriaErrors?.[index];
                 const isLastCriterion = index === criteriaLabels.length - 1;
                 const counterColor =
                   label.length >= MAX_CRITERIA_LABEL_LENGTH
@@ -171,7 +185,7 @@ export default function AddCategoryScreen() {
                       }}
                       accessibilityLabel={fieldLabel}
                       autoCapitalize="words"
-                      className={inputClassName}
+                      className={`${inputClassName} ${error ? "border-[#B3261E]" : "border-subtle"}`}
                       maxLength={MAX_CRITERIA_LABEL_LENGTH}
                       returnKeyType={isLastCriterion ? "done" : "next"}
                       submitBehavior={isLastCriterion ? "blurAndSubmit" : "submit"}
@@ -186,6 +200,15 @@ export default function AddCategoryScreen() {
                         criterionInputs.current[index + 1]?.focus();
                       }}
                     />
+                    {error ? (
+                      <Text
+                        accessibilityLiveRegion="polite"
+                        className="font-body text-[13px] text-[#B3261E]"
+                        selectable
+                      >
+                        {error}
+                      </Text>
+                    ) : null}
                   </View>
                 );
               })}
