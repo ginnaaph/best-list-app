@@ -60,7 +60,7 @@ type StoreState = {
    * Creates a category and adds it to the local store.
    *
    * @param name - The category name to create.
-   * @param criteriaLabels - Optional labels for the four score slots.
+   * @param criteriaLabels - Optional labels to trim and save for the four score slots.
    * @returns The created category.
    */
   addCategory: (name: string, criteriaLabels?: CriteriaLabels) => Promise<Category>;
@@ -122,6 +122,27 @@ type StoreState = {
    */
   ensureCategorySeeded: (categoryId: string) => void;
 };
+
+/**
+ * Trims leading and trailing whitespace from each criteria label.
+ *
+ * @param labels - The optional labels for the four score slots.
+ * @returns A trimmed tuple, or undefined when no labels are given.
+ */
+function trimCriteriaLabels(
+  labels?: CriteriaLabels,
+): CriteriaLabels | undefined {
+  if (!labels) {
+    return undefined;
+  }
+
+  return [
+    labels[0].trim(),
+    labels[1].trim(),
+    labels[2].trim(),
+    labels[3].trim(),
+  ];
+}
 
 function updateCategorySummaries(categories: Category[], entries: Entry[]) {
   return categories.map((category) => {
@@ -208,6 +229,7 @@ export const useStore = create<StoreState>()(
         await AsyncStorage.removeItem(storeStorageKey);
       },
       addCategory: async (name, criteriaLabels) => {
+        const trimmedLabels = trimCriteriaLabels(criteriaLabels);
         const newCategory: Category = {
           id: Crypto.randomUUID(),
           name: name.trim(),
@@ -215,7 +237,7 @@ export const useStore = create<StoreState>()(
           entryCount: 0,
           tone: categoryTones[get().categories.length % categoryTones.length],
           isPublic: false,
-          ...(criteriaLabels ? { criteriaLabels } : {}),
+          ...(trimmedLabels ? { criteriaLabels: trimmedLabels } : {}),
         };
 
         try {
@@ -244,17 +266,9 @@ export const useStore = create<StoreState>()(
         }
 
         try {
-          const labels = input.criteriaLabels;
           const updatedCategory = await updateSupabaseCategory(categoryId, {
             name: input.name.trim(),
-            criteriaLabels: labels
-              ? [
-                  labels[0].trim(),
-                  labels[1].trim(),
-                  labels[2].trim(),
-                  labels[3].trim(),
-                ]
-              : undefined,
+            criteriaLabels: trimCriteriaLabels(input.criteriaLabels),
           });
 
           set((state) => {
