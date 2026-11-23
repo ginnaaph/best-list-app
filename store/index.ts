@@ -16,7 +16,7 @@ import {
 } from "@/lib/api";
 import { getNextCategorySharingState } from "@/lib/category-sharing";
 import { sortEntries } from "@/lib/entry-score";
-import type { Category, CategoryCardTone } from "@/types/category";
+import type { Category, CategoryCardTone, CriteriaLabels } from "@/types/category";
 import type { Entry } from "@/types/entry";
 
 const categoryTones: CategoryCardTone[] = [
@@ -36,7 +36,9 @@ type UpdateEntryInput = Omit<
   Entry,
   "id" | "categoryId" | "createdAt" | "overallScore"
 >;
-type UpdateCategoryInput = Pick<Category, "name">;
+type UpdateCategoryInput = Pick<Category, "name"> & {
+  criteriaLabels?: CriteriaLabels;
+};
 
 type StoreState = {
   categories: Category[];
@@ -58,14 +60,15 @@ type StoreState = {
    * Creates a category and adds it to the local store.
    *
    * @param name - The category name to create.
+   * @param criteriaLabels - Optional labels for the four score slots.
    * @returns The created category.
    */
-  addCategory: (name: string) => Promise<Category>;
+  addCategory: (name: string, criteriaLabels?: CriteriaLabels) => Promise<Category>;
   /**
    * Updates a category and refreshes its local summary.
    *
    * @param categoryId - The category to update.
-   * @param category - The category fields to save.
+   * @param category - The name and optional score labels to trim and save.
    * @returns The updated category, or undefined when it is not found.
    */
   updateCategory: (
@@ -204,7 +207,7 @@ export const useStore = create<StoreState>()(
         set({ categories: [], entries: [], isLoading: false });
         await AsyncStorage.removeItem(storeStorageKey);
       },
-      addCategory: async (name) => {
+      addCategory: async (name, criteriaLabels) => {
         const newCategory: Category = {
           id: Crypto.randomUUID(),
           name: name.trim(),
@@ -212,6 +215,7 @@ export const useStore = create<StoreState>()(
           entryCount: 0,
           tone: categoryTones[get().categories.length % categoryTones.length],
           isPublic: false,
+          ...(criteriaLabels ? { criteriaLabels } : {}),
         };
 
         try {
@@ -240,8 +244,17 @@ export const useStore = create<StoreState>()(
         }
 
         try {
+          const labels = input.criteriaLabels;
           const updatedCategory = await updateSupabaseCategory(categoryId, {
             name: input.name.trim(),
+            criteriaLabels: labels
+              ? [
+                  labels[0].trim(),
+                  labels[1].trim(),
+                  labels[2].trim(),
+                  labels[3].trim(),
+                ]
+              : undefined,
           });
 
           set((state) => {
