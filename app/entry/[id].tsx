@@ -6,18 +6,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { CurrentUserAvatar } from "@/components/current-user-avatar";
 import { images } from "@/constants/images";
 import { colors } from "@/constants/theme";
+import { DEFAULT_CRITERIA_LABELS, getCriteriaLabels } from "@/lib/criteria-labels";
 import { calculateOverallScore } from "@/lib/entry-score";
 import { useStore } from "@/store";
 import type { Entry } from "@/types/entry";
 
 type ScoreKey = keyof Pick<Entry, "taste" | "value" | "portion" | "vibe">;
-
-const scoreRows: { label: string; key: ScoreKey }[] = [
-  { label: "Taste", key: "taste" },
-  { label: "Value", key: "value" },
-  { label: "Portion", key: "portion" },
-  { label: "Vibe", key: "vibe" },
-];
 
 function formatLoggedDate(date: string) {
   return new Intl.DateTimeFormat("en-US", {
@@ -65,15 +59,27 @@ function EntryNotFoundScreen() {
   );
 }
 
+/** @returns The entry detail screen for the current route ID. */
 export default function EntryDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const entries = useStore((state) => state.entries);
+  const categories = useStore((state) => state.categories);
   const entry = entries.find((item) => item.id === id);
 
   if (!entry) {
     return <EntryNotFoundScreen />;
   }
 
+  const category = categories.find((item) => item.id === entry.categoryId);
+  const criteriaLabels = category
+    ? getCriteriaLabels(category)
+    : DEFAULT_CRITERIA_LABELS;
+  const scoreRows: { label: string; key: ScoreKey }[] = [
+    { label: criteriaLabels[0], key: "taste" },
+    { label: criteriaLabels[1], key: "value" },
+    { label: criteriaLabels[2], key: "portion" },
+    { label: criteriaLabels[3], key: "vibe" },
+  ];
   const overallScore = calculateOverallScore(entry);
 
   return (
