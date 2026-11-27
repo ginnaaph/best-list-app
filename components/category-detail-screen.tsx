@@ -9,17 +9,10 @@ import { EntryCard } from "@/components/entry-card";
 import { FloatingAddButton } from "@/components/floating-add-button";
 import { colors } from "@/constants/theme";
 import { getCategoryShareUrl } from "@/lib/category-sharing";
+import { getCriteriaLabels } from "@/lib/criteria-labels";
 import { sortEntries, type SortDimension } from "@/lib/entry-score";
 import type { Category } from "@/types/category";
 import type { Entry } from "@/types/entry";
-
-const sortOptions: { label: string; value: SortDimension }[] = [
-  { label: "Overall", value: "overall" },
-  { label: "Taste", value: "taste" },
-  { label: "Value", value: "value" },
-  { label: "Portion", value: "portion" },
-  { label: "Vibe", value: "vibe" },
-];
 
 type CategoryDetailScreenProps = {
   category: Category;
@@ -40,6 +33,14 @@ export function CategoryDetailScreen({
   toggleDisabled,
 }: CategoryDetailScreenProps) {
   const [selectedSort, setSelectedSort] = useState<SortDimension>("overall");
+  const criteriaLabels = getCriteriaLabels(category);
+  const sortOptions: { label: string; value: SortDimension }[] = [
+    { label: "Overall", value: "overall" },
+    { label: criteriaLabels[0], value: "taste" },
+    { label: criteriaLabels[1], value: "value" },
+    { label: criteriaLabels[2], value: "portion" },
+    { label: criteriaLabels[3], value: "vibe" },
+  ];
   const selectedSortLabel =
     sortOptions.find((option) => option.value === selectedSort)?.label ??
     "Overall";

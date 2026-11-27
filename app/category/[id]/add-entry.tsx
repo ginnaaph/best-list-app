@@ -6,8 +6,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { CategoryNotFoundScreen } from "@/components";
 import { EntryForm, type EntryFormValues } from "@/components/entry-form";
 import { colors } from "@/constants/theme";
+import { getCriteriaLabels } from "@/lib/criteria-labels";
 import { useStore } from "@/store";
 
+/** Renders the form for adding an entry to a category. */
 export default function AddEntryScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const categories = useStore((state) => state.categories);
@@ -75,6 +77,7 @@ export default function AddEntryScreen() {
       </View>
 
       <EntryForm
+        criteriaLabels={getCriteriaLabels(category)}
         initialValues={{
           placeName: "",
           city: "",

@@ -91,3 +91,24 @@ select
 from public.categories
 where user_id = '33333333-3333-3333-3333-333333333333'
   and name = 'pizza';
+-- auth fix for local email-code sign-in (BES-24) --
+-- token columns must be '' not NULL, or auth fails with "Database error finding user"
+update auth.users set
+  confirmation_token = coalesce(confirmation_token, ''),
+  recovery_token = coalesce(recovery_token, ''),
+  email_change_token_new = coalesce(email_change_token_new, ''),
+  email_change_token_current = coalesce(email_change_token_current, ''),
+  email_change = coalesce(email_change, ''),
+  phone_change = coalesce(phone_change, ''),
+  phone_change_token = coalesce(phone_change_token, ''),
+  reauthentication_token = coalesce(reauthentication_token, '')
+where email like '%@bestlist.local';
+
+-- email identity row so seed users can sign in by email --
+insert into auth.identities (provider_id, user_id, identity_data, provider, created_at, updated_at, last_sign_in_at)
+select id::text, id,
+  jsonb_build_object('sub', id::text, 'email', email, 'email_verified', true),
+  'email', now(), now(), now()
+from auth.users
+where email like '%@bestlist.local'
+on conflict do nothing;

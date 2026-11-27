@@ -1,10 +1,13 @@
+import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
+  AccessibilityInfo,
   Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
+  ScrollView,
   Text,
   TextInput,
   View,
@@ -12,8 +15,23 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { colors } from "@/constants/theme";
+import {
+  DEFAULT_CRITERIA_LABELS,
+  getCriteriaLabels,
+  haveCriteriaLabelsChanged,
+  MAX_CRITERIA_LABEL_LENGTH,
+  validateCriteriaLabels,
+} from "@/lib/criteria-labels";
 import { useStore } from "@/store";
+import type { CriteriaLabels } from "@/types/category";
 
+const labelClassName =
+  "font-mono-bestlist text-[10px] font-bold uppercase tracking-[1.5px] text-secondary";
+const inputClassName =
+  "h-12 rounded-xl border bg-white px-4 font-body text-[16px] text-primary";
+const renameWarning = "Old scores will now show under the new name.";
+
+/** Renders the add or edit category form for the current route. */
 export default function AddCategoryScreen() {
   const { categoryId: categoryIdParam } = useLocalSearchParams<{
     categoryId?: string | string[];
@@ -29,7 +47,41 @@ export default function AddCategoryScreen() {
     ? categories.find((item) => item.id === categoryId)
     : undefined;
   const [name, setName] = useState(() => category?.name ?? "");
+  const [savedCriteriaLabels] = useState(() =>
+    category ? getCriteriaLabels(category) : DEFAULT_CRITERIA_LABELS,
+  );
+  const [criteriaLabels, setCriteriaLabels] = useState(savedCriteriaLabels);
+  const [criteriaErrors, setCriteriaErrors] = useState<ReturnType<
+    typeof validateCriteriaLabels
+  > | null>(null);
+  const criterionInputs = useRef<(TextInput | null)[]>([]);
   const [isSaving, setIsSaving] = useState(false);
+  const criteriaLabelsChanged = haveCriteriaLabelsChanged(
+    savedCriteriaLabels,
+    criteriaLabels,
+  );
+  const showRenameWarning =
+    isEditMode &&
+    (category?.entryCount ?? 0) > 0 &&
+    criteriaLabelsChanged;
+
+  useEffect(() => {
+    if (Platform.OS === "ios" && showRenameWarning) {
+      AccessibilityInfo.announceForAccessibilityWithOptions(renameWarning, {
+        queue: true,
+      });
+    }
+  }, [showRenameWarning]);
+
+  const updateCriterion = (index: number, value: string) => {
+    const nextLabels: CriteriaLabels = [...criteriaLabels];
+    nextLabels[index] = value;
+    setCriteriaLabels(nextLabels);
+
+    if (criteriaErrors) {
+      setCriteriaErrors(validateCriteriaLabels(nextLabels));
+    }
+  };
 
   const handleSave = async () => {
     if (isSaving) {
@@ -43,12 +95,19 @@ export default function AddCategoryScreen() {
       return;
     }
 
+    const errors = validateCriteriaLabels(criteriaLabels);
+    if (errors.some((error) => error !== null)) {
+      setCriteriaErrors(errors);
+      return;
+    }
+
     try {
       setIsSaving(true);
 
       if (categoryId) {
         const updatedCategory = await updateCategory(categoryId, {
           name: trimmedName,
+          ...(criteriaLabelsChanged ? { criteriaLabels } : {}),
         });
 
         if (!updatedCategory) {
@@ -61,7 +120,7 @@ export default function AddCategoryScreen() {
         return;
       }
 
-      const newCategory = await addCategory(trimmedName);
+      const newCategory = await addCategory(trimmedName, criteriaLabels);
       router.replace(`/category/${newCategory.id}`);
     } catch (error: unknown) {
       console.error("Failed to save category:", error);
@@ -77,8 +136,8 @@ export default function AddCategoryScreen() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
-        <View className="flex-1 px-5 pb-5 pt-4">
-          <View className="flex-row items-center justify-between">
+        <View className="flex-1 pt-4">
+          <View className="flex-row items-center justify-between px-5">
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Cancel"
@@ -95,30 +154,108 @@ export default function AddCategoryScreen() {
             <View className="h-9 w-19.25" />
           </View>
 
-          <View className="mt-8 gap-5">
+          <ScrollView
+            className="flex-1"
+            contentContainerClassName="px-5 pb-5 pt-8"
+            keyboardShouldPersistTaps="handled"
+          >
             <View className="gap-2">
-              <Text className="font-mono-bestlist text-[10px] font-bold uppercase tracking-[1.5px] text-secondary">
-                Category Name
-              </Text>
+              <Text className={labelClassName}>Category Name</Text>
               <TextInput
                 autoCapitalize="words"
                 autoFocus
-                className="h-12 rounded-xl border border-subtle bg-white px-4 font-body text-[16px] text-primary"
+                className={`${inputClassName} border-subtle`}
                 placeholder="e.g. Breakfast Burrito"
                 placeholderTextColor={colors.secondaryText}
-                returnKeyType="done"
+                returnKeyType="next"
+                submitBehavior="submit"
                 value={name}
                 onChangeText={setName}
-                onSubmitEditing={() => {
-                  void handleSave();
-                }}
+                onSubmitEditing={() => criterionInputs.current[0]?.focus()}
               />
+            </View>
+
+            <View className="mt-7 gap-5">
+              <View className="gap-1">
+                <Text className={labelClassName}>Scoring Criteria</Text>
+                <Text className="font-body text-[13px] text-secondary">
+                  Rename these to fit this category.
+                </Text>
+              </View>
+
+              {criteriaLabels.map((label, index) => {
+                const fieldLabel = `Criterion ${index + 1}`;
+                const error = criteriaErrors?.[index];
+                const isLastCriterion = index === criteriaLabels.length - 1;
+                const counterColor =
+                  label.length >= MAX_CRITERIA_LABEL_LENGTH
+                    ? "text-primary"
+                    : "text-secondary";
+
+                return (
+                  <View key={fieldLabel} className="gap-2">
+                    <View className="flex-row items-center justify-between">
+                      <Text className={labelClassName}>{fieldLabel}</Text>
+                      <Text className={`font-mono-bestlist text-[10px] ${counterColor}`}>
+                        {label.length}/{MAX_CRITERIA_LABEL_LENGTH}
+                      </Text>
+                    </View>
+                    <TextInput
+                      ref={(input) => {
+                        criterionInputs.current[index] = input;
+                      }}
+                      accessibilityLabel={fieldLabel}
+                      autoCapitalize="words"
+                      className={`${inputClassName} ${error ? "border-[#B3261E]" : "border-subtle"}`}
+                      maxLength={MAX_CRITERIA_LABEL_LENGTH}
+                      returnKeyType={isLastCriterion ? "done" : "next"}
+                      submitBehavior={isLastCriterion ? "blurAndSubmit" : "submit"}
+                      value={label}
+                      onChangeText={(value) => updateCriterion(index, value)}
+                      onSubmitEditing={() => {
+                        if (isLastCriterion) {
+                          void handleSave();
+                          return;
+                        }
+
+                        criterionInputs.current[index + 1]?.focus();
+                      }}
+                    />
+                    {error ? (
+                      <Text
+                        accessibilityLiveRegion="polite"
+                        className="font-body text-[13px] text-[#B3261E]"
+                        selectable
+                      >
+                        {error}
+                      </Text>
+                    ) : null}
+                  </View>
+                );
+              })}
+
+              {showRenameWarning ? (
+                <View
+                  accessibilityLiveRegion="polite"
+                  className="min-h-11.5 flex-row items-center gap-2 rounded-xl border border-[#dfb950] bg-[#dfb950]/15 px-3 py-2.5"
+                >
+                  <Ionicons
+                    accessible={false}
+                    name="information-circle-outline"
+                    size={16}
+                    color={colors.primaryText}
+                  />
+                  <Text className="shrink font-body text-[13px] text-primary">
+                    {renameWarning}
+                  </Text>
+                </View>
+              ) : null}
             </View>
 
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Save category"
-              className={`h-13 items-center justify-center rounded-full bg-accent shadow-card ${
+              className={`mt-6 h-13 items-center justify-center rounded-full bg-accent shadow-card ${
                 isSaving ? "opacity-60" : ""
               }`}
               disabled={isSaving}
@@ -130,7 +267,7 @@ export default function AddCategoryScreen() {
                 {isSaving ? "Saving..." : "Save Category"}
               </Text>
             </Pressable>
-          </View>
+          </ScrollView>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>

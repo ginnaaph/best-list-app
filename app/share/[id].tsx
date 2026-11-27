@@ -21,18 +21,12 @@ import {
   getPublicEntries,
 } from "@/lib/api";
 import { getCategoryShareUrl } from "@/lib/category-sharing";
+import { getCriteriaLabels } from "@/lib/criteria-labels";
 import { calculateOverallScore, sortEntries } from "@/lib/entry-score";
-import type { Category } from "@/types/category";
+import type { Category, CriteriaLabels } from "@/types/category";
 import type { Entry } from "@/types/entry";
 
-type ScoreDimension = keyof Pick<Entry, "taste" | "value" | "portion" | "vibe">;
-
-const scoreDimensions: { label: string; key: ScoreDimension }[] = [
-  { label: "TASTE", key: "taste" },
-  { label: "VALUE", key: "value" },
-  { label: "PORTION", key: "portion" },
-  { label: "VIBE", key: "vibe" },
-];
+const scoreDimensions = ["taste", "value", "portion", "vibe"] as const;
 
 const sharedListLogoSource: ImageSourcePropType = { uri: "/favicon.ico" };
 const sharedListLogoFallbackSource: ImageSourcePropType = {
@@ -212,7 +206,12 @@ export default function ShareListScreen() {
         >
           <View className="gap-4 pb-20">
             {sortedEntries.map((entry, index) => (
-              <SharedEntryCard key={entry.id} entry={entry} rank={index + 1} />
+              <SharedEntryCard
+                key={entry.id}
+                entry={entry}
+                rank={index + 1}
+                criteriaLabels={getCriteriaLabels(category)}
+              />
             ))}
 
             {sortedEntries.length === 0 ? (
@@ -258,9 +257,14 @@ function SharedListLogo() {
 type SharedEntryCardProps = {
   entry: Entry;
   rank: number;
+  criteriaLabels: CriteriaLabels;
 };
 
-function SharedEntryCard({ entry, rank }: SharedEntryCardProps) {
+function SharedEntryCard({
+  entry,
+  rank,
+  criteriaLabels,
+}: SharedEntryCardProps) {
   const overallScore = calculateOverallScore(entry);
   const rankingLabel = `#${rank} - ${entry.city.toUpperCase()}`;
   const [hasImageError, setHasImageError] = useState(false);
@@ -310,17 +314,17 @@ function SharedEntryCard({ entry, rank }: SharedEntryCardProps) {
           </View>
         </View>
 
-        <View className="flex-row gap-3">
-          {scoreDimensions.map((dimension) => (
+        <View>
+          {scoreDimensions.map((key, index) => (
             <View
-              key={dimension.key}
-              className="min-w-16px flex-1 items-center rounded-bestlist-sm  bg-white px-2 py-3"
+              key={key}
+              className={`flex-row items-center gap-3 py-2 ${index > 0 ? "border-t border-subtle" : ""}`}
             >
-              <Text className="font-mono-bestlist text-[10px] uppercase leading-3.25 tracking-[2px] text-secondary">
-                {dimension.label}
+              <Text className="min-w-0 flex-1 font-mono-bestlist text-[10px] uppercase leading-3.25 tracking-[2px] text-secondary">
+                {criteriaLabels[index]}
               </Text>
-              <Text className="mt-1 font-body text-[20px] font-bold leading-5 text-accent">
-                {entry[dimension.key].toFixed(1)}
+              <Text className="shrink-0 font-body text-[16px] font-bold leading-[20px] text-accent">
+                {entry[key].toFixed(1)}
               </Text>
             </View>
           ))}
