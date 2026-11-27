@@ -18,6 +18,7 @@ import { colors } from "@/constants/theme";
 import {
   DEFAULT_CRITERIA_LABELS,
   getCriteriaLabels,
+  haveCriteriaLabelsChanged,
   MAX_CRITERIA_LABEL_LENGTH,
   validateCriteriaLabels,
 } from "@/lib/criteria-labels";
@@ -55,12 +56,14 @@ export default function AddCategoryScreen() {
   > | null>(null);
   const criterionInputs = useRef<(TextInput | null)[]>([]);
   const [isSaving, setIsSaving] = useState(false);
+  const criteriaLabelsChanged = haveCriteriaLabelsChanged(
+    savedCriteriaLabels,
+    criteriaLabels,
+  );
   const showRenameWarning =
     isEditMode &&
     (category?.entryCount ?? 0) > 0 &&
-    criteriaLabels.some(
-      (label, index) => label.trim() !== savedCriteriaLabels[index].trim(),
-    );
+    criteriaLabelsChanged;
 
   useEffect(() => {
     if (Platform.OS === "ios" && showRenameWarning) {
@@ -104,7 +107,7 @@ export default function AddCategoryScreen() {
       if (categoryId) {
         const updatedCategory = await updateCategory(categoryId, {
           name: trimmedName,
-          criteriaLabels,
+          ...(criteriaLabelsChanged ? { criteriaLabels } : {}),
         });
 
         if (!updatedCategory) {

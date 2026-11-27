@@ -37,6 +37,20 @@ export function getCriteriaLabels(
 }
 
 /**
+ * Checks whether any criterion label has changed after trimming.
+ *
+ * @param saved - The saved labels in score slot order.
+ * @param current - The current labels in score slot order.
+ * @returns Whether any corresponding labels differ after trimming.
+ */
+export function haveCriteriaLabelsChanged(
+  saved: CriteriaLabels,
+  current: CriteriaLabels,
+): boolean {
+  return current.some((label, index) => label.trim() !== saved[index].trim());
+}
+
+/**
  * Checks criterion labels for blank names and duplicates.
  *
  * @param labels - The four labels in score slot order.
