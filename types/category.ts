@@ -1,5 +1,7 @@
 export type CategoryCardTone = "gold" | "clay" | "tomato" | "brick" | "espresso" | "caramel";
 
+export type CriteriaLabels = [string, string, string, string];
+
 export type Category = {
   id: string;
   name: string;
@@ -9,4 +11,5 @@ export type Category = {
   tone: CategoryCardTone;
   isPublic: boolean;
   shareId?: string;
+  criteriaLabels?: CriteriaLabels;
 };

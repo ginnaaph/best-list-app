@@ -6,6 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { EntryForm, type EntryFormValues } from "@/components/entry-form";
 import { colors } from "@/constants/theme";
+import { DEFAULT_CRITERIA_LABELS, getCriteriaLabels } from "@/lib/criteria-labels";
 import { useStore } from "@/store";
 
 function EntryNotFoundScreen() {
@@ -37,10 +38,12 @@ function EntryNotFoundScreen() {
   );
 }
 
+/** Renders the form for editing an existing entry. */
 export default function EditEntryScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const entries = useStore((state) => state.entries);
   const entry = entries.find((item) => item.id === id);
+  const categories = useStore((state) => state.categories);
   const updateEntry = useStore((state) => state.updateEntry);
   const deleteEntry = useStore((state) => state.deleteEntry);
   const [isSaving, setIsSaving] = useState(false);
@@ -126,6 +129,8 @@ export default function EditEntryScreen() {
     return <EntryNotFoundScreen />;
   }
 
+  const category = categories.find((item) => item.id === entry.categoryId);
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surface }}>
       <View className="flex-row items-center justify-between px-5 pb-2 pt-4">
@@ -145,6 +150,9 @@ export default function EditEntryScreen() {
       </View>
 
       <EntryForm
+        criteriaLabels={
+          category ? getCriteriaLabels(category) : DEFAULT_CRITERIA_LABELS
+        }
         initialValues={{
           placeName: entry.placeName,
           city: entry.city,

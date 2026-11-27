@@ -57,7 +57,7 @@ export default function HowItWorks() {
               <HowItWorksStep
                 number="2"
                 title="Rate it your way"
-                description="Taste, value, portion, vibe. We compute one overall score from your dials."
+                description="Score 4 things you care about: taste, value, portion, vibe, or your own. One overall score, computed for you."
               >
                 <ScorePreview />
               </HowItWorksStep>

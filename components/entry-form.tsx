@@ -17,6 +17,7 @@ import {
 
 import { ScoreSlider } from "@/components/score-slider";
 import { colors } from "@/constants/theme";
+import type { CriteriaLabels } from "@/types/category";
 
 const GOOGLE_PLACES_API_KEY =
   process.env.EXPO_PUBLIC_GOOGLE_PLACES_API_KEY ??
@@ -77,6 +78,7 @@ export type EntryFormValues = {
 };
 
 type EntryFormProps = {
+  criteriaLabels: CriteriaLabels;
   initialValues: EntryFormValues;
   saveLabel: string;
   saving: boolean;
@@ -245,8 +247,12 @@ function clearSessionToken(
 
 /**
  * Renders the entry create and edit form.
+ *
+ * @param props - Form values, actions, and display labels in score slot order.
+ * @param props.criteriaLabels - Labels for the taste, value, portion, and vibe sliders.
  */
 export function EntryForm({
+  criteriaLabels,
   initialValues,
   saveLabel,
   saving,
@@ -724,14 +730,26 @@ export function EntryForm({
               Scores
             </Text>
             <View className="gap-3">
-              <ScoreSlider label="Taste" value={taste} onChange={setTaste} />
-              <ScoreSlider label="Value" value={value} onChange={setValue} />
               <ScoreSlider
-                label="Portion"
+                label={criteriaLabels[0]}
+                value={taste}
+                onChange={setTaste}
+              />
+              <ScoreSlider
+                label={criteriaLabels[1]}
+                value={value}
+                onChange={setValue}
+              />
+              <ScoreSlider
+                label={criteriaLabels[2]}
                 value={portion}
                 onChange={setPortion}
               />
-              <ScoreSlider label="Vibe" value={vibe} onChange={setVibe} />
+              <ScoreSlider
+                label={criteriaLabels[3]}
+                value={vibe}
+                onChange={setVibe}
+              />
             </View>
           </View>
 

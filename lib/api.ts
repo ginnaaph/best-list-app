@@ -1,9 +1,10 @@
+import { getCriteriaLabels } from "@/lib/criteria-labels";
 import { resolveEntryPhotoInput } from "@/lib/entry-photo-upload";
 import {
   getPublicSupabaseClient,
   getSupabaseClient,
 } from "@/lib/supabase";
-import type { Category, CategoryCardTone } from "@/types/category";
+import type { Category, CategoryCardTone, CriteriaLabels } from "@/types/category";
 import type { Entry } from "@/types/entry";
 
 type CategoryRow = {
@@ -14,8 +15,14 @@ type CategoryRow = {
   is_shared: boolean;
   share_id: string | null;
   created_at: string;
+  criterion_1_label: string;
+  criterion_2_label: string;
+  criterion_3_label: string;
+  criterion_4_label: string;
 };
 
+// The taste, value, portion, and vibe columns store scores for slots 1–4.
+// See lib/criteria-labels.ts for how their display labels are resolved.
 type EntryRow = {
   id: string;
   category_id: string;
@@ -36,10 +43,12 @@ type InsertCategoryPayload = {
   name: string;
   tone: CategoryCardTone;
   coverPhoto?: string;
+  criteriaLabels?: CriteriaLabels;
 };
 
 type UpdateCategoryPayload = {
   name: string;
+  criteriaLabels?: CriteriaLabels;
 };
 
 type InsertEntryPayload = Omit<Entry, "createdAt" | "overallScore">;
@@ -50,7 +59,7 @@ type UpdateEntryPayload = Omit<
 >;
 
 const categoryColumns =
-  "id,name,cover_photo,tone,is_shared,share_id,created_at";
+  "id,name,cover_photo,tone,is_shared,share_id,created_at,criterion_1_label,criterion_2_label,criterion_3_label,criterion_4_label";
 const entryColumns =
   "id,category_id,place_name,city,notes,photo_url,created_at,taste,value,portion,vibe,overall_score";
 
@@ -81,6 +90,27 @@ function mapCategory(row: CategoryRow): Category {
     tone: toCategoryTone(row.tone),
     isPublic: row.is_shared,
     shareId: row.share_id ?? undefined,
+    criteriaLabels: getCriteriaLabels({
+      criteriaLabels: [
+        row.criterion_1_label,
+        row.criterion_2_label,
+        row.criterion_3_label,
+        row.criterion_4_label,
+      ],
+    }),
+  };
+}
+
+function toCriteriaLabelColumns(labels?: CriteriaLabels) {
+  if (!labels) {
+    return {};
+  }
+
+  return {
+    criterion_1_label: labels[0],
+    criterion_2_label: labels[1],
+    criterion_3_label: labels[2],
+    criterion_4_label: labels[3],
   };
 }
 
@@ -185,6 +215,7 @@ export async function insertCategory(
       cover_photo: category.coverPhoto ?? null,
       is_shared: false,
       share_id: null,
+      ...toCriteriaLabelColumns(category.criteriaLabels),
     })
     .select(categoryColumns)
     .single()
@@ -246,7 +277,10 @@ export async function updateCategory(
 ): Promise<Category> {
   const { data, error } = await getSupabaseClient()
     .from("categories")
-    .update({ name: category.name })
+    .update({
+      name: category.name,
+      ...toCriteriaLabelColumns(category.criteriaLabels),
+    })
     .eq("id", categoryId)
     .select(categoryColumns)
     .single()
